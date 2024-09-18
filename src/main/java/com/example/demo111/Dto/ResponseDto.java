@@ -9,7 +9,10 @@ import lombok.Data;
 @JacksonXmlRootElement(localName = "response")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ResponseDto {
+    @JacksonXmlProperty(localName = "header")
+    public HeaderDto header;
     @JacksonXmlProperty(localName = "body")
-    private BodyDto body;
+    public BodyDto body;
+
 
 }
