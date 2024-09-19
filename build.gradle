@@ -36,7 +36,6 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation "com.oracle.database.jdbc:ojdbc8:19.18.0.0"
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation 'org.json:json:20211205'
 	// Jackson XML 모듈
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
 	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.0'
