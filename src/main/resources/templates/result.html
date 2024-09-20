@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Rankings</title>
+</head>
+<body>
+<h1>Transaction Rankings</h1>
+<table border="1">
+    <thead>
+    <tr>
+        <th>Apt Name</th>
+        <th>Build Year</th>
+        <th>Deal Amount</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Rankings will be populated here -->
+    <th:block th:each="ranking : ${rankings}">
+        <tr>
+            <td th:text="${ranking.aptNm}"></td>
+            <td th:text="${ranking.buildYear}"></td>
+            <td th:text="${ranking.dealAmount}"></td>
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+<a href="/rankings">Back to Input</a>
+</body>
+</html>
