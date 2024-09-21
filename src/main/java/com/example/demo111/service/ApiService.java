@@ -2,7 +2,7 @@ package com.example.demo111.service;
 
 
 import com.example.demo111.aprtDto.ResponseDto;
-import com.example.demo111.lawdCodDto.LawdCodeDto;
+import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 
 @Service
@@ -53,6 +55,7 @@ public class ApiService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("reponse: "+response);
         return response;
     }
     // API 호출 (pageNo, numOfRows는 필수가 아니므로 기본값 설정 가능)
@@ -80,7 +83,7 @@ public class ApiService {
             return null;
         }
         String xmlData = responseEntity.getBody();
-        System.out.println("success");
+        System.out.println("xmlData: "+xmlData);
 
         // 2. XML 데이터를 파싱하기
         return parseXml(xmlData);
@@ -93,30 +96,36 @@ public class ApiService {
         headers.setContentType(MediaType.APPLICATION_XML);
 
         HttpEntity<HttpHeaders> entity = new HttpEntity<>(headers);
-        return restTemplate.exchange(URI.create(url), HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response= restTemplate.exchange(URI.create(url), HttpMethod.GET, entity, String.class);
+        return response;
     }
 
-    public LawdCodeDto fetchLawdCodes(String locationName) {
+    public LawdCodeResponseDto fetchLawdCodes(String locationName) {
         int pageNo = 1; // 기본 페이지 번호
         int numOfRows = 3; // 기본 행 수
-        String url = String.format("%s/getStanReginCdList?ServiceKey=%s&type=xml&pageNo=%d&numOfRows=%d&flag=Y&locatadd_nm=%s",
-                base2Url, service2Key, pageNo, numOfRows, locationName); // URL 생성
+        String encodedLocationName = URLEncoder.encode(locationName, StandardCharsets.UTF_8); // 한글 인코딩
 
-        ResponseEntity<String> responseEntity = get(url);
+        String url = String.format("%s?ServiceKey=%s&type=xml&pageNo=%d&numOfRows=%d&flag=Y&locatadd_nm=%s",
+                base2Url, service2Key, pageNo, numOfRows, encodedLocationName); // URL 생성
+        System.out.println("url: "+url);
+
+        ResponseEntity<String> responseEntity = get2(url);
         if (responseEntity == null || responseEntity.getBody() == null) {
             System.out.println("No response body received.");
             return null;
         }
 
         String xmlData = responseEntity.getBody();
+        System.out.println("xmlData : "+xmlData);
         return parseLawdCodeResponse(xmlData); // XML 응답 파싱
     }
 
-    public LawdCodeDto parseLawdCodeResponse(String xml) {
+    public LawdCodeResponseDto parseLawdCodeResponse(String xml) {
         // XML 데이터를 LawdCodeDto로 변환
         try {
-            return xmlMapper.readValue(xml, LawdCodeDto.class);
+            return xmlMapper.readValue(xml, LawdCodeResponseDto.class);
         } catch (Exception e) {
+            System.err.println("Failed to parse XML: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

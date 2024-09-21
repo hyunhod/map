@@ -9,4 +9,8 @@ public class Controller {
 
         return "rankings";
     }
+    @GetMapping("/lawd")
+    public String showLawdPage(){
+        return "lawdCode";
+    }
 }

@@ -3,6 +3,8 @@ package com.example.demo111.Controller;
 
 import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.domain.TransactionRanking;
+import com.example.demo111.lawdCodDto.LawdCodeDto;
+import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
 import com.example.demo111.service.ApiService;
 import com.example.demo111.service.RankingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -18,9 +22,9 @@ public class MyController {
     @Autowired
     private RankingService service;
     @Autowired
-    private  ApiService apiService;
+    private ApiService apiService;
     @Autowired
-    private  RankingService rankingService;
+    private RankingService rankingService;
 
 
     // 생성자를 통해 ApiService를 주입받습니다.
@@ -29,7 +33,7 @@ public class MyController {
     }
 
     @GetMapping("/fetch-data")
-    public  String fetchData(
+    public String fetchData(
             @RequestParam String lawdCd,
             @RequestParam String dealYmd,
             @RequestParam(defaultValue = "1") int pageNo,
@@ -37,12 +41,26 @@ public class MyController {
         ResponseDto rankings = apiService.fetchData(lawdCd, dealYmd, pageNo, numOfRows);
         List<TransactionRanking> rankings1 = rankingService.mapToTransactionRanking(rankings);
 
-        model.addAttribute("rankings",rankings1);
+        model.addAttribute("rankings", rankings1);
         return "result";
     }
 
-
-
+    @GetMapping("/lawdcodes")
+    public String getLawdCodes(@RequestParam("locationName") String locationName, Model model) {
+        String encodedLocationName = URLEncoder.encode(locationName, StandardCharsets.UTF_8); // 한글 인코딩
+        LawdCodeResponseDto response = apiService.fetchLawdCodes(encodedLocationName);
+        System.out.println("location : "+encodedLocationName);
+        System.out.println(response);
+        if (response != null) {
+            List<LawdCodeDto> lawdCodes = response.getLawdCodes();
+            System.out.println("list값 : "+lawdCodes+" ,"+locationName);
+            model.addAttribute("lawdCodes", lawdCodes);
+            model.addAttribute("totalCount", response.getHead().getTotalCount());
+        } else {
+            model.addAttribute("error", "No data found.");
+        }
+        return "lawdCodeResult"; // Thymeleaf 템플릿 이름
+    }
 
 
 }
