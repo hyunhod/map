@@ -1,20 +1,17 @@
 package com.example.demo111.Controller;
 
 
-import com.example.demo111.Dto.ResponseDto;
+import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.service.ApiService;
 import com.example.demo111.service.RankingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 public class MyController {
@@ -24,6 +21,7 @@ public class MyController {
     private  ApiService apiService;
     @Autowired
     private  RankingService rankingService;
+
 
     // 생성자를 통해 ApiService를 주입받습니다.
     public MyController(ApiService apiService) {
@@ -42,6 +40,8 @@ public class MyController {
         model.addAttribute("rankings",rankings1);
         return "result";
     }
+
+
 
 
 

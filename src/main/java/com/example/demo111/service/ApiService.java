@@ -1,19 +1,15 @@
 package com.example.demo111.service;
 
 
-import com.example.demo111.Dto.ItemsDto;
-import com.example.demo111.Dto.ResponseDto;
-import com.example.demo111.domain.TransactionRanking;
+import com.example.demo111.aprtDto.ResponseDto;
+import com.example.demo111.lawdCodDto.LawdCodeDto;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 
 @Service
@@ -26,6 +22,13 @@ public class ApiService {
 
     @Value("${api.service.key}")
     private String serviceKey;
+
+    @Value("${api.base2.url}")
+    private String base2Url;
+
+    @Value("${api.service2.key}")
+    private String service2Key;
+
 
     public ApiService() {
         this.restTemplate = new RestTemplate();
@@ -81,6 +84,42 @@ public class ApiService {
 
         // 2. XML 데이터를 파싱하기
         return parseXml(xmlData);
+    }
+
+
+    //api lawcod code
+    public ResponseEntity<String> get2(String url) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_XML);
+
+        HttpEntity<HttpHeaders> entity = new HttpEntity<>(headers);
+        return restTemplate.exchange(URI.create(url), HttpMethod.GET, entity, String.class);
+    }
+
+    public LawdCodeDto fetchLawdCodes(String locationName) {
+        int pageNo = 1; // 기본 페이지 번호
+        int numOfRows = 3; // 기본 행 수
+        String url = String.format("%s/getStanReginCdList?ServiceKey=%s&type=xml&pageNo=%d&numOfRows=%d&flag=Y&locatadd_nm=%s",
+                base2Url, service2Key, pageNo, numOfRows, locationName); // URL 생성
+
+        ResponseEntity<String> responseEntity = get(url);
+        if (responseEntity == null || responseEntity.getBody() == null) {
+            System.out.println("No response body received.");
+            return null;
+        }
+
+        String xmlData = responseEntity.getBody();
+        return parseLawdCodeResponse(xmlData); // XML 응답 파싱
+    }
+
+    public LawdCodeDto parseLawdCodeResponse(String xml) {
+        // XML 데이터를 LawdCodeDto로 변환
+        try {
+            return xmlMapper.readValue(xml, LawdCodeDto.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

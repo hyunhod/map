@@ -1,7 +1,7 @@
 package com.example.demo111.service;
 
-import com.example.demo111.Dto.ItemsDto;
-import com.example.demo111.Dto.ResponseDto;
+import com.example.demo111.aprtDto.ItemsDto;
+import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.Repository.RankingRepository;
 import com.example.demo111.domain.TransactionRanking;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RankingService {
