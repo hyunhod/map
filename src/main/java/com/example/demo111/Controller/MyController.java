@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class MyController {
@@ -28,6 +29,12 @@ public class MyController {
     private RankingService rankingService;
 
 
+    @GetMapping("/")
+    public String showRankingsPage() {
+
+        return "search";
+    }
+
     // 생성자를 통해 ApiService를 주입받습니다.
     public MyController(ApiService apiService) {
         this.apiService = apiService;
@@ -35,7 +42,13 @@ public class MyController {
 
 
     @GetMapping("/fetch-data")
-    public String fetchData(@RequestParam String locationName, @RequestParam String dealYmd, Model model) {
+    public String fetchData(@RequestParam String locationName, @RequestParam String dealYmd,
+                            @RequestParam(required = false) String buildYear,
+                            @RequestParam(required = false) Integer minArea,
+                            @RequestParam(required = false) Integer maxArea,
+                            @RequestParam(required = false) Double minPrice,
+                            @RequestParam(required = false) Double maxPrice,
+                            Model model) {
         ResponseDto responseDto = apiService.fetchDataByLocationName(locationName, dealYmd);
 
         if (responseDto == null) {
@@ -43,6 +56,26 @@ public class MyController {
             return "search"; // 에러 발생 시 다시 검색 페이지로
         }
         List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
+        //건축년도 필터링 추가
+        if (buildYear != null && !buildYear.isEmpty()) {
+            rankings = rankings.stream()
+                    .filter(r -> r.getBuildYear().equals(buildYear))
+                    .collect(Collectors.toList());
+        }
+
+        // 전용면적 필터링 추가
+        if (minArea != null && maxArea != null) {
+            rankings = rankings.stream()
+                    .filter(r -> r.getExcluUseAr() >= minArea && r.getExcluUseAr() <= maxArea)
+                    .collect(Collectors.toList());
+        }
+
+        // 거래 금액 필터링
+        if (minPrice != null && maxPrice != null) {
+            rankings = rankings.stream()
+                    .filter(r -> r.getDealAmount() >= minPrice && r.getDealAmount() <= maxPrice)
+                    .collect(Collectors.toList());
+        }
 
         model.addAttribute("rankings", rankings);
         return "result"; // 결과 페이지 이름

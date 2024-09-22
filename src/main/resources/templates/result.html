@@ -13,6 +13,7 @@
         <th>아파트</th>
         <th>건축년도</th>
         <th>거래금액</th>
+        <th>전용면적(㎡)</th>
     </tr>
     </thead>
     <tbody>
@@ -22,6 +23,7 @@
             <td th:text="${ranking.aptNm}"></td>
             <td th:text="${ranking.buildYear}"></td>
             <td th:text="${ranking.dealAmount}"></td>
+            <td th:text="${ranking.excluUseAr}"></td>
         </tr>
     </th:block>
     </tbody>

@@ -35,9 +35,12 @@ public class RankingService {
             ranking.setAptNm(item.getAptNm());
             ranking.setBuildYear(item.getBuildYear());
             ranking.setDealAmount(item.getDealAmount());
-
-            // 리스트에 추가
+            if (item.getExcluUseAr() != null && !item.getExcluUseAr().isEmpty()) {
+                ranking.setExcluUseAr(Double.parseDouble(item.getExcluUseAr()));
+            }
+            //리스트에 추가
             rankings.add(ranking);
+
         }
 
         return rankings;

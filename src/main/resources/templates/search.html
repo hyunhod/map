@@ -15,6 +15,30 @@
 <form th:action="@{/fetch-data}" method="get">
     <input type="text" id="locationName" name="locationName" placeholder="지역명 입력" required />
     <input type="text" id="dealYmd" name="dealYmd" required placeholder="예: 202309">
+    <label for="minPrice">최소 가격</label>
+    <input type="number" id="minPrice" name="minPrice" placeholder="최소 가격" >
+
+    <label for="maxPrice">최대 가격</label>
+    <input type="number" id="maxPrice" name="maxPrice" placeholder="최대 가격" >
+
+    <!-- 건축년도 추가 -->
+    <label for="buildYear">건축년도</label>
+    <input type="number" id="buildYear" name="buildYear" placeholder="예: 2005">
+
+    <!-- 면적 필터 추가 -->
+    <label for="minArea">최소 면적(㎡)</label>
+    <input type="number" id="minArea" name="minArea" placeholder="최소 면적" min="0">
+
+    <label for="maxArea">최대 면적(㎡)</label>
+    <input type="number" id="maxArea" name="maxArea" placeholder="최대 면적" min="0">
+
+    <!-- 거래 날짜 필터 추가 -->
+    <label for="startDate">시작 날짜</label>
+    <input type="date" id="startDate" name="startDate">
+
+    <label for="endDate">종료 날짜</label>
+    <input type="date" id="endDate" name="endDate">
+
     <button type="submit">검색</button>
 </form>
 

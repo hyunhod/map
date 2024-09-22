@@ -18,9 +18,8 @@ public class TransactionRanking {
 
     private String AptNm;
     private String buildYear;
-    private String dealAmount;
-    private int transactionCount; //거래량
-    private int transactionPrice; //거래가격
-    private LocalDate transactionDate;
+    private Long dealAmount;
+    private Double excluUseAr;
+
 
 }
