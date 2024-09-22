@@ -7,6 +7,11 @@
 <body>
 <h1>아파트 검색</h1>
 
+<!-- 에러 메시지가 있을 경우 표시 -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
 <form th:action="@{/fetch-data}" method="get">
     <input type="text" id="locationName" name="locationName" placeholder="지역명 입력" required />
     <input type="text" id="dealYmd" name="dealYmd" required placeholder="예: 202309">

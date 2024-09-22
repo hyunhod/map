@@ -33,43 +33,17 @@ public class MyController {
         this.apiService = apiService;
     }
 
-//    @GetMapping("/fetch-data")
-//    public String fetchData(
-//            @RequestParam String lawdCd,
-//            @RequestParam String dealYmd,
-//            @RequestParam(defaultValue = "1") int pageNo,
-//            @RequestParam(defaultValue = "1") int numOfRows, Model model) {
-//        ResponseDto rankings = apiService.fetchData(lawdCd, dealYmd, pageNo, numOfRows);
-//        List<TransactionRanking> rankings1 = rankingService.mapToTransactionRanking(rankings);
-//
-//        model.addAttribute("rankings", rankings1);
-//        return "result";
-//    }
-
-    @GetMapping("/lawdcodes")
-    public String getLawdCodes(@RequestParam("locationName") String locationName, Model model) {
-
-        LawdCodeResponseDto response = apiService.fetchLawdCodes(locationName);
-
-        System.out.println(response);
-        System.out.println("location : "+locationName);
-        if (response != null) {
-            List<LawdCodeDto> lawdCodes = response.getLawdCodes();
-            System.out.println("list값 : "+lawdCodes+" ,"+locationName);
-            model.addAttribute("lawdCodes", lawdCodes);
-            model.addAttribute("totalCount", response.getHead().getTotalCount());
-        } else {
-            model.addAttribute("error", "No data found.");
-        }
-        return "lawdCodeResult"; // Thymeleaf 템플릿 이름
-    }
-
-
 
     @GetMapping("/fetch-data")
     public String fetchData(@RequestParam String locationName, @RequestParam String dealYmd, Model model) {
         ResponseDto responseDto = apiService.fetchDataByLocationName(locationName, dealYmd);
+
+        if (responseDto == null) {
+            model.addAttribute("errorMessage", "데이터를 가져오는 중 오류가 발생했습니다. 다시 시도해주세요.");
+            return "search"; // 에러 발생 시 다시 검색 페이지로
+        }
         List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
+
         model.addAttribute("rankings", rankings);
         return "result"; // 결과 페이지 이름
     }
