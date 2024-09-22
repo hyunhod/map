@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -32,18 +33,18 @@ public class MyController {
         this.apiService = apiService;
     }
 
-    @GetMapping("/fetch-data")
-    public String fetchData(
-            @RequestParam String lawdCd,
-            @RequestParam String dealYmd,
-            @RequestParam(defaultValue = "1") int pageNo,
-            @RequestParam(defaultValue = "1") int numOfRows, Model model) {
-        ResponseDto rankings = apiService.fetchData(lawdCd, dealYmd, pageNo, numOfRows);
-        List<TransactionRanking> rankings1 = rankingService.mapToTransactionRanking(rankings);
-
-        model.addAttribute("rankings", rankings1);
-        return "result";
-    }
+//    @GetMapping("/fetch-data")
+//    public String fetchData(
+//            @RequestParam String lawdCd,
+//            @RequestParam String dealYmd,
+//            @RequestParam(defaultValue = "1") int pageNo,
+//            @RequestParam(defaultValue = "1") int numOfRows, Model model) {
+//        ResponseDto rankings = apiService.fetchData(lawdCd, dealYmd, pageNo, numOfRows);
+//        List<TransactionRanking> rankings1 = rankingService.mapToTransactionRanking(rankings);
+//
+//        model.addAttribute("rankings", rankings1);
+//        return "result";
+//    }
 
     @GetMapping("/lawdcodes")
     public String getLawdCodes(@RequestParam("locationName") String locationName, Model model) {
@@ -61,6 +62,16 @@ public class MyController {
             model.addAttribute("error", "No data found.");
         }
         return "lawdCodeResult"; // Thymeleaf 템플릿 이름
+    }
+
+
+
+    @GetMapping("/fetch-data")
+    public String fetchData(@RequestParam String locationName, @RequestParam String dealYmd, Model model) {
+        ResponseDto responseDto = apiService.fetchDataByLocationName(locationName, dealYmd);
+        List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
+        model.addAttribute("rankings", rankings);
+        return "result"; // 결과 페이지 이름
     }
 
 

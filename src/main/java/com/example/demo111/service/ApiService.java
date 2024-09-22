@@ -92,6 +92,28 @@ public class ApiService {
         return parseXml(xmlData);
     }
 
+    public ResponseDto fetchDataByLocationName(String locationName, String dealYmd) {
+        // 지역 이름으로 지역 코드 가져오기
+        LawdCodeResponseDto lawdCodeResponse = fetchLawdCodes(locationName);
+        if (lawdCodeResponse == null || lawdCodeResponse.getLawdCodes().isEmpty()) {
+            System.out.println("법정동 코드 정보를 찾을 수 없습니다.");
+            return null;
+        }
+
+        // 첫 번째 지역 코드 사용, 앞의 5자리만 추출
+        String lawdCd = lawdCodeResponse.getLawdCodes().get(0).getRegionCode();
+        if (lawdCd.length() >= 5) {
+            lawdCd = lawdCd.substring(0, 5); // 앞의 5자리만 사용
+        } else {
+            System.out.println("지역 코드가 5자리 미만입니다.");
+            return null; // 오류 처리
+        }
+
+        // 아파트 데이터 가져오기
+        return fetchData(lawdCd, dealYmd);
+    }
+
+
 
     //api lawcod code
     public ResponseEntity<String> get2(String url) {

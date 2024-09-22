@@ -7,6 +7,8 @@ import com.example.demo111.domain.TransactionRanking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +53,7 @@ public class RankingService {
     public List<TransactionRanking> getRankingsByBuildYear() {
         return rankingRepository.findAllByOrderByBuildYearDesc();
     }
+
 
 
 }

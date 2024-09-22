@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>아파트 검색</title>
+</head>
+<body>
+<h1>아파트 검색</h1>
+
+<form th:action="@{/fetch-data}" method="get">
+    <input type="text" id="locationName" name="locationName" placeholder="지역명 입력" required />
+    <input type="text" id="dealYmd" name="dealYmd" required placeholder="예: 202309">
+    <button type="submit">검색</button>
+</form>
+
+</body>
+</html>
