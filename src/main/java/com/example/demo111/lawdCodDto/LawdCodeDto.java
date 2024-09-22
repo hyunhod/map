@@ -1,10 +1,19 @@
 package com.example.demo111.lawdCodDto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true) // 인식하지 못하는 필드를 무시
+@AllArgsConstructor
+@NoArgsConstructor
 public class LawdCodeDto {
+
+
+
     @JacksonXmlProperty(localName = "region_cd")
     private String regionCode;
 

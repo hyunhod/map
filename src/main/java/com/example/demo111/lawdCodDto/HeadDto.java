@@ -1,10 +1,14 @@
 package com.example.demo111.lawdCodDto;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class Head {
+@AllArgsConstructor
+@NoArgsConstructor
+public class HeadDto {
     @JacksonXmlProperty(localName = "totalCount")
     private int totalCount;
 
@@ -16,5 +20,7 @@ public class Head {
 
     @JacksonXmlProperty(localName = "type")
     private String type;
+    @JacksonXmlProperty(localName = "RESULT")
+    private ResultDto result;
 }
 

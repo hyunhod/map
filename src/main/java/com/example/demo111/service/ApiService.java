@@ -2,6 +2,7 @@ package com.example.demo111.service;
 
 
 import com.example.demo111.aprtDto.ResponseDto;
+import com.example.demo111.lawdCodDto.LawdCodeDto;
 import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,6 +84,8 @@ public class ApiService {
             return null;
         }
         String xmlData = responseEntity.getBody();
+        System.out.println("xmlData: " + xmlData);
+
         System.out.println("xmlData: "+xmlData);
 
         // 2. XML 데이터를 파싱하기
@@ -94,9 +97,10 @@ public class ApiService {
     public ResponseEntity<String> get2(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_XML);
+        headers.set("Accept-Charset", "UTF-8");  // UTF-8 인코딩을 요청
 
         HttpEntity<HttpHeaders> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response= restTemplate.exchange(URI.create(url), HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(URI.create(url), HttpMethod.GET, entity, String.class);
         return response;
     }
 
@@ -107,6 +111,7 @@ public class ApiService {
 
         String url = String.format("%s?ServiceKey=%s&type=xml&pageNo=%d&numOfRows=%d&flag=Y&locatadd_nm=%s",
                 base2Url, service2Key, pageNo, numOfRows, encodedLocationName); // URL 생성
+        System.out.println("받은 location name: "+encodedLocationName);
         System.out.println("url: "+url);
 
         ResponseEntity<String> responseEntity = get2(url);
@@ -114,16 +119,22 @@ public class ApiService {
             System.out.println("No response body received.");
             return null;
         }
+        System.out.println("responseEntity: "+responseEntity);
 
         String xmlData = responseEntity.getBody();
+
         System.out.println("xmlData : "+xmlData);
         return parseLawdCodeResponse(xmlData); // XML 응답 파싱
     }
 
-    public LawdCodeResponseDto parseLawdCodeResponse(String xml) {
+    public LawdCodeResponseDto parseLawdCodeResponse(String xmlData) {
+
         // XML 데이터를 LawdCodeDto로 변환
         try {
-            return xmlMapper.readValue(xml, LawdCodeResponseDto.class);
+            LawdCodeResponseDto responseDto = xmlMapper.readValue(xmlData, LawdCodeResponseDto.class);
+            System.out.println("value: "+responseDto);
+
+            return responseDto;
         } catch (Exception e) {
             System.err.println("Failed to parse XML: " + e.getMessage());
             e.printStackTrace();

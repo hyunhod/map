@@ -47,10 +47,11 @@ public class MyController {
 
     @GetMapping("/lawdcodes")
     public String getLawdCodes(@RequestParam("locationName") String locationName, Model model) {
-        String encodedLocationName = URLEncoder.encode(locationName, StandardCharsets.UTF_8); // 한글 인코딩
-        LawdCodeResponseDto response = apiService.fetchLawdCodes(encodedLocationName);
-        System.out.println("location : "+encodedLocationName);
+
+        LawdCodeResponseDto response = apiService.fetchLawdCodes(locationName);
+
         System.out.println(response);
+        System.out.println("location : "+locationName);
         if (response != null) {
             List<LawdCodeDto> lawdCodes = response.getLawdCodes();
             System.out.println("list값 : "+lawdCodes+" ,"+locationName);
