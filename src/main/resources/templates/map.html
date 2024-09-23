@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
     <meta charset="utf-8">
-    <title>주소-좌표 변환 예시</title>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
+    <title>지도 시작하기</title>
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
 </head>
 <body>
 <div id="map" style="width:500px;height:400px;"></div>
 <input type="text" id="address" placeholder="주소를 입력하세요" style="width:400px;"/>
 <button onclick="searchAddress()">주소 검색</button>
+
+<input type="text" id="region" placeholder="지역 입력 (서울, 인천 등)" style="width:400px;"/>
+<button onclick="getRegionCode(document.getElementById('region').value)">아파트 검색</button>
 
 <script>
     var mapContainer = document.getElementById('map'),
@@ -17,32 +21,138 @@
             level: 3
         };
 
-    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성
-    var geocoder = new kakao.maps.services.Geocoder(); // 주소-좌표 변환 객체 생성
-    var marker = new kakao.maps.Marker(); // 지도에 마커 생성
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var geocoder = new kakao.maps.services.Geocoder();
+    var marker = new kakao.maps.Marker();
 
     // 주소로 좌표를 검색하는 함수
     function searchAddress() {
-        var address = document.getElementById('address').value; // 입력한 주소 가져오기
+        var address = document.getElementById('address').value;
 
-        // 주소로 좌표를 검색
         geocoder.addressSearch(address, function(result, status) {
             if (status === kakao.maps.services.Status.OK) {
                 var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-
-                // 좌표에 마커 표시
                 marker.setPosition(coords);
                 marker.setMap(map);
-
-                // 지도 중심 이동
                 map.setCenter(coords);
-
-                // 여기서 얻은 좌표로 아파트 API 요청 가능
                 console.log("위도:", result[0].y, "경도:", result[0].x);
             } else {
                 alert('주소를 찾을 수 없습니다.');
             }
         });
+    }
+
+    // 지역 코드를 가져오는 함수
+    function getRegionCode(region) {
+        fetch(`https://apis.data.go.kr/1741000/StanReginCd/getStanReginCdList?ServiceKey=8xExb8lrSoH0CZUnRl63I5bo6DnnOfqaVNusp6RPXDmw1XyoV1pW%2BwjBbs84USEoZtAUg61ymXQh%2FsE5uIX3HQ%3D%3D&type=xml&pageNo=1&numOfRows=3&flag=Y&locatadd_nm=${encodeURIComponent(region)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('네트워크 오류');
+                }
+                return response.text();
+            })
+            .then(xmlData => {
+                console.log('XML 데이터(지역코드):', xmlData);
+                const regionCodes = parseRegionCodes(xmlData);
+                if (regionCodes.length > 0) {
+                    fetchApartments(regionCodes[0]);
+                } else {
+                    alert('유효한 지역 코드를 찾을 수 없습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('지역 코드 검색 오류:', error);
+            });
+    }
+
+    function parseRegionCodes(xmlData) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlData, "text/xml");
+        const rows = xmlDoc.getElementsByTagName('row');
+        const regionCodes = [];
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const regionCode = row.getElementsByTagName('region_cd')[0].textContent;
+            regionCodes.push(regionCode.slice(0, 5));
+        }
+        console.log('추출된 지역 코드:', regionCodes);
+        return regionCodes;
+    }
+
+    function fetchApartments(regionCode) {
+        fetch(`https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade?serviceKey=8xExb8lrSoH0CZUnRl63I5bo6DnnOfqaVNusp6RPXDmw1XyoV1pW%2BwjBbs84USEoZtAUg61ymXQh%2FsE5uIX3HQ%3D%3D&LAWD_CD=${regionCode}&DEAL_YMD=202407&pageNo=1&numOfRows=10`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('네트워크 오류');
+                }
+                return response.text();
+            })
+            .then(xmlData => {
+                console.log('XML 데이터(아파트코드):', xmlData);
+
+                const apartments = parseApartments(xmlData);
+                apartments.forEach(apartment => {
+                    console.log('아파트 :', apartment);
+                    const address = [
+                        apartment.umdNm.trim(), // umdNm 사용
+                        apartment.aptNm.trim() // aptNm 사용
+                    ].filter(Boolean).join(' '); // 빈 문자열 필터링
+
+                    // 주소가 비어있으면 경고 메시지를 표시하고 다음 아파트로 넘어갑니다.
+                    if (!address) {
+                        console.warn('유효한 주소가 없습니다:', apartment);
+                        return; // 주소가 없으면 계속 진행
+                    }
+
+                    geocoder.addressSearch(address, function(result, status) {
+                        if (status === kakao.maps.services.Status.OK) {
+                            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                            const marker = new kakao.maps.Marker({
+                                position: coords,
+                                map: map
+                            });
+
+                            const infowindow = new kakao.maps.InfoWindow({
+                                content: `<div style="padding:5px;">${apartment.aptNm}<br>거래 금액: ${apartment.dealAmount}</div>`
+                            });
+
+                            kakao.maps.event.addListener(marker, 'click', function() {
+                                infowindow.open(map, marker);
+                            });
+                        } else {
+                            console.error('주소 검색 실패:', address);
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('아파트 검색 오류:', error);
+            });
+    }
+
+    function parseApartments(xmlData) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlData, "text/xml");
+        const items = xmlDoc.getElementsByTagName('item');
+        const apartments = [];
+
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            const apartment = {
+                aptDong: item.getElementsByTagName('aptDong')[0].textContent,
+                umdNm: item.getElementsByTagName('umdNm')[0].textContent,
+                sggCd: item.getElementsByTagName('sggCd')[0].textContent,
+                aptNm: item.getElementsByTagName('aptNm')[0].textContent, // aptNm로 수정
+                dealAmount: item.getElementsByTagName('dealAmount')[0].textContent,
+                estateAgent: item.getElementsByTagName('estateAgentSggNm')[0].textContent,
+                buildYear: item.getElementsByTagName('buildYear')[0].textContent,
+                floor: item.getElementsByTagName('floor')[0].textContent
+            };
+            apartments.push(apartment);
+        }
+
+        return apartments;
     }
 </script>
 </body>
