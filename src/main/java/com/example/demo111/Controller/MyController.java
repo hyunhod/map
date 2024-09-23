@@ -46,8 +46,8 @@ public class MyController {
                             @RequestParam(required = false) String buildYear,
                             @RequestParam(required = false) Integer minArea,
                             @RequestParam(required = false) Integer maxArea,
-                            @RequestParam(required = false) Double minPrice,
-                            @RequestParam(required = false) Double maxPrice,
+                            @RequestParam(required = false) Integer minPrice,
+                            @RequestParam(required = false) Integer maxPrice,
                             Model model) {
         ResponseDto responseDto = apiService.fetchDataByLocationName(locationName, dealYmd);
 
@@ -70,7 +70,7 @@ public class MyController {
                     .collect(Collectors.toList());
         }
 
-        // 거래 금액 필터링
+        //거래 금액 필터링
         if (minPrice != null && maxPrice != null) {
             rankings = rankings.stream()
                     .filter(r -> r.getDealAmount() >= minPrice && r.getDealAmount() <= maxPrice)

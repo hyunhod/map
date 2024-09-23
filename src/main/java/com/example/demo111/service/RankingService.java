@@ -34,7 +34,17 @@ public class RankingService {
             TransactionRanking ranking = new TransactionRanking();
             ranking.setAptNm(item.getAptNm());
             ranking.setBuildYear(item.getBuildYear());
-            ranking.setDealAmount(item.getDealAmount());
+
+
+            if (item.getDealAmount() != null && !item.getDealAmount().isEmpty()) {
+               try{
+                   String sanitizedAmount = item.getDealAmount().replace(",", ""); // 쉼표 제거
+                   ranking.setDealAmount(Integer.parseInt(sanitizedAmount));
+               }catch (NumberFormatException e){
+                   ranking.setDealAmount(0);
+               }
+            }
+
             if (item.getExcluUseAr() != null && !item.getExcluUseAr().isEmpty()) {
                 ranking.setExcluUseAr(Double.parseDouble(item.getExcluUseAr()));
             }
@@ -42,6 +52,7 @@ public class RankingService {
             rankings.add(ranking);
 
         }
+
 
         return rankings;
     }
