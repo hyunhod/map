@@ -34,6 +34,10 @@ public class MyController {
 
         return "search";
     }
+    @GetMapping("map")
+    public String map(){
+        return "map";
+    }
 
     // 생성자를 통해 ApiService를 주입받습니다.
     public MyController(ApiService apiService) {
