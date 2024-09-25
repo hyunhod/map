@@ -5,6 +5,21 @@
     <title>지도 시작하기</title>
     <script type="text/javascript"
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
+    <style>
+        #address-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        .address-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .address-item:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 <body>
 <div id="map" style="width:500px;height:400px;"></div>
@@ -13,6 +28,8 @@
 
 <input type="text" id="region" placeholder="지역 입력 (서울, 인천 등)" style="width:400px;"/>
 <button onclick="getRegionCode(document.getElementById('region').value)">아파트 검색</button>
+
+<div id="address-list"></div>
 
 <script>
     var mapContainer = document.getElementById('map'),
@@ -117,7 +134,7 @@
                 umdNm: item.getElementsByTagName('umdNm')[0].textContent,
                 jibun: item.getElementsByTagName('jibun')[0].textContent,
                 sggCd: item.getElementsByTagName('sggCd')[0].textContent,
-                aptNm: item.getElementsByTagName('aptNm')[0].textContent, // aptNm로 수정
+                aptNm: item.getElementsByTagName('aptNm')[0].textContent,
                 dealAmount: item.getElementsByTagName('dealAmount')[0].textContent,
                 estateAgent: item.getElementsByTagName('estateAgentSggNm')[0].textContent,
                 buildYear: item.getElementsByTagName('buildYear')[0].textContent,
@@ -135,6 +152,10 @@
 
         // estateAgentSggNm 필드를 쉼표(,)로 분리하여 배열로 만듦
         const regions = estateAgent.split(',').map(region => region.trim());
+
+        // 주소 리스트 초기화
+        const addressListDiv = document.getElementById('address-list');
+        addressListDiv.innerHTML = '';
 
         // 각 지역에 대해 검색을 실행
         regions.forEach(region => {
@@ -156,13 +177,19 @@
                         map: map
                     });
 
-                    const infowindow = new kakao.maps.InfoWindow({
-                        content: `<div style="padding:5px;">${apartment.aptNm}<br>거래 금액: ${apartment.dealAmount}</div>`
-                    });
+                    // 주소 리스트에 항목 추가
+                    const addressItem = document.createElement('div');
+                    addressItem.className = 'address-item';
 
-                    kakao.maps.event.addListener(marker, 'click', function() {
-                        infowindow.open(map, marker);
-                    });
+                    // 아파트 이름과 주소를 조합하여 표시
+                    const displayName = `${apartment.aptNm} (${address})`;
+                    addressItem.textContent = displayName;
+
+                    addressItem.onclick = function() {
+                        document.getElementById('address').value = address; // 주소 입력
+                        searchAddress(); // 주소 검색 호출
+                    };
+                    addressListDiv.appendChild(addressItem);
                 } else {
                     console.error('주소 검색 실패:', address);
                 }
