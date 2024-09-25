@@ -43,6 +43,7 @@
 <button onclick="searchAddress()">주소 검색</button>
 
 <input type="text" id="region" placeholder="지역 입력 (서울, 인천 등)" style="width:400px;"/>
+<input type="text" id="dealDate" placeholder="거래일자 (YYYYMM 형식)" style="width:400px;"/>
 <button onclick="getRegionCode(document.getElementById('region').value)">아파트 검색</button>
 
 <div id="address-list"></div>
@@ -77,6 +78,7 @@
 
     // 지역 코드를 가져오는 함수
     function getRegionCode(region) {
+     const dealDate = document.getElementById('dealDate').value;
         fetch(`https://apis.data.go.kr/1741000/StanReginCd/getStanReginCdList?ServiceKey=8xExb8lrSoH0CZUnRl63I5bo6DnnOfqaVNusp6RPXDmw1XyoV1pW%2BwjBbs84USEoZtAUg61ymXQh%2FsE5uIX3HQ%3D%3D&type=xml&pageNo=1&numOfRows=3&flag=Y&locatadd_nm=${encodeURIComponent(region)}`)
             .then(response => {
                 if (!response.ok) {
@@ -88,7 +90,7 @@
                 console.log('XML 데이터(지역코드):', xmlData);
                 const regionCodes = [...new Set(parseRegionCodes(xmlData))];  // 중복 제거
                 if (regionCodes.length > 0) {
-                   regionCodes.forEach(code => fetchApartments(code));
+                   regionCodes.forEach(code => fetchApartments(code,dealDate));
                 } else {
                     alert('유효한 지역 코드를 찾을 수 없습니다.');
                 }
@@ -113,8 +115,8 @@
         return regionCodes;
     }
 
-    function fetchApartments(regionCode) {
-        fetch(`https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade?serviceKey=8xExb8lrSoH0CZUnRl63I5bo6DnnOfqaVNusp6RPXDmw1XyoV1pW%2BwjBbs84USEoZtAUg61ymXQh%2FsE5uIX3HQ%3D%3D&LAWD_CD=${regionCode}&DEAL_YMD=202407&pageNo=1&numOfRows=30`)
+    function fetchApartments(regionCode,dealDate) {
+        fetch(`https://apis.data.go.kr/1613000/RTMSDataSvcAptTrade/getRTMSDataSvcAptTrade?serviceKey=8xExb8lrSoH0CZUnRl63I5bo6DnnOfqaVNusp6RPXDmw1XyoV1pW%2BwjBbs84USEoZtAUg61ymXQh%2FsE5uIX3HQ%3D%3D&LAWD_CD=${regionCode}&DEAL_YMD=${dealDate}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('네트워크 오류');
@@ -223,6 +225,7 @@
 
     // 아파트 정보를 표시하는 함수
     function displayApartmentInfo(apartment) {
+
         const apartmentInfoDiv = document.getElementById('apartment-info');
         apartmentInfoDiv.innerHTML = `
             <strong>${apartment.aptNm}</strong><br>
