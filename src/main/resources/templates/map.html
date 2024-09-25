@@ -6,6 +6,18 @@
     <script type="text/javascript"
             src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
     <style>
+        #map {
+            width: 500px;
+            height: 400px;
+            float: left;
+        }
+        #info {
+            width: 200px;
+            height: 400px;
+            float: left;
+            padding: 10px;
+            border-left: 1px solid #ccc;
+        }
         #address-list {
             max-height: 200px;
             overflow-y: auto;
@@ -22,7 +34,11 @@
     </style>
 </head>
 <body>
-<div id="map" style="width:500px;height:400px;"></div>
+<div id="map"></div>
+<div id="info">
+    <h3>아파트 정보</h3>
+    <div id="apartment-info">정보를 클릭하여 아파트 정보를 여기에 표시합니다.</div>
+</div>
 <input type="text" id="address" placeholder="주소를 입력하세요" style="width:400px;"/>
 <button onclick="searchAddress()">주소 검색</button>
 
@@ -134,11 +150,18 @@
                 umdNm: item.getElementsByTagName('umdNm')[0].textContent,
                 jibun: item.getElementsByTagName('jibun')[0].textContent,
                 sggCd: item.getElementsByTagName('sggCd')[0].textContent,
+                floor: item.getElementsByTagName('floor')[0].textContent,
+                rgstDate: item.getElementsByTagName('rgstDate')[0].textContent,
                 aptNm: item.getElementsByTagName('aptNm')[0].textContent,
                 dealAmount: item.getElementsByTagName('dealAmount')[0].textContent,
                 estateAgent: item.getElementsByTagName('estateAgentSggNm')[0].textContent,
                 buildYear: item.getElementsByTagName('buildYear')[0].textContent,
-                floor: item.getElementsByTagName('floor')[0].textContent
+                slerGbn: item.getElementsByTagName('slerGbn')[0].textContent,
+                buyerGbn: item.getElementsByTagName('buyerGbn')[0].textContent,
+                rgstDate: item.getElementsByTagName('rgstDate')[0].textContent,
+                dealingGbn: item.getElementsByTagName('dealingGbn')[0].textContent,
+                excluUseAr: item.getElementsByTagName('excluUseAr')[0].textContent
+
             };
             apartments.push(apartment);
         }
@@ -188,6 +211,7 @@
                     addressItem.onclick = function() {
                         document.getElementById('address').value = address; // 주소 입력
                         searchAddress(); // 주소 검색 호출
+                        displayApartmentInfo(apartment); // 아파트 정보 표시
                     };
                     addressListDiv.appendChild(addressItem);
                 } else {
@@ -195,6 +219,24 @@
                 }
             });
         });
+    }
+
+    // 아파트 정보를 표시하는 함수
+    function displayApartmentInfo(apartment) {
+        const apartmentInfoDiv = document.getElementById('apartment-info');
+        apartmentInfoDiv.innerHTML = `
+            <strong>${apartment.aptNm}</strong><br>
+            지역: ${apartment.umdNm}<br>
+            지번: ${apartment.jibun}<br>
+            거래금액: ${apartment.dealAmount}만원<br>
+            건축연도: ${apartment.buildYear}<br>
+            층수: ${apartment.floor}층<br>
+            평형: ${apartment.excluUseAr}<br>
+            거래방식: ${apartment.dealingGbn}<br>
+            매수자: ${apartment.buyerGbn}<br>
+            매도자: ${apartment.slerGbn}<br>
+            등기일자: ${apartment.rgstDate}<br>
+        `;
     }
 </script>
 </body>
