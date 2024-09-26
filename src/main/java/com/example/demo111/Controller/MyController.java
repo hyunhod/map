@@ -2,6 +2,7 @@ package com.example.demo111.Controller;
 
 
 import com.example.demo111.Repository.RankingRepository;
+import com.example.demo111.aprtDto.BodyDto;
 import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.lawdCodDto.LawdCodeDto;
@@ -68,6 +69,7 @@ public class MyController {
         }
         List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
 
+
         //건축년도 필터링 추가
         if (buildYear != null && !buildYear.isEmpty()) {
             rankings = rankings.stream()
@@ -100,6 +102,7 @@ public class MyController {
         }
 
         model.addAttribute("rankings", sortedRankings);
+        model.addAttribute("totalCount",rankings.size());
         return "result"; // 결과 페이지 이름
     }
     // 데이터 가져와서 저장하는 엔드포인트

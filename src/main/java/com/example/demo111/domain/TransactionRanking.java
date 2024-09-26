@@ -21,6 +21,7 @@ public class TransactionRanking {
     private Integer dealAmount;
     private String dealYear;
     private Double excluUseAr;
+    private int totalCount;
 
 
 }

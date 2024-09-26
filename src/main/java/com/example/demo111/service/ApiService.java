@@ -60,20 +60,31 @@ public class ApiService {
         return response;
     }
     // API 호출 (pageNo, numOfRows는 필수가 아니므로 기본값 설정 가능)
+
     public ResponseDto fetchData(String lawdCd, String dealYmd) {
-        int defaultPageNo = 1; // 기본값 설정
         int defaultNumOfRows = 10; // 기본값 설정
-        return fetchData(lawdCd, dealYmd, defaultPageNo, defaultNumOfRows);
+
+        ResponseDto initialResponse = fetchData(lawdCd, dealYmd, defaultNumOfRows);
+        if (initialResponse == null || initialResponse.getBody() == null) {
+            return null; // 응답이 없을 경우
+        }
+        // 2단계: totalCount를 가져와서 numOfRows에 설정
+        int totalCount = initialResponse.getBody().getTotalCount(); // totalCount 값을 가져오기
+
+        System.out.println("total count: "+totalCount);
+        // 3단계: totalCount를 numOfRows로 설정하여 다시 API 호출
+        return fetchData(lawdCd, dealYmd, totalCount);
+
     }
 
-    public ResponseDto fetchData(String lawdCd, String dealYmd, int pageNo, int numOfRows) {
+
+    public ResponseDto fetchData(String lawdCd, String dealYmd, int numOfRows) {
         // URL을 수동으로 생성
-        String url = String.format("%s?serviceKey=%s&LAWD_CD=%s&DEAL_YMD=%s&pageNo=%d&numOfRows=%d",
+        String url = String.format("%s?serviceKey=%s&LAWD_CD=%s&DEAL_YMD=%s&numOfRows=%d",
                 baseUrl,
                 serviceKey,
                 lawdCd,
                 dealYmd,
-                pageNo,
                 numOfRows);
 
         System.out.println("url : "+url);
