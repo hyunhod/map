@@ -5,6 +5,8 @@ import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.Repository.RankingRepository;
 import com.example.demo111.domain.TransactionRanking;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -72,15 +74,19 @@ public class RankingService {
 
 
     // 거래 금액 순으로 랭킹을 조회
-    public List<TransactionRanking> getRankingsByDealAmount() {
+    public Page<TransactionRanking> getRankingsByDealAmount(Pageable pageable) {
 
-        return rankingRepository.findAllByOrderByDealAmountDesc();
+        return rankingRepository.findAllByOrderByDealAmountDesc(pageable);
     }
 
     // 건설 연도 순으로 랭킹을 조회
-    public List<TransactionRanking> getRankingsByBuildYear() {
-        return rankingRepository.findAllByOrderByBuildYearDesc();
+    public Page<TransactionRanking> getRankingsByBuildYear(Pageable pageable) {
+        return rankingRepository.findAllByOrderByBuildYearDesc(pageable);
     }
+    // 특정 아파트 이름으로 검색 및 페이징 처리
+//    public Page<TransactionRanking> searchByAptNm(String aptNm, Pageable pageable) {
+//        return rankingRepository.findByAptNmContaining(aptNm, pageable);
+//    }
 
 
 

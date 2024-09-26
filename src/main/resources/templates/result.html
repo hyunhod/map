@@ -5,40 +5,56 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transaction Rankings</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        h1 {
-            color: #2c3e50;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border: 1px solid #bdc3c7;
-        }
-        th {
-            background-color: #3498db;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #ecf0f1;
-        }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-            color: #3498db;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+
+        .pagination {
+      display: flex;
+      list-style: none;
+      padding: 0;
+  }
+  .pagination li {
+      margin-right: 10px; /* 버튼 사이 간격 */
+  }
+  .pagination li.active a {
+    text-decoration: underline; /* 현재 페이지 번호에 밑줄 추가 */
+    font-weight: bold; /* 강조를 위해 글씨를 두껍게 할 수도 있음 */
+}
+  .pagination li.disabled a {
+     display: none; /* 비활성화된 버튼을 숨김 */
+  }
+      body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+      }
+      h1 {
+          color: #2c3e50;
+      }
+      table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+      }
+      th, td {
+          padding: 10px;
+          text-align: left;
+          border: 1px solid #bdc3c7;
+      }
+      th {
+          background-color: #3498db;
+          color: white;
+      }
+      tr:nth-child(even) {
+          background-color: #ecf0f1;
+      }
+      a {
+          display: inline-block;
+          margin-top: 20px;
+          color: #3498db;
+          text-decoration: none;
+          font-weight: bold;
+      }
+      a:hover {
+          text-decoration: underline;
+      }
     </style>
 </head>
 <body>
@@ -64,6 +80,24 @@
     </th:block>
     </tbody>
 </table>
+
+<!-- 예시 페이지네이션 HTML 코드 -->
+<div>
+    <ul class="pagination">
+        <li th:class="${currentPage == 0} ? 'disabled'">
+            <a th:href="@{/fetch-data(page=${currentPage - 1}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}">Previous</a>
+        </li>
+        <li th:each="page : ${#numbers.sequence(startPage, endPage)}" th:class="${page == currentPage} ? 'active' : ''">
+            <a th:href="@{/fetch-data(page=${page}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}"
+               th:text="${page + 1}"></a>
+        </li>
+        <li th:class="${currentPage == totalPages - 1} ? 'disabled'">
+            <a th:href="@{/fetch-data(page=${currentPage + 1}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}">Next</a>
+        </li>
+    </ul>
+</div>
+
+
 <a href="/">Back to Input</a>
 </body>
 </html>

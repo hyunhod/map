@@ -11,6 +11,9 @@ import com.example.demo111.service.ApiService;
 import com.example.demo111.service.RankingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,7 +63,15 @@ public class MyController {
                             @RequestParam(required = false) Integer minPrice,
                             @RequestParam(required = false) Integer maxPrice,
                             @RequestParam(required = false, defaultValue = "price") String sortBy, // 기본값은 가격순
+                            @RequestParam(defaultValue = "0") int page,  // 페이지 번호
+                            @RequestParam(defaultValue = "10") int size, // 페이지 크기
                             Model model) {
+        // 페이지 값 검증
+        if (page < 0) {
+            model.addAttribute("errorMessage", "페이지 번호는 0 이상이어야 합니다.");
+            return "search"; // 오류 시 다시 검색 페이지로
+        }
+
         ResponseDto responseDto = apiService.fetchDataByLocationName(locationName, dealYmd);
 
         if (responseDto == null) {
@@ -91,18 +102,40 @@ public class MyController {
                     .collect(Collectors.toList());
         }
         rankingService.saveTransactionRankings(rankings);
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(page, size);
 
 
         // 정렬 기준에 따라 데이터베이스에서 결과 가져오기
-        List<TransactionRanking> sortedRankings;
+        Page<TransactionRanking> sortedRankings;
         if ("price".equals(sortBy)) {
-            sortedRankings = rankingService.getRankingsByDealAmount(); // 건축일 기준으로 정렬된 랭킹
+            sortedRankings = rankingService.getRankingsByDealAmount(pageable); // 건축일 기준으로 정렬된 랭킹
+
         } else {
-            sortedRankings = rankingService.getRankingsByBuildYear();
+            sortedRankings = rankingService.getRankingsByBuildYear(pageable);
         }
 
         model.addAttribute("rankings", sortedRankings);
-        model.addAttribute("totalCount",rankings.size());
+        model.addAttribute("totalCount", rankings.size());
+        model.addAttribute("totalPages", sortedRankings.getTotalPages());
+        model.addAttribute("currentPage", sortedRankings.getNumber());
+        model.addAttribute("locationName", locationName);
+        model.addAttribute("dealYmd", dealYmd);
+        model.addAttribute("minPrice", minPrice);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("buildYear", buildYear);
+        model.addAttribute("minArea", minArea);
+        model.addAttribute("maxArea", maxArea);
+        model.addAttribute("sortBy", sortBy);
+
+
+        // 페이지네이션 범위 계산
+        int startPage = Math.max(0, sortedRankings.getNumber() - 5); // 최소 0 페이지
+        int endPage = Math.min(sortedRankings.getTotalPages() - 1, sortedRankings.getNumber() + 4); // 최대 총 페이지 수
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "result"; // 결과 페이지 이름
     }
     // 데이터 가져와서 저장하는 엔드포인트
