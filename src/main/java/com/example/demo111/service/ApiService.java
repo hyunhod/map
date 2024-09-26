@@ -1,6 +1,8 @@
 package com.example.demo111.service;
 
 
+import com.example.demo111.aprtDto.BodyDto;
+import com.example.demo111.aprtDto.ItemsDto;
 import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.lawdCodDto.LawdCodeDto;
 import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
@@ -13,6 +15,10 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -61,21 +67,38 @@ public class ApiService {
     }
     // API 호출 (pageNo, numOfRows는 필수가 아니므로 기본값 설정 가능)
 
-    public ResponseDto fetchData(String lawdCd, String dealYmd) {
-        int defaultNumOfRows = 10; // 기본값 설정
+    public ResponseDto fetchData(List<String> lawdCodes, String dealYmd) {
+        ResponseDto combinedResponse = new ResponseDto();
+        BodyDto combinedBody = new BodyDto(); // BodyDto 객체를 생성
+        List<ItemsDto> combinedItems = new ArrayList<>(); // 결합된 ItemsDto 리스트
 
-        ResponseDto initialResponse = fetchData(lawdCd, dealYmd, defaultNumOfRows);
-        if (initialResponse == null || initialResponse.getBody() == null) {
-            return null; // 응답이 없을 경우
+        for (String lawdCd : lawdCodes) {
+            int defaultNumOfRows = 10; // 기본값 설정
+
+            ResponseDto initialResponse = fetchData(lawdCd, dealYmd, defaultNumOfRows);
+            if (initialResponse == null || initialResponse.getBody() == null) {
+                continue; // 응답이 없을 경우 다음 코드로 진행
+            }
+
+            int totalCount = initialResponse.getBody().getTotalCount(); // totalCount 값을 가져오기
+            System.out.println("total count for " + lawdCd + ": " + totalCount);
+
+            ResponseDto fetchedData = fetchData(lawdCd, dealYmd, totalCount);
+            if (fetchedData != null && fetchedData.getBody() != null) {
+                List<ItemsDto> items = fetchedData.getBody().getItems(); // fetchedData의 items를 가져옴
+                if (items != null) {
+                    combinedItems.addAll(items); // 리스트에 데이터 추가
+                }
+            }
         }
-        // 2단계: totalCount를 가져와서 numOfRows에 설정
-        int totalCount = initialResponse.getBody().getTotalCount(); // totalCount 값을 가져오기
 
-        System.out.println("total count: "+totalCount);
-        // 3단계: totalCount를 numOfRows로 설정하여 다시 API 호출
-        return fetchData(lawdCd, dealYmd, totalCount);
+        combinedBody.setItems(combinedItems); // 결합된 items 리스트를 combinedBody에 설정
+        combinedBody.setTotalCount(combinedItems.size()); // 총 개수를 설정
+        combinedResponse.setBody(combinedBody); // combinedResponse에 combinedBody 설정
 
+        return combinedResponse; // 결합된 응답 반환
     }
+
 
 
     public ResponseDto fetchData(String lawdCd, String dealYmd, int numOfRows) {
@@ -87,7 +110,7 @@ public class ApiService {
                 dealYmd,
                 numOfRows);
 
-        System.out.println("url : "+url);
+        System.out.println("local url : "+url);
 
         ResponseEntity<String> responseEntity = get(url);
         if (responseEntity == null || responseEntity.getBody() == null) {
@@ -112,17 +135,25 @@ public class ApiService {
                return null;
            }
 
-           // 첫 번째 지역 코드 사용, 앞의 5자리만 추출
-           String lawdCd = lawdCodeResponse.getLawdCodes().get(0).getRegionCode();
-           if (lawdCd.length() >= 5) {
-               lawdCd = lawdCd.substring(0, 5); // 앞의 5자리만 사용
-           } else {
-               System.out.println("지역 코드가 5자리 미만입니다.");
-               return null; // 오류 처리
+
+           // Set을 사용하여 중복을 제거
+           Set<String> lawdCodesSet = new HashSet<>();
+           for (LawdCodeDto lawdCodeDto : lawdCodeResponse.getLawdCodes()) {
+               String lawdCd = lawdCodeDto.getRegionCode();
+               if (lawdCd.length() >= 5) {
+                   lawdCd = lawdCd.substring(0, 5); // 앞의 5자리만 사용
+                   lawdCodesSet.add(lawdCd); // 유효한 코드만 리스트에 추가
+               } else {
+                   System.out.println("지역 코드가 5자리 미만입니다.");
+                   return null; // 오류 처리
+               }
            }
+           // Set을 리스트로 변환
+           List<String> lawdCodes = new ArrayList<>(lawdCodesSet);
+           System.out.println("regionCode: " + lawdCodes);
 
            // 아파트 데이터 가져오기
-           return fetchData(lawdCd, dealYmd);
+           return fetchData(lawdCodes, dealYmd);
        }catch (Exception e){
            System.out.println("API 호출 중 에러 발생: "+e.getMessage());
            return null;

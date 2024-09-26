@@ -40,8 +40,7 @@ public class RankingService {
             TransactionRanking ranking = new TransactionRanking();
             ranking.setAptNm(item.getAptNm());
             ranking.setBuildYear(item.getBuildYear());
-            ranking.setDealYear((item.getDealYear()));
-
+            ranking.setDealYear(item.getDealYear());
 
 
             if (item.getDealAmount() != null && !item.getDealAmount().isEmpty()) {
