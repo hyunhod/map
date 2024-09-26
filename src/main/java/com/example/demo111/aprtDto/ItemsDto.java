@@ -15,4 +15,6 @@ public class ItemsDto {
     public String dealAmount;
     @JacksonXmlProperty(localName = "excluUseAr")
     private String excluUseAr;
+    @JacksonXmlProperty(localName = "dealYear")
+    private String dealYear;
 }

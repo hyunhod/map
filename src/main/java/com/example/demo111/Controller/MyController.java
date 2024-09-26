@@ -8,6 +8,7 @@ import com.example.demo111.lawdCodDto.LawdCodeDto;
 import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
 import com.example.demo111.service.ApiService;
 import com.example.demo111.service.RankingService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@Slf4j
 public class MyController {
     @Autowired
     private RankingRepository rankingRepository;

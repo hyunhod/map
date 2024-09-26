@@ -19,6 +19,7 @@ public class TransactionRanking {
     private String AptNm;
     private String buildYear;
     private Integer dealAmount;
+    private String dealYear;
     private Double excluUseAr;
 
 

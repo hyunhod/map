@@ -25,6 +25,7 @@ public class RankingService {
 
     // ResponseDto를 TransactionRanking으로 매핑하는 메소드
     public List<TransactionRanking> mapToTransactionRanking(ResponseDto responseDto) {
+        rankingRepository.deleteAll();
         if (responseDto == null || responseDto.getBody().getItems() == null) {
             return null;
         }
@@ -37,6 +38,8 @@ public class RankingService {
             TransactionRanking ranking = new TransactionRanking();
             ranking.setAptNm(item.getAptNm());
             ranking.setBuildYear(item.getBuildYear());
+            ranking.setDealYear((item.getDealYear()));
+
 
 
             if (item.getDealAmount() != null && !item.getDealAmount().isEmpty()) {
@@ -53,6 +56,7 @@ public class RankingService {
             }
             //리스트에 추가
             rankings.add(ranking);
+            System.out.println("rankings :: "+rankings);
 
         }
 
