@@ -1,33 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transaction Rankings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #bdc3c7;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #ecf0f1;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 <h1>Transaction Rankings</h1>
-<table border="1">
+<table>
     <thead>
     <tr>
         <th>아파트</th>
-        <th>건축년도</th>
         <th>거래금액</th>
+        <th>건축년도</th>
         <th>전용면적(㎡)</th>
     </tr>
     </thead>
     <tbody>
-    <!-- Rankings will be populated here -->
     <th:block th:each="ranking : ${rankings}">
         <tr>
             <td th:text="${ranking.aptNm}"></td>
-            <td th:text="${ranking.buildYear}"></td>
             <td th:text="${ranking.dealAmount}"></td>
+            <td th:text="${ranking.buildYear}"></td>
             <td th:text="${ranking.excluUseAr}"></td>
         </tr>
     </th:block>
     </tbody>
 </table>
-<a href="/rankings">Back to Input</a>
+<a href="/">Back to Input</a>
 </body>
 </html>

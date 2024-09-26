@@ -18,6 +18,9 @@ public class RankingService {
     @Autowired
     private RankingRepository rankingRepository;
 
+    @Autowired
+    private ApiService apiService;
+
 
 
     // ResponseDto를 TransactionRanking으로 매핑하는 메소드
@@ -56,10 +59,17 @@ public class RankingService {
 
         return rankings;
     }
+    // 매핑된 TransactionRanking 리스트를 데이터베이스에 저장하는 메소드
+    public void saveTransactionRankings(List<TransactionRanking> rankings) {
+        if (rankings != null && !rankings.isEmpty()) {
+            rankingRepository.saveAll(rankings); // JPA의 saveAll 메소드 사용
+        }
+    }
 
 
     // 거래 금액 순으로 랭킹을 조회
     public List<TransactionRanking> getRankingsByDealAmount() {
+
         return rankingRepository.findAllByOrderByDealAmountDesc();
     }
 

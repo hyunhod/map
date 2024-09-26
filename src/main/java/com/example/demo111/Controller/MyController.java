@@ -1,6 +1,7 @@
 package com.example.demo111.Controller;
 
 
+import com.example.demo111.Repository.RankingRepository;
 import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.lawdCodDto.LawdCodeDto;
@@ -16,11 +17,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
 public class MyController {
+    @Autowired
+    private RankingRepository rankingRepository;
     @Autowired
     private RankingService service;
     @Autowired
@@ -52,6 +56,7 @@ public class MyController {
                             @RequestParam(required = false) Integer maxArea,
                             @RequestParam(required = false) Integer minPrice,
                             @RequestParam(required = false) Integer maxPrice,
+                            @RequestParam(required = false, defaultValue = "price") String sortBy, // 기본값은 가격순
                             Model model) {
         ResponseDto responseDto = apiService.fetchDataByLocationName(locationName, dealYmd);
 
@@ -60,6 +65,7 @@ public class MyController {
             return "search"; // 에러 발생 시 다시 검색 페이지로
         }
         List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
+
         //건축년도 필터링 추가
         if (buildYear != null && !buildYear.isEmpty()) {
             rankings = rankings.stream()
@@ -80,10 +86,21 @@ public class MyController {
                     .filter(r -> r.getDealAmount() >= minPrice && r.getDealAmount() <= maxPrice)
                     .collect(Collectors.toList());
         }
+        rankingService.saveTransactionRankings(rankings);
 
-        model.addAttribute("rankings", rankings);
+
+        // 정렬 기준에 따라 데이터베이스에서 결과 가져오기
+        List<TransactionRanking> sortedRankings;
+        if ("price".equals(sortBy)) {
+            sortedRankings = rankingService.getRankingsByDealAmount(); // 건축일 기준으로 정렬된 랭킹
+        } else {
+            sortedRankings = rankingService.getRankingsByBuildYear();
+        }
+
+        model.addAttribute("rankings", sortedRankings);
         return "result"; // 결과 페이지 이름
     }
+    // 데이터 가져와서 저장하는 엔드포인트
 
 
 }
