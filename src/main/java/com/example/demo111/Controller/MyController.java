@@ -39,7 +39,7 @@ public class MyController {
     private RankingService rankingService;
 
 
-    @GetMapping("/")
+    @GetMapping("/ranking")
     public String showRankingsPage() {
 
         return "search";
