@@ -6,7 +6,9 @@ import com.example.demo111.Repository.RankingRepository;
 import com.example.demo111.domain.TransactionRanking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
@@ -86,6 +88,16 @@ public class RankingService {
 //    public Page<TransactionRanking> searchByAptNm(String aptNm, Pageable pageable) {
 //        return rankingRepository.findByAptNmContaining(aptNm, pageable);
 //    }
+
+    // 거래 금액 순으로 상위 10개의 아파트만 조회하는 메서드
+    public List<TransactionRanking> getTop10ByDealAmount() {
+        // 페이지 크기 10으로 설정하고 첫 번째 페이지만 가져옴
+        Pageable topTen = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "dealAmount"));
+        Page<TransactionRanking> rankingPage = rankingRepository.findAll(topTen);
+
+        // 상위 10개의 데이터를 반환
+        return rankingPage.getContent();
+    }
 
 
 

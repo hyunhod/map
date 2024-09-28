@@ -42,18 +42,18 @@
     <!-- 추천 아파트 섹션 -->
     <div class="row mt-4">
         <div class="col-md-12">
-            <h3>추천 아파트</h3>
-            <p>최근 사용자들이 구매한 비싼 아파트를 확인해보세요.</p>
-            <ul>
+            <h3>최근 실거래가 서울 Top 10</h3>
+            <p>최근 거래된 상위 10개의 아파트 정보를 확인해보세요.</p>
+            <ul class="list-group">
                 <!-- 추천 아파트 목록을 동적으로 표시 -->
-                <li th:each="apartment : ${recommendedApartments}">
-                    <span th:text="${apartment.name}">아파트 이름</span> -
-                    <span th:text="${apartment.location}">위치</span>
+                <li th:each="apartment : ${recommendedApartments}" class="list-group-item">
+                    <span th:text="${apartment.aptNm}">아파트 이름</span> -
+                    <span th:text="${#numbers.formatInteger(apartment.dealAmount, 0)}">실거래가</span>원 -
+                    <span th:text="${apartment.excluUseAr}"></span>m²
                 </li>
             </ul>
         </div>
     </div>
-</main>
 
 <!-- Footer Section -->
 <footer class="bg-dark text-white text-center py-3 mt-4">

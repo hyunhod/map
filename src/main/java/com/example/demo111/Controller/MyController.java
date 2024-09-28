@@ -39,6 +39,24 @@ public class MyController {
     private RankingService rankingService;
 
 
+    @GetMapping("/")
+    public String showMainPage(Model model,Pageable pageable) {
+        String location = "서울";
+        String deal = "202409";
+
+        ResponseDto responseDto = apiService.fetchDataByLocationName(location, deal);
+
+
+        List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
+        rankingService.saveTransactionRankings(rankings);
+
+         // 실거래가 상위 10개 아파트를 가져옴
+        List<TransactionRanking> top10Apartments = rankingService.getTop10ByDealAmount();
+
+        // 모델에 추천 아파트(Top 10) 추가
+        model.addAttribute("recommendedApartments", top10Apartments);
+        return "main";
+    }
     @GetMapping("/ranking")
     public String showRankingsPage() {
 
