@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검색 결과</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <h2>검색 결과</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>이름</th>
+            <th>건축년도</th>
+            <th>가격</th>
+            <th>전용면적</th>
+            <th>거래일자</th>
+            <th>거래유형</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ranking : ${transactions}">
+            <td th:text="${ranking.aptNm}"></td>
+            <td th:text="${ranking.buildYear}"></td>
+            <td th:text="${ranking.dealAmount}"></td>
+            <td th:text="${ranking.excluUseAr}"></td>
+            <td th:text="${ranking.dealYear} + '-' + ${ranking.dealMonth} + '-' + ${ranking.dealDay}"></td>
+            <td th:text="${ranking.dealingGbn}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

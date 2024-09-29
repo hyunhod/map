@@ -1,8 +1,9 @@
 package com.example.demo111.controller;
 
-
-import com.example.demo111.Repository.LocationRepository;
+import com.example.demo111.domain.Location;
+import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.service.LocationService;
+import com.example.demo111.service.RankingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,9 +20,9 @@ public class SearchController {
 
     @Autowired
     private LocationService locationService;
-    @Autowired
-    private LocationRepository locationRepository;
 
+    @Autowired
+    private RankingService rankingService;
 
 
 
@@ -41,6 +43,35 @@ public class SearchController {
         String regionPrefix = regionCode.substring(1, 3);
         System.out.println(regionPrefix);
         return locationService.getSubLocationsByRegion(regionPrefix);
+    }
+
+    // 아파트 거래 정보를 조회하는 메서드
+    @GetMapping("/search1")
+    public String searchTransactions( @RequestParam String locationName,
+                                     @RequestParam(required = false) Integer minPrice,
+                                     @RequestParam(required = false) Integer maxPrice,
+                                     Model model) {
+
+        Location location = locationService.findLocationByCityOrDistrict(locationName);
+
+
+        String regionCode = location.getRegionCode(); // 지역 코드 얻기
+        System.out.println("regionCode: "+regionCode);
+
+        // regionCode에 해당하는 거래 정보를 가져옵니다.
+        List<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode);
+
+        // 가격 필터링
+        if (minPrice != null) {
+            transactionRankings.removeIf(ranking -> ranking.getDealAmount() < minPrice);
+        }
+        if (maxPrice != null) {
+            transactionRankings.removeIf(ranking -> ranking.getDealAmount() > maxPrice);
+        }
+
+        // 모델에 결과 추가
+        model.addAttribute("transactions", transactionRankings);
+        return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
 
 }

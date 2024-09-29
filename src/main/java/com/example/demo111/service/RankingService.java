@@ -107,6 +107,12 @@ public class RankingService {
         return rankingPage.getContent();
     }
 
+    // 지역 코드로 거래 정보 가져오기
+    public List<TransactionRanking> getTransactionRankingsByRegion(String regionCode) {
+        return rankingRepository.findBySggCd(regionCode); // 지역 코드로 거래 정보 검색
+    }
+
+
 
 
 

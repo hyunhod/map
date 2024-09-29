@@ -16,6 +16,6 @@ public class Location {
     @Column(name = "지역명")
     private String name;
     @Column(name = "시/군")
-    private String cityOrDistrict;
+    private String cityDistrict;
 
 }

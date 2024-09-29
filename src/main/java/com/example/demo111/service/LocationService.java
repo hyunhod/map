@@ -50,7 +50,7 @@ public class LocationService {
                 Location location = new Location();
                 location.setRegionCode(regionCode);
                 location.setName(regionName);
-                location.setCityOrDistrict(cityOrDistrict);
+                location.setCityDistrict(cityOrDistrict);
 
                 locationRepository.save(location); // JPA를 통해 데이터베이스에 저장
             }
@@ -63,8 +63,9 @@ public class LocationService {
         List<Location> allLocations = locationRepository.findAll();
         return allLocations.stream()
                 .filter(location -> location.getRegionCode().startsWith(regionPrefix))
-                .map(Location::getCityOrDistrict)
+                .map(Location::getCityDistrict)
                 .collect(Collectors.toSet());
+
     }
 
 
@@ -74,5 +75,11 @@ public class LocationService {
         return locations.stream()
                 .collect(Collectors.groupingBy(Location::getName,
                         Collectors.mapping(Location::getRegionCode, Collectors.toSet())));
+    }
+
+    // 수정된 메서드
+    public Location findLocationByCityOrDistrict(String cityOrDistrict) {
+        Optional<Location> location = locationRepository.findByCityDistrict(cityOrDistrict);
+        return location.orElse(null); // 없으면 null 반환
     }
 }

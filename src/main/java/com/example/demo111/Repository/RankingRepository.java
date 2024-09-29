@@ -19,6 +19,7 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
     // 건설 연도 기준으로 내림차순 정렬하여 조회
     Page<TransactionRanking> findAllByOrderByBuildYearDesc(Pageable pageable);
 
+    List<TransactionRanking> findBySggCd(String sggCd); // 지역 코드로 거래 정보 찾기
 
 
 }

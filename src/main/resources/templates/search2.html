@@ -10,7 +10,7 @@
 <body>
 <div class="container mt-5">
     <h2>거래 검색</h2>
-    <form action="/search" method="GET">
+    <form action="/search1" method="GET">
         <div class="form-group">
             <label for="region">지역</label>
             <select id="region" name="region" class="form-control" required>
@@ -51,6 +51,7 @@
                 $.get('/sub-locations', { regionCode: regionCode }, function(data) {
                     data.forEach(function(loc) {
                         $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
+
                     });
                 });
             }
