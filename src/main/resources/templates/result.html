@@ -4,100 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transaction Rankings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .card {
+            margin: 10px 0;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+        .card-header {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        .card-body {
+            padding: 15px;
+        }
         .pagination {
-      display: flex;
-      list-style: none;
-      padding: 0;
-  }
-  .pagination li {
-      margin-right: 10px; /* 버튼 사이 간격 */
-  }
-  .pagination li.active a {
-    text-decoration: underline; /* 현재 페이지 번호에 밑줄 추가 */
-    font-weight: bold; /* 강조를 위해 글씨를 두껍게 할 수도 있음 */
-}
-  .pagination li.disabled a {
-     display: none; /* 비활성화된 버튼을 숨김 */
-  }
-      body {
-          font-family: Arial, sans-serif;
-          margin: 20px;
-      }
-      h1 {
-          color: #2c3e50;
-      }
-      table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 20px;
-      }
-      th, td {
-          padding: 10px;
-          text-align: left;
-          border: 1px solid #bdc3c7;
-      }
-      th {
-          background-color: #3498db;
-          color: white;
-      }
-      tr:nth-child(even) {
-          background-color: #ecf0f1;
-      }
-      a {
-          display: inline-block;
-          margin-top: 20px;
-          color: #3498db;
-          text-decoration: none;
-          font-weight: bold;
-      }
-      a:hover {
-          text-decoration: underline;
-      }
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination li {
+            margin: 0 5px;
+        }
+        .pagination li.active a {
+            text-decoration: underline;
+            font-weight: bold;
+        }
+        .pagination li.disabled a {
+            display: none;
+        }
     </style>
 </head>
 <body>
 <h1>Transaction Rankings</h1>
-<p>총 거래 수: <span th:text="${totalCount}"></span></p>
-<table>
-    <thead>
-    <tr>
-        <th>아파트</th>
-        <th>거래금액</th>
-        <th>건축년도</th>
-        <th>전용면적(㎡)</th>
-    </tr>
-    </thead>
-    <tbody>
-    <th:block th:each="ranking : ${rankings}">
-        <tr>
-            <td th:text="${ranking.aptNm}"></td>
-            <td th:text="${ranking.dealAmount}"></td>
-            <td th:text="${ranking.buildYear}"></td>
-            <td th:text="${ranking.excluUseAr}"></td>
-        </tr>
-    </th:block>
-    </tbody>
-</table>
+<p class="text-center">총 거래 수: <span th:text="${totalCount}"></span></p>
+
+<div class="container">
+    <div class="row">
+        <th:block th:each="ranking : ${rankings}" class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <span th:text="${ranking.aptNm}">아파트 이름</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>거래금액:</strong> <span th:text="${#numbers.formatInteger(ranking.dealAmount, 0)}">거래금액</span> 원</p>
+                    <p><strong>건축년도:</strong> <span th:text="${ranking.buildYear}">건축년도</span></p>
+                    <p><strong>전용면적:</strong> <span th:text="${ranking.excluUseAr}">전용면적</span> m²</p>
+                </div>
+            </div>
+        </th:block>
+    </div>
+</div>
 
 <!-- 예시 페이지네이션 HTML 코드 -->
 <div>
     <ul class="pagination">
         <li th:class="${currentPage == 0} ? 'disabled'">
-            <a th:href="@{/fetch-data(page=${currentPage - 1}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}">Previous</a>
+            <a th:href="@{/fetch-data(page=${currentPage - 1}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}" class="btn btn-secondary">Previous</a>
         </li>
         <li th:each="page : ${#numbers.sequence(startPage, endPage)}" th:class="${page == currentPage} ? 'active' : ''">
-            <a th:href="@{/fetch-data(page=${page}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}"
-               th:text="${page + 1}"></a>
+            <a th:href="@{/fetch-data(page=${page}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}" class="btn btn-primary" th:text="${page + 1}"></a>
         </li>
         <li th:class="${currentPage == totalPages - 1} ? 'disabled'">
-            <a th:href="@{/fetch-data(page=${currentPage + 1}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}">Next</a>
+            <a th:href="@{/fetch-data(page=${currentPage + 1}, size=${size}, locationName=${locationName}, dealYmd=${dealYmd}, minPrice=${minPrice}, maxPrice=${maxPrice}, buildYear=${buildYear}, minArea=${minArea}, maxArea=${maxArea}, sortBy=${sortBy})}" class="btn btn-secondary">Next</a>
         </li>
     </ul>
 </div>
 
+<a href="/" class="btn btn-link">Back to Input</a>
 
-<a href="/">Back to Input</a>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -2,11 +2,9 @@ package com.example.demo111.Controller;
 
 
 import com.example.demo111.Repository.RankingRepository;
-import com.example.demo111.aprtDto.BodyDto;
+
 import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.domain.TransactionRanking;
-import com.example.demo111.lawdCodDto.LawdCodeDto;
-import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
 import com.example.demo111.service.ApiService;
 import com.example.demo111.service.RankingService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,11 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +32,13 @@ public class MyController {
     @Autowired
     private RankingService rankingService;
 
+
+
+    @GetMapping("/import")
+    public String importApartmentData() {
+        apiService.fetchAndSaveApartmentData("C:/Users/black/Downloads/법정동코드 전체자료 (1)/법정동코드 전체자료.txt");
+        return null;
+    }
 
     @GetMapping("/")
     public String showMainPage(Model model,Pageable pageable) {
@@ -72,7 +73,6 @@ public class MyController {
         this.apiService = apiService;
     }
 
-
     @GetMapping("/fetch-data")
     public String fetchData(@RequestParam String locationName, @RequestParam String dealYmd,
                             @RequestParam(required = false) String buildYear,
@@ -84,6 +84,10 @@ public class MyController {
                             @RequestParam(defaultValue = "0") int page,  // 페이지 번호
                             @RequestParam(defaultValue = "10") int size, // 페이지 크기
                             Model model) {
+
+
+        long startTime = System.currentTimeMillis(); // 시작 시간 기록
+
         // 페이지 값 검증
         if (page < 0) {
             model.addAttribute("errorMessage", "페이지 번호는 0 이상이어야 합니다.");
@@ -153,6 +157,9 @@ public class MyController {
 
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        long endTime = System.currentTimeMillis(); // 종료 시간 기록
+        long duration = endTime - startTime; // 응답 시간 계산
+        System.out.println("응답 시간: " + duration + "ms");
 
         return "result"; // 결과 페이지 이름
     }

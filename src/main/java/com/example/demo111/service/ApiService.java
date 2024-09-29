@@ -1,24 +1,29 @@
 package com.example.demo111.service;
 
 
+import com.example.demo111.Repository.RankingRepository;
 import com.example.demo111.aprtDto.BodyDto;
 import com.example.demo111.aprtDto.ItemsDto;
 import com.example.demo111.aprtDto.ResponseDto;
+import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.lawdCodDto.LawdCodeDto;
 import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.Year;
+import java.util.*;
 
 
 @Service
@@ -28,6 +33,12 @@ public class ApiService {
     private final XmlMapper xmlMapper;
     @org.springframework.beans.factory.annotation.Value("${api.base.url}")
     private String baseUrl;
+
+    @Autowired
+    RankingService rankingService;
+    @Autowired
+    RankingRepository rankingRepository;
+
 
     @Value("${api.service.key}")
     private String serviceKey;
@@ -62,7 +73,7 @@ public class ApiService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("reponse: "+response);
+        System.out.println("reponse: " + response);
         return response;
     }
     // API 호출 (pageNo, numOfRows는 필수가 아니므로 기본값 설정 가능)
@@ -100,7 +111,6 @@ public class ApiService {
     }
 
 
-
     public ResponseDto fetchData(String lawdCd, String dealYmd, int numOfRows) {
         // URL을 수동으로 생성
         String url = String.format("%s?serviceKey=%s&LAWD_CD=%s&DEAL_YMD=%s&numOfRows=%d",
@@ -110,7 +120,7 @@ public class ApiService {
                 dealYmd,
                 numOfRows);
 
-        System.out.println("local url : "+url);
+        System.out.println("local url : " + url);
 
         ResponseEntity<String> responseEntity = get(url);
         if (responseEntity == null || responseEntity.getBody() == null) {
@@ -120,46 +130,45 @@ public class ApiService {
         String xmlData = responseEntity.getBody();
         System.out.println("xmlData: " + xmlData);
 
-        System.out.println("xmlData: "+xmlData);
+        System.out.println("xmlData: " + xmlData);
 
         // 2. XML 데이터를 파싱하기
         return parseXml(xmlData);
     }
 
     public ResponseDto fetchDataByLocationName(String locationName, String dealYmd) {
-       try {
-           // 지역 이름으로 지역 코드 가져오기
-           LawdCodeResponseDto lawdCodeResponse = fetchLawdCodes(locationName);
-           if (lawdCodeResponse == null || lawdCodeResponse.getLawdCodes().isEmpty()) {
-               System.out.println("법정동 코드 정보를 찾을 수 없습니다.");
-               return null;
-           }
+        try {
+            // 지역 이름으로 지역 코드 가져오기
+            LawdCodeResponseDto lawdCodeResponse = fetchLawdCodes(locationName);
+            if (lawdCodeResponse == null || lawdCodeResponse.getLawdCodes().isEmpty()) {
+                System.out.println("법정동 코드 정보를 찾을 수 없습니다.");
+                return null;
+            }
 
 
-           // Set을 사용하여 중복을 제거
-           Set<String> lawdCodesSet = new HashSet<>();
-           for (LawdCodeDto lawdCodeDto : lawdCodeResponse.getLawdCodes()) {
-               String lawdCd = lawdCodeDto.getRegionCode();
-               if (lawdCd.length() >= 5) {
-                   lawdCd = lawdCd.substring(0, 5); // 앞의 5자리만 사용
-                   lawdCodesSet.add(lawdCd); // 유효한 코드만 리스트에 추가
-               } else {
-                   System.out.println("지역 코드가 5자리 미만입니다.");
-                   return null; // 오류 처리
-               }
-           }
-           // Set을 리스트로 변환
-           List<String> lawdCodes = new ArrayList<>(lawdCodesSet);
-           System.out.println("regionCode: " + lawdCodes);
+            // Set을 사용하여 중복을 제거
+            Set<String> lawdCodesSet = new HashSet<>();
+            for (LawdCodeDto lawdCodeDto : lawdCodeResponse.getLawdCodes()) {
+                String lawdCd = lawdCodeDto.getRegionCode();
+                if (lawdCd.length() >= 5) {
+                    lawdCd = lawdCd.substring(0, 5); // 앞의 5자리만 사용
+                    lawdCodesSet.add(lawdCd); // 유효한 코드만 리스트에 추가
+                } else {
+                    System.out.println("지역 코드가 5자리 미만입니다.");
+                    return null; // 오류 처리
+                }
+            }
+            // Set을 리스트로 변환
+            List<String> lawdCodes = new ArrayList<>(lawdCodesSet);
+            System.out.println("regionCode: " + lawdCodes);
 
-           // 아파트 데이터 가져오기
-           return fetchData(lawdCodes, dealYmd);
-       }catch (Exception e){
-           System.out.println("API 호출 중 에러 발생: "+e.getMessage());
-           return null;
-       }
+            // 아파트 데이터 가져오기
+            return fetchData(lawdCodes, dealYmd);
+        } catch (Exception e) {
+            System.out.println("API 호출 중 에러 발생: " + e.getMessage());
+            return null;
+        }
     }
-
 
 
     //api lawcod code
@@ -180,19 +189,19 @@ public class ApiService {
 
         String url = String.format("%s?ServiceKey=%s&type=xml&pageNo=%d&numOfRows=%d&flag=Y&locatadd_nm=%s",
                 base2Url, service2Key, pageNo, numOfRows, encodedLocationName); // URL 생성
-        System.out.println("받은 location name: "+encodedLocationName);
-        System.out.println("url: "+url);
+        System.out.println("받은 location name: " + encodedLocationName);
+        System.out.println("url: " + url);
 
         ResponseEntity<String> responseEntity = get2(url);
         if (responseEntity == null || responseEntity.getBody() == null) {
             System.out.println("No response body received.");
             return null;
         }
-        System.out.println("responseEntity: "+responseEntity);
+        System.out.println("responseEntity: " + responseEntity);
 
         String xmlData = responseEntity.getBody();
 
-        System.out.println("xmlData : "+xmlData);
+        System.out.println("xmlData : " + xmlData);
         return parseLawdCodeResponse(xmlData); // XML 응답 파싱
     }
 
@@ -201,7 +210,7 @@ public class ApiService {
         // XML 데이터를 LawdCodeDto로 변환
         try {
             LawdCodeResponseDto responseDto = xmlMapper.readValue(xmlData, LawdCodeResponseDto.class);
-            System.out.println("value: "+responseDto);
+            System.out.println("value: " + responseDto);
 
             return responseDto;
         } catch (Exception e) {
@@ -209,8 +218,71 @@ public class ApiService {
             e.printStackTrace();
             return null;
         }
+
     }
 
+
+    //.txt에서 행정코드 가져오기
+
+    public List<String> readLawdCodesFromFile(String filePath) {
+        Set<String> lawdCodesSet = new LinkedHashSet<>(); // 중복을 제거하기 위해 LinkedHashSet 사용
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            boolean isFirstLine = true; // 첫 줄인지 확인하는 변수
+
+            while ((line = br.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false; // 첫 줄은 건너뜁니다.
+                    continue;
+                }
+
+                String[] parts = line.split("\t"); // 탭으로 분리
+                if (parts.length > 0) {
+                    String lawdCode = parts[0].trim(); // 법정동코드
+                    if (!lawdCode.isEmpty()) {
+                        // 앞 5자리만 추가
+                        String truncatedLawdCode = lawdCode.substring(0, 5);
+                        lawdCodesSet.add(truncatedLawdCode); // Set에 추가하여 중복 제거
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new ArrayList<>(lawdCodesSet); // List로 변환하여 반환
+    }
+
+    @Async
+    public void fetchAndSaveApartmentData(String filePath) {
+        try {
+            List<String> lawdCodes = readLawdCodesFromFile(filePath);
+            int currentYear = Year.now().getValue(); // 현재 연도를 가져옵니다.
+            for (String lawdCode : lawdCodes) {
+                for (int year = 1990; year <= currentYear; year++) {
+                    for (int month = 1; month <= 12; month++) { // 1월부터 12월까지 반복
+                        String dealYmd = String.format("%04d%02d", year, month); // 연도와 월을 사용
+                        ResponseDto responseDto = fetchData(lawdCode, dealYmd, Integer.MAX_VALUE);
+                        if (responseDto != null) {
+                            List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
+                            saveTransactionRankings(rankings);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace(); // 에러 메시지를 출력합니다.
+            System.out.println("here we wrrr");
+        }
+    }
+    public void saveTransactionRankings(List<TransactionRanking> rankings) {
+        rankingRepository.saveAll(rankings); // ranking 리스트를 저장
+    }
 }
+
+
+
+
+
 
 

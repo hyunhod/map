@@ -17,4 +17,26 @@ public class ItemsDto {
     private String excluUseAr;
     @JacksonXmlProperty(localName = "dealYear")
     private String dealYear;
+    @JacksonXmlProperty(localName = "dealMonth")
+    private String dealMonth;
+    @JacksonXmlProperty(localName = "dealDay")
+    private String dealDay;
+
+    @JacksonXmlProperty(localName = "estateAgentSggNm")
+    private String estateAgentSggNm;
+    @JacksonXmlProperty(localName = "floor")
+    private String floor;
+    @JacksonXmlProperty(localName = "jibun")
+    private String jibun;
+    @JacksonXmlProperty(localName = "umdNm")
+    private String umdNm;
+    @JacksonXmlProperty(localName = "slerGbn")
+    private String slerGbn;
+    @JacksonXmlProperty(localName = "buyerGbn")
+    private String buyerGbn;
+    @JacksonXmlProperty(localName = "dealingGbn")
+    private String dealingGbn;
+    @JacksonXmlProperty(localName = "sggCd")
+    private String sggCd;
+
 }

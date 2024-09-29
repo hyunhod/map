@@ -11,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,14 +20,13 @@ public class RankingService {
     @Autowired
     private RankingRepository rankingRepository;
 
-    @Autowired
-    private ApiService apiService;
+
 
 
 
     // ResponseDto를 TransactionRanking으로 매핑하는 메소드
     public List<TransactionRanking> mapToTransactionRanking(ResponseDto responseDto) {
-        rankingRepository.deleteAll();
+        //rankingRepository.deleteAll();
         if (responseDto == null || responseDto.getBody().getItems() == null) {
             return null;
         }
@@ -43,6 +40,17 @@ public class RankingService {
             ranking.setAptNm(item.getAptNm());
             ranking.setBuildYear(item.getBuildYear());
             ranking.setDealYear(item.getDealYear());
+            ranking.setFloor(item.getFloor());
+            ranking.setUmdNm(item.getUmdNm());
+            ranking.setJibun(item.getJibun());
+            ranking.setDealDay(item.getDealDay());
+            ranking.setBuyerGbn(item.getBuyerGbn());
+            ranking.setDealMonth(item.getDealMonth());
+            ranking.setEstateAgentSggNm(item.getEstateAgentSggNm());
+            ranking.setSggCd(item.getSggCd());
+            ranking.setSlerGbn(item.getSlerGbn());
+            ranking.setDealingGbn(item.getDealingGbn());
+
 
 
             if (item.getDealAmount() != null && !item.getDealAmount().isEmpty()) {
@@ -98,6 +106,10 @@ public class RankingService {
         // 상위 10개의 데이터를 반환
         return rankingPage.getContent();
     }
+
+
+
+
 
 
 
