@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -40,6 +41,10 @@ public class ApiService {
     RankingRepository rankingRepository;
 
 
+
+
+    @Value("${apartment.data.file.path}")
+    private String filePath;
     @Value("${api.service.key}")
     private String serviceKey;
 
@@ -73,7 +78,7 @@ public class ApiService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("reponse: " + response);
+
         return response;
     }
     // API 호출 (pageNo, numOfRows는 필수가 아니므로 기본값 설정 가능)
@@ -92,7 +97,6 @@ public class ApiService {
             }
 
             int totalCount = initialResponse.getBody().getTotalCount(); // totalCount 값을 가져오기
-            System.out.println("total count for " + lawdCd + ": " + totalCount);
 
             ResponseDto fetchedData = fetchData(lawdCd, dealYmd, totalCount);
             if (fetchedData != null && fetchedData.getBody() != null) {
@@ -120,7 +124,7 @@ public class ApiService {
                 dealYmd,
                 numOfRows);
 
-        System.out.println("local url : " + url);
+
 
         ResponseEntity<String> responseEntity = get(url);
         if (responseEntity == null || responseEntity.getBody() == null) {
@@ -128,9 +132,7 @@ public class ApiService {
             return null;
         }
         String xmlData = responseEntity.getBody();
-        System.out.println("xmlData: " + xmlData);
 
-        System.out.println("xmlData: " + xmlData);
 
         // 2. XML 데이터를 파싱하기
         return parseXml(xmlData);
@@ -189,19 +191,18 @@ public class ApiService {
 
         String url = String.format("%s?ServiceKey=%s&type=xml&pageNo=%d&numOfRows=%d&flag=Y&locatadd_nm=%s",
                 base2Url, service2Key, pageNo, numOfRows, encodedLocationName); // URL 생성
-        System.out.println("받은 location name: " + encodedLocationName);
-        System.out.println("url: " + url);
+
 
         ResponseEntity<String> responseEntity = get2(url);
         if (responseEntity == null || responseEntity.getBody() == null) {
             System.out.println("No response body received.");
             return null;
         }
-        System.out.println("responseEntity: " + responseEntity);
+
 
         String xmlData = responseEntity.getBody();
 
-        System.out.println("xmlData : " + xmlData);
+
         return parseLawdCodeResponse(xmlData); // XML 응답 파싱
     }
 
@@ -210,7 +211,7 @@ public class ApiService {
         // XML 데이터를 LawdCodeDto로 변환
         try {
             LawdCodeResponseDto responseDto = xmlMapper.readValue(xmlData, LawdCodeResponseDto.class);
-            System.out.println("value: " + responseDto);
+
 
             return responseDto;
         } catch (Exception e) {
@@ -253,8 +254,9 @@ public class ApiService {
         return new ArrayList<>(lawdCodesSet); // List로 변환하여 반환
     }
 
-    @Async
-    public void fetchAndSaveApartmentData(String filePath) {
+
+    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정
+    public void fetchAndSaveApartmentData() {
         try {
             List<String> lawdCodes = readLawdCodesFromFile(filePath);
             int currentYear = Year.now().getValue(); // 현재 연도를 가져옵니다.
@@ -272,7 +274,6 @@ public class ApiService {
             }
         } catch (Exception e) {
             e.printStackTrace(); // 에러 메시지를 출력합니다.
-            System.out.println("here we wrrr");
         }
     }
     public void saveTransactionRankings(List<TransactionRanking> rankings) {
