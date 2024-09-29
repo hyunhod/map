@@ -92,10 +92,7 @@ public class RankingService {
     public Page<TransactionRanking> getRankingsByBuildYear(Pageable pageable) {
         return rankingRepository.findAllByOrderByBuildYearDesc(pageable);
     }
-    // 특정 아파트 이름으로 검색 및 페이징 처리
-//    public Page<TransactionRanking> searchByAptNm(String aptNm, Pageable pageable) {
-//        return rankingRepository.findByAptNmContaining(aptNm, pageable);
-//    }
+
 
     // 거래 금액 순으로 상위 10개의 아파트만 조회하는 메서드
     public List<TransactionRanking> getTop10ByDealAmount() {
@@ -111,6 +108,20 @@ public class RankingService {
     public Page<TransactionRanking> getTransactionRankingsByRegion(String regionCode,int page,int size) {
         PageRequest pageRequest = PageRequest.of(page, size); // 페이지 번호와 페이지 크기를 설정
         return rankingRepository.findBySggCd(regionCode,pageRequest); // 지역 코드로 거래 정보 검색
+    }
+    public Page<TransactionRanking> getTransactionRankingsByRegion(String regionCode, int page, int size, Integer minPrice, Integer maxPrice) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        // 가격 필터링 조건을 추가
+        if (minPrice != null && maxPrice != null) {
+            return rankingRepository.findBySggCdAndDealAmountBetween(regionCode, minPrice, maxPrice, pageable);
+        } else if (minPrice != null) {
+            return rankingRepository.findBySggCdAndDealAmountGreaterThanEqual(regionCode, minPrice, pageable);
+        } else if (maxPrice != null) {
+            return rankingRepository.findBySggCdAndDealAmountLessThanEqual(regionCode, maxPrice, pageable);
+        } else {
+            return rankingRepository.findBySggCd(regionCode, pageable);
+        }
     }
 
 

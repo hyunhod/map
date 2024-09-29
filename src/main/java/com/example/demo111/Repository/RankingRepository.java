@@ -21,5 +21,16 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
 
     Page<TransactionRanking> findBySggCd(String sggCd,Pageable pageable); // 지역 코드로 거래 정보 찾기
 
+    // 지역 코드와 거래 가격 범위를 기준으로 필터링
+    Page<TransactionRanking> findBySggCdAndDealAmountBetween(String sggCd, Integer minPrice, Integer maxPrice, Pageable pageable);
+
+    // 최소 가격 필터링
+    Page<TransactionRanking> findBySggCdAndDealAmountGreaterThanEqual(String sggCd, Integer minPrice, Pageable pageable);
+
+    // 최대 가격 필터링
+    Page<TransactionRanking> findBySggCdAndDealAmountLessThanEqual(String sggCd, Integer maxPrice, Pageable pageable);
+
+
+
 
 }

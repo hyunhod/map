@@ -41,16 +41,16 @@
         <ul class="pagination">
             <!-- 이전 버튼 -->
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName}, page=${currentPage - 1}, size=${size})}">이전</a>
+                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, page=${currentPage - 1}, size=${size})}">이전</a>
             </li>
             <!-- 페이지 번호 범위 계산 -->
             <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
                 th:classappend="${currentPage == i} ? 'active'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName}, page=${i}, size=${size})}" th:text="${i + 1}"></a>
+                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, page=${i}, size=${size})}" th:text="${i + 1}"></a>
             </li>
             <!-- 다음 버튼 -->
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName}, page=${currentPage + 1}, size=${size})}">다음</a>
+                <a class="page-link" th:href="@{/search1(locationName=${locationName}, minPrice=${minPrice}, maxPrice=${maxPrice},page=${currentPage + 1}, size=${size})}">다음</a>
             </li>
         </ul>
     </nav>

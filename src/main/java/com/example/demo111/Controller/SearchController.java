@@ -60,7 +60,7 @@ public class SearchController {
         String regionCode = location.getRegionCode(); // 지역 코드 얻기
 
         // regionCode에 해당하는 거래 정보를 가져옵니다.
-        Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode,page,size);
+        Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode,page,size,minPrice,maxPrice);
 
 
 
@@ -70,6 +70,9 @@ public class SearchController {
         model.addAttribute("currentPage", page); // 현재 페이지
         model.addAttribute("transactions", transactionRankings);
         model.addAttribute("locationName",locationName);
+        model.addAttribute("minPrice", minPrice); // 최소 가격 필터 유지
+        model.addAttribute("maxPrice", maxPrice); // 최대 가격 필터 유지
+
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
 
