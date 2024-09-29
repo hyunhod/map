@@ -17,7 +17,9 @@
             <th>가격</th>
             <th>전용면적</th>
             <th>거래일자</th>
-            <th>거래유형</th>
+            <th>층</th>
+            <th>법정동</th>
+            <th>지번</th>
         </tr>
         </thead>
         <tbody>
@@ -27,10 +29,32 @@
             <td th:text="${ranking.dealAmount}"></td>
             <td th:text="${ranking.excluUseAr}"></td>
             <td th:text="${ranking.dealYear} + '-' + ${ranking.dealMonth} + '-' + ${ranking.dealDay}"></td>
-            <td th:text="${ranking.dealingGbn}"></td>
+            <td th:text="${ranking.floor}"></td>
+            <td th:text="${ranking.umdNm}"></td>
+            <td th:text="${ranking.jibun}"></td>
         </tr>
         </tbody>
     </table>
+
+    <!-- 페이징 링크 -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <!-- 이전 버튼 -->
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/search1(locationName=${locationName}, page=${currentPage - 1}, size=${size})}">이전</a>
+            </li>
+            <!-- 페이지 번호 범위 계산 -->
+            <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
+                th:classappend="${currentPage == i} ? 'active'">
+                <a class="page-link" th:href="@{/search1(locationName=${locationName}, page=${i}, size=${size})}" th:text="${i + 1}"></a>
+            </li>
+            <!-- 다음 버튼 -->
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/search1(locationName=${locationName}, page=${currentPage + 1}, size=${size})}">다음</a>
+            </li>
+        </ul>
+    </nav>
+
 </div>
 </body>
 </html>

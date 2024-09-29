@@ -2,6 +2,8 @@ package com.example.demo111.service;
 
 import com.example.demo111.Repository.LocationRepository;
 import com.example.demo111.domain.Location;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -81,5 +83,11 @@ public class LocationService {
     public Location findLocationByCityOrDistrict(String cityOrDistrict) {
         Optional<Location> location = locationRepository.findByCityDistrict(cityOrDistrict);
         return location.orElse(null); // 없으면 null 반환
+    }
+
+    // 시/군/구로 검색하여 해당 지역의 페이징된 거래 정보를 반환
+    public Page<Location> getPagedLocationsByRegionCode(String regionCode, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size); // 페이지 번호와 페이지 크기를 설정
+        return locationRepository.findByRegionCode(regionCode, pageRequest);
     }
 }

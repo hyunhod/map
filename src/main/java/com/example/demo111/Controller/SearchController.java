@@ -5,6 +5,7 @@ import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.service.LocationService;
 import com.example.demo111.service.RankingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,6 @@ public class SearchController {
 
     @Autowired
     private RankingService rankingService;
-
 
 
     //db에 지역코드와 이름 저장후 불러오기
@@ -47,30 +47,29 @@ public class SearchController {
 
     // 아파트 거래 정보를 조회하는 메서드
     @GetMapping("/search1")
-    public String searchTransactions( @RequestParam String locationName,
+    public String searchTransactions(@RequestParam String locationName,
                                      @RequestParam(required = false) Integer minPrice,
                                      @RequestParam(required = false) Integer maxPrice,
+                                     @RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "20") int size,
                                      Model model) {
 
+// 지역명으로 지역 정보를 조회
         Location location = locationService.findLocationByCityOrDistrict(locationName);
 
-
         String regionCode = location.getRegionCode(); // 지역 코드 얻기
-        System.out.println("regionCode: "+regionCode);
 
         // regionCode에 해당하는 거래 정보를 가져옵니다.
-        List<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode);
+        Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode,page,size);
 
-        // 가격 필터링
-        if (minPrice != null) {
-            transactionRankings.removeIf(ranking -> ranking.getDealAmount() < minPrice);
-        }
-        if (maxPrice != null) {
-            transactionRankings.removeIf(ranking -> ranking.getDealAmount() > maxPrice);
-        }
 
-        // 모델에 결과 추가
+
+        // 모델에 결과와 페이징 정보를 추가
+        model.addAttribute("transactions", transactionRankings.getContent()); // 거래 리스트
+        model.addAttribute("totalPages", transactionRankings.getTotalPages()); // 전체 페이지 수
+        model.addAttribute("currentPage", page); // 현재 페이지
         model.addAttribute("transactions", transactionRankings);
+        model.addAttribute("locationName",locationName);
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
 

@@ -108,8 +108,9 @@ public class RankingService {
     }
 
     // 지역 코드로 거래 정보 가져오기
-    public List<TransactionRanking> getTransactionRankingsByRegion(String regionCode) {
-        return rankingRepository.findBySggCd(regionCode); // 지역 코드로 거래 정보 검색
+    public Page<TransactionRanking> getTransactionRankingsByRegion(String regionCode,int page,int size) {
+        PageRequest pageRequest = PageRequest.of(page, size); // 페이지 번호와 페이지 크기를 설정
+        return rankingRepository.findBySggCd(regionCode,pageRequest); // 지역 코드로 거래 정보 검색
     }
 
 
