@@ -29,11 +29,31 @@
         </div>
         <div class="form-group">
             <label for="minPrice">최소 가격</label>
-            <input type="number" class="form-control" id="minPrice" name="minPrice">
+            <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="최소 가격을 입력하세요">
         </div>
         <div class="form-group">
             <label for="maxPrice">최대 가격</label>
-            <input type="number" class="form-control" id="maxPrice" name="maxPrice">
+            <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="최대 가격을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label for="minArea">최소 면적 (㎡)</label>
+            <input type="number" class="form-control" id="minArea" name="minArea" placeholder="최소 면적을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label for="maxArea">최대 면적 (㎡)</label>
+            <input type="number" class="form-control" id="maxArea" name="maxArea" placeholder="최대 면적을 입력하세요">
+        </div>
+        <div class="form-group">
+            <label for="dealDate">거래 날짜</label>
+            <input type="date" class="form-control" id="dealDate" name="dealDate">
+        </div>
+        <div class="form-group">
+            <label for="sortBy">정렬 기준</label>
+            <select id="sortBy" name="sortBy" class="form-control">
+                <option value="">선택하세요</option>
+                <option value="dealAmount">거래 금액순</option>
+                <option value="buildYear">건축년도순</option>
+            </select>
         </div>
         <button type="submit" class="btn btn-primary">검색</button>
     </form>
@@ -51,7 +71,6 @@
                 $.get('/sub-locations', { regionCode: regionCode }, function(data) {
                     data.forEach(function(loc) {
                         $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
-
                     });
                 });
             }

@@ -4,11 +4,13 @@ import com.example.demo111.aprtDto.ItemsDto;
 import com.example.demo111.aprtDto.ResponseDto;
 import com.example.demo111.Repository.RankingRepository;
 import com.example.demo111.domain.TransactionRanking;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,9 +21,6 @@ public class RankingService {
 
     @Autowired
     private RankingRepository rankingRepository;
-
-
-
 
 
     // ResponseDto를 TransactionRanking으로 매핑하는 메소드
@@ -52,14 +51,13 @@ public class RankingService {
             ranking.setDealingGbn(item.getDealingGbn());
 
 
-
             if (item.getDealAmount() != null && !item.getDealAmount().isEmpty()) {
-               try{
-                   String sanitizedAmount = item.getDealAmount().replace(",", ""); // 쉼표 제거
-                   ranking.setDealAmount(Integer.parseInt(sanitizedAmount));
-               }catch (NumberFormatException e){
-                   ranking.setDealAmount(0);
-               }
+                try {
+                    String sanitizedAmount = item.getDealAmount().replace(",", ""); // 쉼표 제거
+                    ranking.setDealAmount(Integer.parseInt(sanitizedAmount));
+                } catch (NumberFormatException e) {
+                    ranking.setDealAmount(0);
+                }
             }
 
             if (item.getExcluUseAr() != null && !item.getExcluUseAr().isEmpty()) {
@@ -67,13 +65,14 @@ public class RankingService {
             }
             //리스트에 추가
             rankings.add(ranking);
-            System.out.println("rankings :: "+rankings);
+            System.out.println("rankings :: " + rankings);
 
         }
 
 
         return rankings;
     }
+
     // 매핑된 TransactionRanking 리스트를 데이터베이스에 저장하는 메소드
     public void saveTransactionRankings(List<TransactionRanking> rankings) {
         if (rankings != null && !rankings.isEmpty()) {
@@ -105,30 +104,78 @@ public class RankingService {
     }
 
     // 지역 코드로 거래 정보 가져오기
-    public Page<TransactionRanking> getTransactionRankingsByRegion(String regionCode,int page,int size) {
+    public Page<TransactionRanking> getTransactionRankingsByRegion(String regionCode, int page, int size) {
         PageRequest pageRequest = PageRequest.of(page, size); // 페이지 번호와 페이지 크기를 설정
-        return rankingRepository.findBySggCd(regionCode,pageRequest); // 지역 코드로 거래 정보 검색
+        return rankingRepository.findBySggCd(regionCode, pageRequest); // 지역 코드로 거래 정보 검색
     }
-    public Page<TransactionRanking> getTransactionRankingsByRegion(String regionCode, int page, int size, Integer minPrice, Integer maxPrice) {
+
+    public Page<TransactionRanking> getTransactionRankingsByRegion(String sggCd, int page, int size, Integer minPrice, Integer maxPrice, Integer minArea, Integer maxArea, String dealDate, String sortBy) {
         Pageable pageable = PageRequest.of(page, size);
 
-        // 가격 필터링 조건을 추가
-        if (minPrice != null && maxPrice != null) {
-            return rankingRepository.findBySggCdAndDealAmountBetween(regionCode, minPrice, maxPrice, pageable);
-        } else if (minPrice != null) {
-            return rankingRepository.findBySggCdAndDealAmountGreaterThanEqual(regionCode, minPrice, pageable);
-        } else if (maxPrice != null) {
-            return rankingRepository.findBySggCdAndDealAmountLessThanEqual(regionCode, maxPrice, pageable);
+
+        // 동적 쿼리 작성
+        Specification<TransactionRanking> spec = (root, query, criteriaBuilder) -> {
+            Predicate predicate = criteriaBuilder.conjunction(); // 모든 조건을 결합하는 Predicate 생성
+
+
+            // 지역 코드 필터링 조건 추가
+            if (sggCd != null && !sggCd.isEmpty()) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("sggCd"), sggCd));
+            }
+            // 가격 필터링 조건을 추가
+            if (minPrice != null && maxPrice != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.between(root.get("dealAmount"), minPrice, maxPrice));
+            } else if (minPrice != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThanOrEqualTo(root.get("dealAmount"), minPrice));
+            } else if (maxPrice != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.lessThanOrEqualTo(root.get("dealAmount"), maxPrice));
+            }
+
+            if (minArea != null && maxArea != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.between(root.get("excluUseAr"), minArea, maxArea));
+            } else if (minArea != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.greaterThanOrEqualTo(root.get("excluUseAr"), minArea));
+            } else if (maxArea != null) {
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.lessThanOrEqualTo(root.get("excluUseAr"), maxArea));
+            }
+            // 거래 날짜 필터링 조건 적용
+            if (dealDate != null && !dealDate.isEmpty()) {
+                String[] dateParts = dealDate.split("-");
+                Integer year = Integer.parseInt(dateParts[0]);
+                Integer month = Integer.parseInt(dateParts[1]);
+                Integer day = Integer.parseInt(dateParts[2]);
+
+                // 거래 날짜 필터링 조건 추가 (예: "dealYear", "dealMonth", "dealDay" 필드 사용)
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("dealYear"), year));
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("dealMonth"), month));
+                predicate = criteriaBuilder.and(predicate, criteriaBuilder.equal(root.get("dealDay"), day));
+            }
+            return predicate;
+        };
+        // 정렬 기준을 포함한 Pageable 생성
+        Sort sort;
+        if ("buildYear".equals(sortBy)) {
+            sort = Sort.by("buildYear").descending(); // buildYear로 정렬
         } else {
-            return rankingRepository.findBySggCd(regionCode, pageable);
+            sort = Sort.by("dealAmount").descending(); // 기본 정렬 기준
         }
+
+        pageable = PageRequest.of(page, size, sort); // 정렬 기준을 포함한 Pageable 생성
+
+        // 검색 결과 반환
+        Page<TransactionRanking> result = rankingRepository.findAll(spec, pageable);
+
+        System.out.println("Result: " + result);
+        return result; // 검색 결과 반환
     }
-
-
-
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+

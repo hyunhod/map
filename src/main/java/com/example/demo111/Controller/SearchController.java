@@ -50,6 +50,10 @@ public class SearchController {
     public String searchTransactions(@RequestParam String locationName,
                                      @RequestParam(required = false) Integer minPrice,
                                      @RequestParam(required = false) Integer maxPrice,
+                                     @RequestParam(required = false) Integer minArea,
+                                     @RequestParam(required = false) Integer maxArea,
+                                     @RequestParam(required = false) String dealDate,
+                                     @RequestParam(required = false, defaultValue = "dealAmount") String sortBy,
                                      @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "20") int size,
                                      Model model) {
@@ -60,7 +64,7 @@ public class SearchController {
         String regionCode = location.getRegionCode(); // 지역 코드 얻기
 
         // regionCode에 해당하는 거래 정보를 가져옵니다.
-        Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode,page,size,minPrice,maxPrice);
+        Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode,page,size,minPrice,maxPrice,minArea,maxArea,dealDate,sortBy);
 
 
 
@@ -72,6 +76,10 @@ public class SearchController {
         model.addAttribute("locationName",locationName);
         model.addAttribute("minPrice", minPrice); // 최소 가격 필터 유지
         model.addAttribute("maxPrice", maxPrice); // 최대 가격 필터 유지
+        model.addAttribute("minArea", minArea);
+        model.addAttribute("maxArea", maxArea);
+        model.addAttribute("dealDate", dealDate);
+        model.addAttribute("sortBy", sortBy);
 
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
