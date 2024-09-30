@@ -80,9 +80,9 @@ public class LocationService {
     }
 
     // 수정된 메서드
-    public Location findLocationByCityOrDistrict(String cityOrDistrict) {
-        Optional<Location> location = locationRepository.findByCityDistrict(cityOrDistrict);
-        return location.orElse(null); // 없으면 null 반환
+    public List<Location> findLocationByCityOrDistrict(String cityOrDistrict) {
+        return locationRepository.findByCityDistrict(cityOrDistrict);
+
     }
 
     // 시/군/구로 검색하여 해당 지역의 페이징된 거래 정보를 반환

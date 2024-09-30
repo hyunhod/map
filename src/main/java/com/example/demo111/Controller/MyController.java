@@ -34,6 +34,12 @@ public class MyController {
     @Autowired
     private RankingService rankingService;
 
+    @GetMapping("/import")
+    public String aa(){
+        apiService.fetchAndSaveApartmentData("C:/Users/black/Downloads/법정동코드 전체자료 (1)/법정동코드 전체자료.txt");
+        return "search2";
+
+    }
 
 
 

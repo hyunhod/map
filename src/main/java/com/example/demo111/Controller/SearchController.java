@@ -2,6 +2,7 @@ package com.example.demo111.controller;
 
 import com.example.demo111.domain.Location;
 import com.example.demo111.domain.TransactionRanking;
+import com.example.demo111.service.ApiService;
 import com.example.demo111.service.LocationService;
 import com.example.demo111.service.RankingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +13,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 @Controller
 public class SearchController {
+    @Autowired
+    private ApiService apiService;
 
     @Autowired
     private LocationService locationService;
@@ -59,21 +63,28 @@ public class SearchController {
                                      Model model) {
 
 // 지역명으로 지역 정보를 조회
-        Location location = locationService.findLocationByCityOrDistrict(locationName);
-
-        String regionCode = location.getRegionCode(); // 지역 코드 얻기
-
-        // regionCode에 해당하는 거래 정보를 가져옵니다.
-        Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode,page,size,minPrice,maxPrice,minArea,maxArea,dealDate,sortBy);
+        List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
+        List<TransactionRanking> allTransactions = new ArrayList<>();
 
 
+        for (Location location : locations) {
+            String regionCode = location.getRegionCode(); // 지역 코드 얻기
+            Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
+            allTransactions.addAll(transactionRankings.getContent());
+        }
+
+
+        // 전체 거래 정보를 페이지 단위로 잘라냅니다.
+        int totalTransactions = allTransactions.size();
+        int start = page * size;
+        int end = Math.min(start + size, totalTransactions);
+        List<TransactionRanking> paginatedTransactions = allTransactions.subList(start, end);
 
         // 모델에 결과와 페이징 정보를 추가
-        model.addAttribute("transactions", transactionRankings.getContent()); // 거래 리스트
-        model.addAttribute("totalPages", transactionRankings.getTotalPages()); // 전체 페이지 수
+        model.addAttribute("transactions", paginatedTransactions); // 거래 리스트
+        model.addAttribute("totalPages", (int) Math.ceil((double) totalTransactions / size)); // 전체 페이지 수
         model.addAttribute("currentPage", page); // 현재 페이지
-        model.addAttribute("transactions", transactionRankings);
-        model.addAttribute("locationName",locationName);
+        model.addAttribute("locationName", locationName);
         model.addAttribute("minPrice", minPrice); // 최소 가격 필터 유지
         model.addAttribute("maxPrice", maxPrice); // 최대 가격 필터 유지
         model.addAttribute("minArea", minArea);
@@ -83,5 +94,4 @@ public class SearchController {
 
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
-
 }

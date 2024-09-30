@@ -255,8 +255,8 @@ public class ApiService {
     }
 
 
-    @Scheduled(cron = "0 0 0 * * ?") // 매일 자정
-    public void fetchAndSaveApartmentData() {
+    //@Scheduled(cron = "0 0 0 * * ?") // 매일 자정
+    public void fetchAndSaveApartmentData(String filePath) {
         try {
             List<String> lawdCodes = readLawdCodesFromFile(filePath);
             int currentYear = Year.now().getValue(); // 현재 연도를 가져옵니다.

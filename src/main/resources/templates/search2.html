@@ -61,21 +61,28 @@
 
 <script>
     $(document).ready(function() {
-        $('#region').change(function() {
-            var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
+       $('#region').change(function() {
+           var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
 
-            $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
+           $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
 
-            if (regionCode) {
-                // AJAX 요청을 통해 세부 지역 가져오기
-                $.get('/sub-locations', { regionCode: regionCode }, function(data) {
-                    data.forEach(function(loc) {
-                        $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
-                    });
-                });
-            }
-        });
-    });
+           if (regionCode) {
+               // AJAX 요청을 통해 세부 지역 가져오기
+               $.get('/sub-locations', { regionCode: regionCode }, function(data) {
+                   data.forEach(function(loc) {
+                       $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
+                   });
+               });
+           }
+       });
+
+       // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
+       $('#locationName').on('change', function() {
+           var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
+           console.log('선택된 세부 지역 코드:', selectedLocationCode); // 콘솔에 로그 찍기
+       });
+   });
+
 </script>
 </body>
 </html>

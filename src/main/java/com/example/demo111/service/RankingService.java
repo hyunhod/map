@@ -110,8 +110,8 @@ public class RankingService {
     }
 
     public Page<TransactionRanking> getTransactionRankingsByRegion(String sggCd, int page, int size, Integer minPrice, Integer maxPrice, Integer minArea, Integer maxArea, String dealDate, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size);
 
+        System.out.println("pageaa :"+sggCd);
 
         // 동적 쿼리 작성
         Specification<TransactionRanking> spec = (root, query, criteriaBuilder) -> {
@@ -160,12 +160,11 @@ public class RankingService {
             sort = Sort.by("dealAmount").descending(); // 기본 정렬 기준
         }
 
-        pageable = PageRequest.of(page, size, sort); // 정렬 기준을 포함한 Pageable 생성
+        Pageable pageable = PageRequest.of(page, size, sort); // 정렬 기준을 포함한 Pageable 생성
 
         // 검색 결과 반환
         Page<TransactionRanking> result = rankingRepository.findAll(spec, pageable);
 
-        System.out.println("Result: " + result);
         return result; // 검색 결과 반환
     }
 }
