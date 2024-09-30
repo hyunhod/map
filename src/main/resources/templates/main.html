@@ -40,7 +40,7 @@
                 <div class="card-body">
                     <h2 class="card-title">아파트 랭킹 보기</h2>
                     <p class="card-text">가장 인기 있는 아파트를 랭킹으로 확인하세요.</p>
-                    <a th:href="@{/search2}" class="btn btn-primary">랭킹 보기</a>
+                    <a th:href="@{/map}" class="btn btn-primary">랭킹 보기</a>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
                 <div class="card-body">
                     <h2 class="card-title">아파트 거래 조회</h2>
                     <p class="card-text">최근 아파트 거래 내역을 조회해보세요.</p>
-                    <a th:href="@{/map}" class="btn btn-success">거래 조회하기</a>
+                    <a th:href="@{/search2}" class="btn btn-success">거래 조회하기</a>
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                 <!-- 추천 아파트 목록을 동적으로 표시 -->
                 <li th:each="apartment : ${recommendedApartments}" class="list-group-item">
                     <span class="highlight" th:text="${apartment.aptNm}">아파트 이름</span> -
-                    <span th:text="${#numbers.formatInteger(apartment.dealAmount, 0)}">실거래가</span>원 -
+                    <span th:text="${apartment.dealAmount/10000}">실거래가</span>억 -
                     <span th:text="${apartment.excluUseAr}"></span>m²
                 </li>
             </ul>

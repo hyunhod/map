@@ -109,11 +109,12 @@ public class RankingService {
         return rankingRepository.findBySggCd(regionCode, pageRequest); // 지역 코드로 거래 정보 검색
     }
 
-    public List<TransactionRanking> getAllRankings() {
-        return rankingRepository.findAll();
+
+    public List<TransactionRanking> getTop10BySggCd(String sggCd) {
+        return rankingRepository.findTop10BySggCd(sggCd).stream()
+                .limit(10)  // 리스트에서 상위 10개만 가져오기
+                .toList();  // Java 16 이상에서 사용 가능
     }
-
-
 
 
 

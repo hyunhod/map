@@ -120,6 +120,8 @@
 
 <div class="container mt-5">
     <h2>검색 결과</h2>
+    <!-- 홈 버튼 -->
+    <a href="/" class="btn btn-primary mb-3">홈</a>
 
     <table class="table">
         <thead>
@@ -142,7 +144,7 @@
                       th:attr="onclick='showOnMap(\'' + ${ranking.umdNm} + '\', \'' + ${ranking.jibun} + '\')'"></span>
             </td>
             <td th:text="${ranking.buildYear}"></td>
-            <td th:text="${ranking.dealAmount}"></td>
+            <td th:text="${ranking.dealAmount/10000 +'억'}"></td>
             <td th:text="${ranking.excluUseAr}"></td>
             <td th:text="${ranking.dealYear} + '-' + ${ranking.dealMonth} + '-' + ${ranking.dealDay}"></td>
             <td th:text="${ranking.floor}"></td>

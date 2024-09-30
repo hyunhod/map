@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,10 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
     // 건설 연도 기준으로 내림차순 정렬하여 조회
     Page<TransactionRanking> findAllByOrderByBuildYearDesc(Pageable pageable);
 
+
+    // sggCd로 가격이 가장 높은 상위 10개 거래 정보를 가져오는 메서드 추가
+    @Query(value = "SELECT tr FROM TransactionRanking tr WHERE tr.sggCd Like '11%' ORDER BY tr.dealAmount DESC")
+    List<TransactionRanking> findTop10BySggCd(String sggCd);
 
     //222
     Page<TransactionRanking> findBySggCd(String sggCd,Pageable pageable); // 지역 코드로 거래 정보 찾기
