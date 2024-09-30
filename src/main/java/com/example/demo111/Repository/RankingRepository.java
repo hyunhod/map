@@ -26,4 +26,7 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
 
 
 
+
+
+
 }

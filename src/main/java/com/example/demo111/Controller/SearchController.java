@@ -59,7 +59,7 @@ public class SearchController {
                                      @RequestParam(required = false) String dealDate,
                                      @RequestParam(required = false, defaultValue = "dealAmount") String sortBy,
                                      @RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "20") int size,
+                                     @RequestParam(defaultValue = "10") int size,
                                      Model model) {
 
         // 지역명으로 지역 정보를 조회
@@ -98,5 +98,6 @@ public class SearchController {
 
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
+
 
 }

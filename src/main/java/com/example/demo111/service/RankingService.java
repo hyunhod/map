@@ -109,6 +109,14 @@ public class RankingService {
         return rankingRepository.findBySggCd(regionCode, pageRequest); // 지역 코드로 거래 정보 검색
     }
 
+    public List<TransactionRanking> getAllRankings() {
+        return rankingRepository.findAll();
+    }
+
+
+
+
+
     public Page<TransactionRanking> getTransactionRankingsByRegion(String sggCd, int page, int size, Integer minPrice, Integer maxPrice, Integer minArea, Integer maxArea, String dealDate, String sortBy) {
 
 
@@ -163,9 +171,6 @@ public class RankingService {
 
         // 검색 결과 반환
         Page<TransactionRanking> result = rankingRepository.findAll(spec, pageable);
-
-        System.out.println("Total Elements: " + result.getTotalElements());
-        System.out.println("Current Page Content: " + result.getContent());
 
 
         return result; // 검색 결과 반환
