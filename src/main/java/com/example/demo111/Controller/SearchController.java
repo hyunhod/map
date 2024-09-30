@@ -62,27 +62,31 @@ public class SearchController {
                                      @RequestParam(defaultValue = "20") int size,
                                      Model model) {
 
-// 지역명으로 지역 정보를 조회
+        // 지역명으로 지역 정보를 조회
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
-        List<TransactionRanking> allTransactions = new ArrayList<>();
-
+        System.out.println("locations :" + locations);
+        List<TransactionRanking> paginatedTransactions = new ArrayList<>();
+        int totalTransactions = 0;
 
         for (Location location : locations) {
             String regionCode = location.getRegionCode(); // 지역 코드 얻기
+            System.out.println("Fetching transactions for region: " + regionCode);
+
+            // 각 지역에 대해 페이지별로 거래 정보를 가져옴
             Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
-            allTransactions.addAll(transactionRankings.getContent());
+
+            // 현재 페이지에 해당하는 데이터만 추가
+            paginatedTransactions.addAll(transactionRankings.getContent());
+            totalTransactions += transactionRankings.getTotalElements(); // 전체 거래 수 업데이트
         }
 
-
-        // 전체 거래 정보를 페이지 단위로 잘라냅니다.
-        int totalTransactions = allTransactions.size();
-        int start = page * size;
-        int end = Math.min(start + size, totalTransactions);
-        List<TransactionRanking> paginatedTransactions = allTransactions.subList(start, end);
+        // 전체 페이지 수 계산
+        int totalPages = (int) Math.ceil((double) totalTransactions / size);
+        System.out.println("Total Pages: " + totalPages);
 
         // 모델에 결과와 페이징 정보를 추가
         model.addAttribute("transactions", paginatedTransactions); // 거래 리스트
-        model.addAttribute("totalPages", (int) Math.ceil((double) totalTransactions / size)); // 전체 페이지 수
+        model.addAttribute("totalPages", totalPages); // 전체 페이지 수
         model.addAttribute("currentPage", page); // 현재 페이지
         model.addAttribute("locationName", locationName);
         model.addAttribute("minPrice", minPrice); // 최소 가격 필터 유지
@@ -94,4 +98,5 @@ public class SearchController {
 
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
+
 }

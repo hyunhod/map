@@ -111,7 +111,6 @@ public class RankingService {
 
     public Page<TransactionRanking> getTransactionRankingsByRegion(String sggCd, int page, int size, Integer minPrice, Integer maxPrice, Integer minArea, Integer maxArea, String dealDate, String sortBy) {
 
-        System.out.println("pageaa :"+sggCd);
 
         // 동적 쿼리 작성
         Specification<TransactionRanking> spec = (root, query, criteriaBuilder) -> {
@@ -164,6 +163,10 @@ public class RankingService {
 
         // 검색 결과 반환
         Page<TransactionRanking> result = rankingRepository.findAll(spec, pageable);
+
+        System.out.println("Total Elements: " + result.getTotalElements());
+        System.out.println("Current Page Content: " + result.getContent());
+
 
         return result; // 검색 결과 반환
     }
