@@ -50,7 +50,7 @@ public class SearchController {
 
     // 아파트 거래 정보를 조회하는 메서드
     @GetMapping("/search1")
-    public String searchTransactions(@RequestParam String locationName,
+    public String searchTransactions(@RequestParam(required = false)  String locationName,
                                      @RequestParam(required = false) Integer minPrice,
                                      @RequestParam(required = false) Integer maxPrice,
                                      @RequestParam(required = false) Integer minArea,
@@ -60,6 +60,11 @@ public class SearchController {
                                      @RequestParam(defaultValue = "0") int page,
                                      @RequestParam(defaultValue = "10") int size,
                                      Model model) {
+
+        Map<String, Set<String>> locations1 = locationService.getAllLocations();
+        model.addAttribute("locations", locations1);
+
+        System.out.println("lcname:"+locationName);
 
         // 지역명으로 지역 정보를 조회
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
