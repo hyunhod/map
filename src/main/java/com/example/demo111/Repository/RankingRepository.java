@@ -28,6 +28,9 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
     //222
     Page<TransactionRanking> findBySggCd(String sggCd,Pageable pageable); // 지역 코드로 거래 정보 찾기
 
+    // 아파트 이름으로 거래 내역을 조회하는 메소드
+    List<TransactionRanking> findByAptNm(String AptName);
+
 
 
 

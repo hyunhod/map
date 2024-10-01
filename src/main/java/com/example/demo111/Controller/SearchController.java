@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Controller
 public class SearchController {
@@ -96,6 +93,22 @@ public class SearchController {
         model.addAttribute("sortBy", sortBy);
 
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
+    }
+
+
+    @GetMapping("/price-history")
+    @ResponseBody
+    public List<TransactionRanking> getPriceHistoryByAptNm(@RequestParam String aptNm) {
+        // 아파트 이름을 기준으로 거래 기록 조회
+        List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(aptNm);
+
+        // 거래 날짜 기준으로 정렬 (연도, 월, 일 기준)
+        transactions.sort(Comparator.comparing(TransactionRanking::getDealYear)
+                .thenComparing(TransactionRanking::getDealMonth)
+                .thenComparing(TransactionRanking::getDealDay));
+
+        // 정렬된 거래 기록 반환
+        return transactions;
     }
 
 

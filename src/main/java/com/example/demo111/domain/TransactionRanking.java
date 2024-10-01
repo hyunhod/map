@@ -15,7 +15,7 @@ public class TransactionRanking {
 
 
     @Column(name="이름")
-    private String AptNm;
+    private String aptNm;
     @Column(name="건축년도")
     private String buildYear;
     @Column(name="가격")
