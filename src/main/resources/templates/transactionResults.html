@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>검색 결과</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script type="text/javascript"
-            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
     <style>
         #map {
             width: 100%;
@@ -38,19 +37,84 @@
             color: blue; /* 링크처럼 보이도록 색상 변경 */
             text-decoration: underline; /* 밑줄 추가 */
         }
+        .chart-container {
+            height: 400px; /* 그래프 높이 설정 */
+        }
     </style>
 </head>
 <body>
 
-<!-- Kakao Map -->
-<div id="map"></div>
+<div class="container mt-5">
+    <h2>검색 결과</h2>
 
-<input type="text" id="address" placeholder="주소를 입력하세요" style="width:400px;"/>
-<button onclick="searchAddress()">주소 검색</button>
+    <!-- Kakao Map -->
+    <div id="map"></div>
 
-<div id="address-list"></div>
-<!-- 그래프를 표시할 캔버스 -->
-<canvas id="priceChart" width="400" height="200"></canvas>
+    <input type="text" id="address" placeholder="번지-지번 검색" style="width:400px;"/>
+    <button onclick="searchAddress()" class="btn btn-secondary">주소 검색</button>
+
+    <div id="address-list"></div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>이름</th>
+                    <th>건축년도</th>
+                    <th>가격</th>
+                    <th>전용면적</th>
+                    <th>거래일자</th>
+                    <th>층</th>
+                    <th>법정동</th>
+                    <th>지번</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ranking : ${transactions}">
+                    <td>
+                        <span class="apt-name"
+                              th:text="${ranking.aptNm}"
+                              th:attr="onclick='showOnMap(\'' + ${ranking.umdNm} + '\', \'' + ${ranking.jibun} + '\', \'' + ${ranking.aptNm} + '\')'"></span>
+                    </td>
+                    <td th:text="${ranking.buildYear}"></td>
+                    <td th:text="${ranking.dealAmount/10000 +'억'}"></td>
+                    <td th:text="${ranking.excluUseAr}"></td>
+                    <td th:text="${ranking.dealYear} + '-' + ${ranking.dealMonth} + '-' + ${ranking.dealDay}"></td>
+                    <td th:text="${ranking.floor}"></td>
+                    <td th:text="${ranking.umdNm}"></td>
+                    <td th:text="${ranking.jibun}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-4">
+            <!-- 그래프를 표시할 캔버스 -->
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <!-- 홈 버튼 -->
+    <a href="/" class="btn btn-primary mb-3">홈</a>
+
+
+    <!-- 페이징 링크 -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage - 1}, size=${size})}">이전</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${i}, size=${size})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage + 1}, size=${size})}">다음</a>
+            </li>
+        </ul>
+    </nav>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -82,7 +146,7 @@
     }
 
     // 선택한 아파트를 지도에 표시하는 함수
-    function showOnMap(umdNm, jibun,aptNm) {
+    function showOnMap(umdNm, jibun, aptNm) {
         var address = umdNm + " " + jibun; // 법정동 + 지번
         geocoder.addressSearch(address, function(result, status) {
             if (status === kakao.maps.services.Status.OK) {
@@ -91,14 +155,12 @@
                 marker.setMap(map);
                 map.setCenter(coords);
                 console.log("위도:", result[0].y, "경도:", result[0].x);
-                fetchPriceHistory(aptNm)
-
+                fetchPriceHistory(aptNm);
             } else {
                 alert('주소를 찾을 수 없습니다.');
             }
         });
     }
-
 
    let priceChart; // 차트 전역 변수
 
@@ -106,9 +168,24 @@ function fetchPriceHistory(aptNm) {
     fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
         .then(response => response.json())
         .then(data => {
-            // 날짜와 가격 데이터를 배열로 변환
-            const labels = data.map(transaction => `${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}`);
-            const prices = data.map(transaction => transaction.dealAmount / 10000); // 억 단위로 변환
+            // 거래 데이터를 월별로 집계
+            const monthlyData = {};
+            data.forEach(transaction => {
+                const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { total: 0, count: 0 };
+                }
+                monthlyData[monthKey].total += transaction.dealAmount;
+                monthlyData[monthKey].count++;
+            });
+
+            // 월별 평균 가격 계산
+            const labels = [];
+            const prices = [];
+            for (const month in monthlyData) {
+                labels.push(month);
+                prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
+            }
 
             // 이전 차트가 존재하면 파괴
             if (priceChart) {
@@ -122,7 +199,7 @@ function fetchPriceHistory(aptNm) {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '매매가(억 원)',
+                        label: '평균 매매가(억 원)',
                         data: prices,
                         borderColor: 'rgba(75, 192, 192, 1)',
                         fill: false,
@@ -134,7 +211,7 @@ function fetchPriceHistory(aptNm) {
                         x: {
                             title: {
                                 display: true,
-                                text: '거래일자'
+                                text: '거래 월'
                             }
                         },
                         y: {
@@ -146,89 +223,9 @@ function fetchPriceHistory(aptNm) {
                     }
                 }
             });
-        })
-        .catch(error => {
-            console.error('가격 기록을 가져오는 중 오류 발생:', error);
         });
 }
 
-
-    // 지역 코드를 가져오는 함수
-    function getRegionCode(region) {
-        const dealDate = document.getElementById('dealDate').value;
-        fetch(`https://apis.data.go.kr/1741000/StanReginCd/getStanReginCdList?ServiceKey=YOUR_SERVICE_KEY&type=xml&pageNo=1&numOfRows=3&flag=Y&locatadd_nm=${encodeURIComponent(region)}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('네트워크 오류');
-                }
-                return response.text();
-            })
-            .then(xmlData => {
-                const regionCodes = [...new Set(parseRegionCodes(xmlData))];  // 중복 제거
-                if (regionCodes.length > 0) {
-                    regionCodes.forEach(code => fetchApartments(code, dealDate));
-                } else {
-                    alert('유효한 지역 코드를 찾을 수 없습니다.');
-                }
-            })
-            .catch(error => {
-                console.error('지역 코드 검색 오류:', error);
-            });
-    }
 </script>
-
-<div class="container mt-5">
-    <h2>검색 결과</h2>
-    <!-- 홈 버튼 -->
-    <a href="/" class="btn btn-primary mb-3">홈</a>
-
-    <table class="table">
-        <thead>
-        <tr>
-            <th>이름</th>
-            <th>건축년도</th>
-            <th>가격</th>
-            <th>전용면적</th>
-            <th>거래일자</th>
-            <th>층</th>
-            <th>법정동</th>
-            <th>지번</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="ranking : ${transactions}">
-            <td>
-                <span class="apt-name"
-                      th:text="${ranking.aptNm}"
-                      th:attr="onclick='showOnMap(\'' + ${ranking.umdNm} + '\', \'' + ${ranking.jibun} + '\', \'' + ${ranking.aptNm} + '\')'"></span>
-            </td>
-            <td th:text="${ranking.buildYear}"></td>
-            <td th:text="${ranking.dealAmount/10000 +'억'}"></td>
-            <td th:text="${ranking.excluUseAr}"></td>
-            <td th:text="${ranking.dealYear} + '-' + ${ranking.dealMonth} + '-' + ${ranking.dealDay}"></td>
-            <td th:text="${ranking.floor}"></td>
-            <td th:text="${ranking.umdNm}"></td>
-            <td th:text="${ranking.jibun}"></td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- 페이징 링크 -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage - 1}, size=${size})}">이전</a>
-            </li>
-            <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
-                th:classappend="${i == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${i}, size=${size})}" th:text="${i + 1}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage + 1}, size=${size})}">다음</a>
-            </li>
-        </ul>
-    </nav>
-</div>
-
 </body>
 </html>
