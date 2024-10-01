@@ -23,7 +23,7 @@ public class LocationService {
     }
 
     public void saveLocationsFromFile(String filePath) {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "EUC-KR"))) {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), "UTF-8"))) {
             String line;
             boolean isFirstLine = true; // 첫 줄인지 확인하는 변수
 

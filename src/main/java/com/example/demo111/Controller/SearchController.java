@@ -33,8 +33,7 @@ public class SearchController {
     //db에 지역코드와 이름 저장후 불러오기
     @GetMapping("/search2")
     public String search(Model model) {
-        //locationRepository.deleteAll();
-        //locationService.saveLocationsFromFile("C:/Users/black/Downloads/법정동코드 전체자료 (1)/법정동코드 전체자료.txt");
+        //locationService.saveLocationsFromFile("C:/Users/black/OneDrive/바탕 화면/수도권코드.txt");
         Map<String, Set<String>> locations = locationService.getAllLocations();
         model.addAttribute("locations", locations);
         return "search2"; // search.html로 이동

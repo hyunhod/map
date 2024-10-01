@@ -259,15 +259,16 @@ public class ApiService {
     public void fetchAndSaveApartmentData(String filePath) {
         try {
             List<String> lawdCodes = readLawdCodesFromFile(filePath);
+            System.out.println("추출된값 :"+lawdCodes);
             int currentYear = Year.now().getValue(); // 현재 연도를 가져옵니다.
             for (String lawdCode : lawdCodes) {
-                for (int year = 1990; year <= currentYear; year++) {
+                for (int year = 2024; year <= currentYear; year++) {
                     for (int month = 1; month <= 12; month++) { // 1월부터 12월까지 반복
                         String dealYmd = String.format("%04d%02d", year, month); // 연도와 월을 사용
                         ResponseDto responseDto = fetchData(lawdCode, dealYmd, Integer.MAX_VALUE);
                         if (responseDto != null) {
                             List<TransactionRanking> rankings = rankingService.mapToTransactionRanking(responseDto);
-                            saveTransactionRankings(rankings);
+                             saveTransactionRankings(rankings);
                         }
                     }
                 }

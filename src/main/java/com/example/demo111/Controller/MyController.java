@@ -35,7 +35,7 @@ public class MyController {
 
     @GetMapping("/import")
     public String aa(){
-        apiService.fetchAndSaveApartmentData("C:/Users/black/Downloads/법정동코드 전체자료 (1)/법정동코드 전체자료.txt");
+        apiService.fetchAndSaveApartmentData("C:/Users/black/OneDrive/바탕 화면/수도권코드.txt");
         return "search2";
 
     }
