@@ -183,6 +183,23 @@ public class RankingService {
     }
 
 
+
+    // 거래량이 가장 많은 상위 10개 아파트 반환 메서드
+    public List<String> getTopAptsByTransactionCount(String regionCode) {
+        Pageable pageable = PageRequest.of(0, 20);
+        List<Object[]> results = rankingRepository.findTopAptsByTransactionCount(regionCode);
+        List<String> topApartments = new ArrayList<>();
+
+        System.out.println("count " +topApartments.stream().count());
+
+        for (Object[] result : results) {
+            topApartments.add((String) result[0]); // 아파트 이름 추가
+        }
+
+        return topApartments;
+    }
+
+
 }
 
 

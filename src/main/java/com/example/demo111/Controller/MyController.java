@@ -42,8 +42,6 @@ public class MyController {
 
 
 
-
-
     @GetMapping("/")
     public String showMainPage(Model model) {
 
@@ -57,7 +55,7 @@ public class MyController {
     @GetMapping("/ranking")
     public String showRankingsPage() {
 
-        return "search";
+        return "search2";
     }
     @GetMapping("map")
     public String map(){

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class SearchController {
@@ -31,12 +32,36 @@ public class SearchController {
 
 
     //db에 지역코드와 이름 저장후 불러오기
-    @GetMapping("/search2")
-    public String search(Model model) {
+    @GetMapping("/aptRanking")
+    public String search(@RequestParam(required = false) String locationName, Model model) {
         //locationService.saveLocationsFromFile("C:/Users/black/OneDrive/바탕 화면/수도권코드.txt");
-        Map<String, Set<String>> locations = locationService.getAllLocations();
-        model.addAttribute("locations", locations);
-        return "search2"; // search.html로 이동
+        Map<String, Set<String>> locationsMap  = locationService.getAllLocations();
+        model.addAttribute("locations", locationsMap );
+
+        List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
+        List<String> topApartments = new ArrayList<>();
+
+        for (Location location : locations) {
+            String regionCode = location.getRegionCode(); // 지역 코드 얻기
+            System.out.println("Fetching transactions for region: " + regionCode);
+
+            // 상위 10개 아파트 이름 가져오기
+            topApartments.addAll(rankingService.getTopAptsByTransactionCount(regionCode));
+
+        }
+
+        // 중복 제거를 위해 Set 사용
+        Set<String> uniqueTopApartmentsSet = new HashSet<>(topApartments);
+        List<String> uniqueTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
+
+        // 필요한 경우 상위 20개 아파트만 선택
+        List<String> finalTopApartments = uniqueTopApartments.stream()
+                .limit(20)
+                .collect(Collectors.toList());
+        // 모델에 상위 아파트 목록 추가
+        model.addAttribute("topApartments", finalTopApartments );
+
+        return "aptRanking"; // search.html로 이동
     }
 
     @GetMapping("/sub-locations")
@@ -49,8 +74,8 @@ public class SearchController {
     }
 
     // 아파트 거래 정보를 조회하는 메서드
-    @GetMapping("/search1")
-    public String searchTransactions(@RequestParam(required = false)  String locationName,
+    @GetMapping("/aptSearch")
+    public String searchTransactions(@RequestParam(required = false) String locationName,
                                      @RequestParam(required = false) Integer minPrice,
                                      @RequestParam(required = false) Integer maxPrice,
                                      @RequestParam(required = false) Integer minArea,
@@ -61,10 +86,10 @@ public class SearchController {
                                      @RequestParam(defaultValue = "10") int size,
                                      Model model) {
 
-        Map<String, Set<String>> locations1 = locationService.getAllLocations();
-        model.addAttribute("locations", locations1);
+        Map<String, Set<String>> mapLocation = locationService.getAllLocations();
+        model.addAttribute("locations", mapLocation);
 
-        System.out.println("lcname:"+locationName);
+
 
         // 지역명으로 지역 정보를 조회
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
@@ -74,7 +99,6 @@ public class SearchController {
 
         for (Location location : locations) {
             String regionCode = location.getRegionCode(); // 지역 코드 얻기
-            System.out.println("Fetching transactions for region: " + regionCode);
 
             // 각 지역에 대해 페이지별로 거래 정보를 가져옴
             Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
@@ -86,7 +110,6 @@ public class SearchController {
 
         // 전체 페이지 수 계산
         int totalPages = (int) Math.ceil((double) totalTransactions / size);
-        System.out.println("Total Pages: " + totalPages);
 
         // 모델에 결과와 페이징 정보를 추가
         model.addAttribute("transactions", paginatedTransactions); // 거래 리스트
@@ -99,6 +122,7 @@ public class SearchController {
         model.addAttribute("maxArea", maxArea);
         model.addAttribute("dealDate", dealDate);
         model.addAttribute("sortBy", sortBy);
+
 
         return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
     }
