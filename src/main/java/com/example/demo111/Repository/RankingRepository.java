@@ -22,17 +22,22 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
     Page<TransactionRanking> findAllByOrderByBuildYearDesc(Pageable pageable);
 
 
-    // sggCd로 가격이 가장 높은 상위 10개 거래 정보를 가져오는 메서드 추가
-    @Query("SELECT distinct tr FROM TransactionRanking tr WHERE tr.sggCd LIKE CONCAT(:sggCd, '%') AND (tr.dealYear = :year1 AND tr.dealMonth >= :month1 OR tr.dealYear = :year2 AND tr.dealMonth <= :month2 OR tr.dealYear = :year3) ORDER BY tr.dealAmount DESC")
-    Page<TransactionRanking> findTop10BySggCd(
+
+
+    @Query("SELECT tr.aptNm, MAX(tr.dealAmount) AS maxPrice " +
+            "FROM TransactionRanking tr " +
+            "WHERE tr.sggCd LIKE CONCAT(:sggCd, '%') " +
+            "AND tr.dealYear = :year " +
+            "AND tr.dealMonth = :month " +
+            "GROUP BY tr.aptNm " +
+            "ORDER BY maxPrice DESC")
+    List<Object[]> findTop10BySggCdAndDealAmount(
             @Param("sggCd") String sggCd,
-            @Param("year1") String year1,
-            @Param("month1") String month1,
-            @Param("year2") String year2,
-            @Param("month2") String month2,
-            @Param("year3") String year3,
-            Pageable pageable
-    );
+            @Param("year") String year,
+            @Param("month") String month,
+            Pageable pageable);
+
+
 
     boolean existsBySggCdAndDealYearAndDealMonthAndAptNm(String sggCd, String dealYear, String dealMonth, String aptNm);
 

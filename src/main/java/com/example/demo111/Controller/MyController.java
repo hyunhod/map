@@ -45,7 +45,7 @@ public class MyController {
     @GetMapping("/")
     public String showMainPage(Model model) {
 
-        List<TransactionRanking> ranking = rankingService.getTop10BySggCd("11110");
+        List<TransactionRanking> ranking = rankingService.getTop10BySggCd("11");
 
 
         // 모델에 추천 아파트(Top 10) 추가

@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RankingService {
@@ -115,21 +118,32 @@ public class RankingService {
         // 현재 날짜 가져오기
         LocalDate currentDate = LocalDate.now();
 
-        // 최근 3개월의 연도와 월 계산
-        String year1 = String.valueOf(currentDate.getYear());
-        String month1 = String.format("%02d", currentDate.getMonthValue());
+        // 지난달의 연도와 월 계산
+        int year = currentDate.getYear();
+        int month = currentDate.getMonthValue();
 
-        LocalDate lastMonthDate = currentDate.minusMonths(1);
-        String year2 = String.valueOf(lastMonthDate.getYear());
-        String month2 = String.format("%02d", lastMonthDate.getMonthValue());
+        // 이전 달을 가져오기 위해 조정
+        if (month == 1) { // 1월이면 작년 12월로 설정
+            year = year - 1;
+            month = 12; // 12로 설정
+        } else { // 나머지 달은 월을 감소
+            month = month - 1; // 이전 달로 설정
+        }
 
-        LocalDate twoMonthsAgoDate = currentDate.minusMonths(2);
-        String year3 = String.valueOf(twoMonthsAgoDate.getYear());
-        String month3 = String.format("%02d", twoMonthsAgoDate.getMonthValue());
-
+        // Pageable 생성
         Pageable pageable = PageRequest.of(0, 10);
-        List<TransactionRanking> rankings = rankingRepository.findTop10BySggCd(sggCd, year1, month1, year2, month2, year3, pageable).getContent();
-        System.out.println(rankings);
+        // 리포지토리 메서드 호출
+        List<Object[]> results = rankingRepository.findTop10BySggCdAndDealAmount(sggCd, String.valueOf(year), String.valueOf(month), pageable);
+
+        // 결과를 TransactionRanking 객체로 변환
+        List<TransactionRanking> rankings = results.stream()
+                .map(result -> {
+                    TransactionRanking ranking = new TransactionRanking();
+                    ranking.setAptNm((String) result[0]); // 아파트 이름
+                    ranking.setDealAmount((Integer) result[1]); // 최대 가격
+                    return ranking;
+                })
+                .collect(Collectors.toList());
 
         return rankings;
     }
