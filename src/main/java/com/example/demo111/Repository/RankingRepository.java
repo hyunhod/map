@@ -24,20 +24,18 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
 
 
 
-    @Query("SELECT tr.aptNm, MAX(tr.dealAmount) AS maxPrice " +
+    @Query("SELECT tr.aptNm, MAX(tr.dealAmount), tr.excluUseAr, tr.estateAgentSggNm " +
             "FROM TransactionRanking tr " +
             "WHERE tr.sggCd LIKE CONCAT(:sggCd, '%') " +
             "AND tr.dealYear = :year " +
             "AND tr.dealMonth = :month " +
-            "GROUP BY tr.aptNm " +
-            "ORDER BY maxPrice DESC")
+            "GROUP BY tr.aptNm, tr.excluUseAr, tr.estateAgentSggNm " +
+            "ORDER BY MAX(tr.dealAmount) DESC")
     List<Object[]> findTop10BySggCdAndDealAmount(
             @Param("sggCd") String sggCd,
             @Param("year") String year,
             @Param("month") String month,
             Pageable pageable);
-
-
 
     boolean existsBySggCdAndDealYearAndDealMonthAndAptNm(String sggCd, String dealYear, String dealMonth, String aptNm);
 

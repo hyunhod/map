@@ -141,6 +141,9 @@ public class RankingService {
                     TransactionRanking ranking = new TransactionRanking();
                     ranking.setAptNm((String) result[0]); // 아파트 이름
                     ranking.setDealAmount((Integer) result[1]); // 최대 가격
+                    ranking.setExcluUseAr((Double) result[2]); // 전용면적
+                    ranking.setEstateAgentSggNm((String) result[3]);
+
                     return ranking;
                 })
                 .collect(Collectors.toList());
