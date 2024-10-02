@@ -34,34 +34,45 @@ public class SearchController {
     //db에 지역코드와 이름 저장후 불러오기
     @GetMapping("/aptRanking")
     public String search(@RequestParam(required = false) String locationName, Model model) {
-        //locationService.saveLocationsFromFile("C:/Users/black/OneDrive/바탕 화면/수도권코드.txt");
+        // locationService.saveLocationsFromFile("C:/Users/black/OneDrive/바탕 화면/수도권코드.txt");
         Map<String, Set<String>> locationsMap  = locationService.getAllLocations();
         model.addAttribute("locations", locationsMap );
 
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
-        List<String> topApartments = new ArrayList<>();
+        // 아파트 이름과 거래 수량을 포함한 리스트
+        List<String> finalTopApartments = new ArrayList<>();
 
         for (Location location : locations) {
             String regionCode = location.getRegionCode(); // 지역 코드 얻기
             System.out.println("Fetching transactions for region: " + regionCode);
 
-            // 상위 10개 아파트 이름 가져오기
-            topApartments.addAll(rankingService.getTopAptsByTransactionCount(regionCode));
+            // 상위 아파트 이름과 거래 수량 가져오기
+            List<Object[]> topApartmentsWithCount = rankingService.getTopAptsByTransactionCount(regionCode);
 
+            for (Object[] result : topApartmentsWithCount) {
+                String apartmentName = (String) result[0];
+                Long transactionCount = (Long) result[1];
+
+                // 거래 수량을 포함한 아파트 이름 추가
+                finalTopApartments.add(apartmentName + " (" + transactionCount + "건)");
+                // 콘솔에 로그 찍기
+                System.out.println("Apartment: " + apartmentName + ", Transaction Count: " + transactionCount);
+            }
         }
 
-        // 중복 제거를 위해 Set 사용
-        Set<String> uniqueTopApartmentsSet = new HashSet<>(topApartments);
-        List<String> uniqueTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
+        // 중복 제거를 위한 Set 사용
+        Set<String> uniqueTopApartmentsSet = new LinkedHashSet<>(finalTopApartments);
+        finalTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
 
         // 필요한 경우 상위 20개 아파트만 선택
-        List<String> finalTopApartments = uniqueTopApartments.stream()
+        finalTopApartments = finalTopApartments.stream()
                 .limit(20)
                 .collect(Collectors.toList());
-        // 모델에 상위 아파트 목록 추가
-        model.addAttribute("topApartments", finalTopApartments );
 
-        return "aptRanking"; // search.html로 이동
+        // 모델에 상위 아파트 목록 추가
+        model.addAttribute("topApartments", finalTopApartments);
+
+        return "aptRankingResults"; // search.html로 이동
     }
 
     @GetMapping("/sub-locations")
@@ -124,7 +135,7 @@ public class SearchController {
         model.addAttribute("sortBy", sortBy);
 
 
-        return "transactionResults"; // 결과를 표시할 HTML 페이지로 이동
+        return "aptSearchResults"; // 결과를 표시할 HTML 페이지로 이동
     }
 
 

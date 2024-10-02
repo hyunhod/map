@@ -6,10 +6,10 @@
     <title>거래 검색</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js 추가 -->
 </head>
 <body>
 <div class="container mt-5">
-    <h2>인기 아파트</h2>
     <form action="/aptRanking" method="GET">
         <div class="form-row">
             <div class="form-group col-md-3">
@@ -35,7 +35,6 @@
     </form>
 </div>
 
-
 <script>
     $(document).ready(function() {
        $('#region').change(function() {
@@ -58,14 +57,21 @@
            var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
            console.log('선택된 세부 지역 코드:', selectedLocationCode); // 콘솔에 로그 찍기
        });
-   });
-
+    });
 </script>
 
-<h1>Top Apartments by Transaction Count</h1>
+<h1>인기 아파트 Top 20</h1>
+<canvas id="myChart" style="max-width: 600px; margin: auto;"></canvas> <!-- 막대 그래프 위치 -->
+
 <ul>
     <li th:each="apartment : ${topApartments}" th:text="${apartment}"></li>
 </ul>
+
+
+
+
+<!-- 홈 버튼 -->
+<a href="/" class="btn btn-primary mb-3">홈</a>
 
 </body>
 </html>
