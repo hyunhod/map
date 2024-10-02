@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import java.lang.Integer;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,12 +36,12 @@ public class SearchController {
     @GetMapping("/aptRanking")
     public String search(@RequestParam(required = false) String locationName, Model model) {
         // locationService.saveLocationsFromFile("C:/Users/black/OneDrive/바탕 화면/수도권코드.txt");
-        Map<String, Set<String>> locationsMap  = locationService.getAllLocations();
-        model.addAttribute("locations", locationsMap );
+        Map<String, Set<String>> locationsMap = locationService.getAllLocations();
+        model.addAttribute("locations", locationsMap);
 
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
-        // 아파트 이름과 거래 수량을 포함한 리스트
         List<String> finalTopApartments = new ArrayList<>();
+        List<Long> transactionCounts = new ArrayList<>(); // 거래 건수를 저장할 리스트
 
         for (Location location : locations) {
             String regionCode = location.getRegionCode(); // 지역 코드 얻기
@@ -54,14 +55,15 @@ public class SearchController {
                 Long transactionCount = (Long) result[1];
 
                 // 거래 수량을 포함한 아파트 이름 추가
-                finalTopApartments.add(apartmentName + " (" + transactionCount + "건)");
+                finalTopApartments.add(apartmentName);
+                transactionCounts.add(transactionCount);
                 // 콘솔에 로그 찍기
                 System.out.println("Apartment: " + apartmentName + ", Transaction Count: " + transactionCount);
             }
         }
 
-        // 중복 제거를 위한 Set 사용
-        Set<String> uniqueTopApartmentsSet = new LinkedHashSet<>(finalTopApartments);
+        // 중복 제거를 위해 Set 사용
+        Set<String> uniqueTopApartmentsSet = new HashSet<>(finalTopApartments);
         finalTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
 
         // 필요한 경우 상위 20개 아파트만 선택
@@ -69,11 +71,20 @@ public class SearchController {
                 .limit(20)
                 .collect(Collectors.toList());
 
-        // 모델에 상위 아파트 목록 추가
+        // 거래 건수의 최대값 계산( 막대도표 상대비교하기위해)
+        Long maxTransactionCount = transactionCounts.stream()
+                .max(Long::compareTo) // Long 타입의 최대값 찾기
+                .orElse(1L); // 기본값 1L로 설정
+
+        // 모델에 상위 아파트 목록과 거래 수 추가
         model.addAttribute("topApartments", finalTopApartments);
+        model.addAttribute("transactionCounts", transactionCounts);
+        model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
 
         return "aptRankingResults"; // search.html로 이동
     }
+
+
 
     @GetMapping("/sub-locations")
     @ResponseBody

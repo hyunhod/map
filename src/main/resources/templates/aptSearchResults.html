@@ -80,7 +80,7 @@
 
 <div class="container mt-5">
     <h2>거래 검색</h2>
-    <form action="/search1" method="GET">
+    <form action="/aptSearch" method="GET">
         <div class="form-row">
             <div class="form-group col-md-1">
                 <label for="region">지역</label>
@@ -192,14 +192,14 @@
     <nav aria-label="Page navigation">
         <ul class="pagination">
             <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage - 1}, size=${size})}">이전</a>
+                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage - 1}, size=${size})}">이전</a>
             </li>
             <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
                 th:classappend="${i == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${i}, size=${size})}" th:text="${i + 1}">1</a>
+                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${i}, size=${size})}" th:text="${i + 1}">1</a>
             </li>
             <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/search1(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage + 1}, size=${size})}">다음</a>
+                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage + 1}, size=${size})}">다음</a>
             </li>
         </ul>
     </nav>

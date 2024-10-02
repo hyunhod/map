@@ -6,14 +6,61 @@
     <title>거래 검색</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js 추가 -->
+    <style>
+        .bar {
+            height: 30px; /* 막대 높이 */
+            background: linear-gradient(135deg, #36a2eb, #4bc0c0); /* 그라데이션 색상 */
+            position: relative; /* 상대 위치 설정 */
+            margin: 5px 0; /* 상하 여백 */
+            transition: width 0.3s ease; /* 너비 변화 애니메이션 */
+            border-radius: 5px; /* 모서리 둥글게 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+        }
+
+        .bar-text {
+            position: absolute;
+            color: #fff;
+            font-weight: bold;
+            margin-bottom: 5px; /* 텍스트와 막대 간 간격 설정 */
+            font-size: 0.9em; /* 폰트 크기 조정 */
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 텍스트 그림자 추가 */
+        }
+
+        .bar-container {
+            height: 80%; /* 그래프 높이를 전체의 80%로 설정 */
+            margin: 20px 0; /* 상하 여백 */
+            padding-left: 20px; /* 여백 설정 */
+            background-color: #fff; /* 배경 색상 */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+            border-radius: 8px; /* 모서리 둥글게 */
+            flex-grow: 1; /* 그래프가 가능한 공간을 채우도록 설정 */
+        }
+
+        .bar:hover {
+            transform: translateY(-5px) scale(1.05); /* 호버 시 약간 위로 이동 및 확대 */
+        }
+
+        /* 홈 버튼을 페이지의 맨 아래에 고정 */
+        .home-button {
+            margin: 20px auto; /* 상하 여백 및 중앙 정렬 */
+            width: 200px; /* 버튼 너비 설정 */
+        }
+
+        .header-container {
+            display: flex; /* Flexbox 사용 */
+            justify-content: space-between; /* 양쪽 끝으로 정렬 */
+            align-items: center; /* 세로 중앙 정렬 */
+            margin-bottom: 20px; /* 아래 여백 추가 */
+        }
+    </style>
 </head>
 <body>
 <div class="container mt-5">
-    <form action="/aptRanking" method="GET">
-        <div class="form-row">
-            <div class="form-group col-md-3">
-                <label for="region">지역</label>
+    <div class="header-container">
+        <h1>인기 아파트 Top 20</h1>
+        <form action="/aptRanking" method="GET" class="form-inline">
+            <div class="form-group mb-2">
+                <label for="region" class="mr-2">지역</label>
                 <select id="region" name="region" class="form-control" required>
                     <option value="">선택하세요</option>
                     <th:block th:each="entry : ${locations}">
@@ -21,54 +68,53 @@
                     </th:block>
                 </select>
             </div>
-            <div class="form-group col-md-3">
-                <label for="locationName">세부 지역</label>
+            <div class="form-group mb-2 mx-2">
+                <label for="locationName" class="mr-2">세부 지역</label>
                 <select id="locationName" name="locationName" class="form-control" required>
                     <option value="">선택하세요</option>
                     <!-- 세부 지역은 JavaScript를 통해 동적으로 추가됩니다 -->
                 </select>
             </div>
-            <div class="form-group col-md-1 align-self-end">
-                <button type="submit" class="btn btn-primary btn-block">검색</button>
-            </div>
-        </div>
-    </form>
+            <button type="submit" class="btn btn-primary mb-2">검색</button>
+        </form>
+    </div>
 </div>
 
 <script>
     $(document).ready(function() {
-       $('#region').change(function() {
-           var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
+        $('#region').change(function() {
+            var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
 
-           $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
+            $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
 
-           if (regionCode) {
-               // AJAX 요청을 통해 세부 지역 가져오기
-               $.get('/sub-locations', { regionCode: regionCode }, function(data) {
-                   data.forEach(function(loc) {
-                       $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
-                   });
-               });
-           }
-       });
+            if (regionCode) {
+                // AJAX 요청을 통해 세부 지역 가져오기
+                $.get('/sub-locations', { regionCode: regionCode }, function(data) {
+                    data.forEach(function(loc) {
+                        $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
+                    });
+                });
+            }
+        });
 
-       // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
-       $('#locationName').on('change', function() {
-           var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
-           console.log('선택된 세부 지역 코드:', selectedLocationCode); // 콘솔에 로그 찍기
-       });
+        // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
+        $('#locationName').on('change', function() {
+            var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
+            console.log('선택된 세부 지역 코드:', selectedLocationCode); // 콘솔에 로그 찍기
+        });
     });
 </script>
 
-<h1>인기 아파트 Top 20</h1>
-<canvas id="myChart" style="max-width: 600px; margin: auto;"></canvas> <!-- 막대 그래프 위치 -->
-
-<ul>
-    <li th:each="apartment : ${topApartments}" th:text="${apartment}"></li>
-</ul>
-
-
-
+<!-- 막대그래프 표시 -->
+<div class="bar-container">
+    <th:block th:each="apartment, iterStat : ${topApartments}">
+        <div class="bar"
+             th:style="'width: ' + (${transactionCounts[iterStat.index]} / ${maxTransactionCount} * 100) + '%'">
+            <!-- 상대 길이 설정 -->
+            <span class="bar-text" th:text="${apartment} + ' (' + ${transactionCounts[iterStat.index]} + '건)'"></span>
+        </div>
+    </th:block>
+</div>
 
 <!-- 홈 버튼 -->
 <a href="/" class="btn btn-primary mb-3">홈</a>
