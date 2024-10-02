@@ -278,8 +278,26 @@ public class ApiService {
         }
     }
     public void saveTransactionRankings(List<TransactionRanking> rankings) {
-        rankingRepository.saveAll(rankings); // ranking 리스트를 저장
+        Set<TransactionRanking> uniqueRankings = new HashSet<>();  // 중복을 방지하기 위한 Set
+
+        for (TransactionRanking ranking : rankings) {
+            // 중복 체크
+            if (!rankingRepository.existsBySggCdAndDealYearAndDealMonthAndAptNm(
+                    ranking.getSggCd(), ranking.getDealYear(), ranking.getDealMonth(), ranking.getAptNm())) {
+                uniqueRankings.add(ranking);  // 중복이 아닌 경우 Set에 추가
+            }
+        }
+        int batchSize = 10000;  // 배치 크기를 10,000으로 설정
+        List<TransactionRanking> uniqueList = new ArrayList<>(uniqueRankings);
+
+        // 중복이 제거된 데이터베이스에 저장
+        for (int i = 0; i < uniqueList.size(); i += batchSize) {
+            List<TransactionRanking> batchList = uniqueList.subList(i, Math.min(i + batchSize, uniqueList.size()));
+            rankingRepository.saveAll(batchList);  // 배치로 데이터 저장
+        }
+
     }
+
 }
 
 

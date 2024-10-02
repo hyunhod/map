@@ -23,8 +23,21 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
 
 
     // sggCd로 가격이 가장 높은 상위 10개 거래 정보를 가져오는 메서드 추가
-    @Query(value = "SELECT tr FROM TransactionRanking tr WHERE tr.sggCd Like '11%' ORDER BY tr.dealAmount DESC")
-    List<TransactionRanking> findTop10BySggCd(String sggCd);
+    @Query("SELECT distinct tr FROM TransactionRanking tr WHERE tr.sggCd LIKE CONCAT(:sggCd, '%') AND (tr.dealYear = :year1 AND tr.dealMonth >= :month1 OR tr.dealYear = :year2 AND tr.dealMonth <= :month2 OR tr.dealYear = :year3) ORDER BY tr.dealAmount DESC")
+    Page<TransactionRanking> findTop10BySggCd(
+            @Param("sggCd") String sggCd,
+            @Param("year1") String year1,
+            @Param("month1") String month1,
+            @Param("year2") String year2,
+            @Param("month2") String month2,
+            @Param("year3") String year3,
+            Pageable pageable
+    );
+
+    boolean existsBySggCdAndDealYearAndDealMonthAndAptNm(String sggCd, String dealYear, String dealMonth, String aptNm);
+
+
+
 
     //222
     Page<TransactionRanking> findBySggCd(String sggCd,Pageable pageable); // 지역 코드로 거래 정보 찾기

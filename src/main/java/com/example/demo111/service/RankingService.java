@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,9 +112,26 @@ public class RankingService {
 
 
     public List<TransactionRanking> getTop10BySggCd(String sggCd) {
-        return rankingRepository.findTop10BySggCd(sggCd).stream()
-                .limit(10)  // 리스트에서 상위 10개만 가져오기
-                .toList();  // Java 16 이상에서 사용 가능
+        // 현재 날짜 가져오기
+        LocalDate currentDate = LocalDate.now();
+
+        // 최근 3개월의 연도와 월 계산
+        String year1 = String.valueOf(currentDate.getYear());
+        String month1 = String.format("%02d", currentDate.getMonthValue());
+
+        LocalDate lastMonthDate = currentDate.minusMonths(1);
+        String year2 = String.valueOf(lastMonthDate.getYear());
+        String month2 = String.format("%02d", lastMonthDate.getMonthValue());
+
+        LocalDate twoMonthsAgoDate = currentDate.minusMonths(2);
+        String year3 = String.valueOf(twoMonthsAgoDate.getYear());
+        String month3 = String.format("%02d", twoMonthsAgoDate.getMonthValue());
+
+        Pageable pageable = PageRequest.of(0, 10);
+        List<TransactionRanking> rankings = rankingRepository.findTop10BySggCd(sggCd, year1, month1, year2, month2, year3, pageable).getContent();
+        System.out.println(rankings);
+
+        return rankings;
     }
 
 

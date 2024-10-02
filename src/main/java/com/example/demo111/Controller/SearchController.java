@@ -45,7 +45,6 @@ public class SearchController {
 
         for (Location location : locations) {
             String regionCode = location.getRegionCode(); // 지역 코드 얻기
-            System.out.println("Fetching transactions for region: " + regionCode);
 
             // 상위 아파트 이름과 거래 수량 가져오기
             List<Object[]> topApartmentsWithCount = rankingService.getTopAptsByTransactionCount(regionCode);
@@ -57,8 +56,6 @@ public class SearchController {
                 // 거래 수량을 포함한 아파트 이름 추가
                 finalTopApartments.add(apartmentName);
                 transactionCounts.add(transactionCount);
-                // 콘솔에 로그 찍기
-                System.out.println("Apartment: " + apartmentName + ", Transaction Count: " + transactionCount);
             }
         }
 
@@ -91,7 +88,7 @@ public class SearchController {
     public Set<String> getSubLocations(@RequestParam String regionCode) {
         // 앞 2자리 (예: "11")을 사용하여 세부 지역 가져오기
         String regionPrefix = regionCode.substring(1, 3);
-        System.out.println(regionPrefix);
+
         return locationService.getSubLocationsByRegion(regionPrefix);
     }
 
@@ -115,7 +112,7 @@ public class SearchController {
 
         // 지역명으로 지역 정보를 조회
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
-        System.out.println("locations :" + locations);
+
         List<TransactionRanking> paginatedTransactions = new ArrayList<>();
         int totalTransactions = 0;
 
