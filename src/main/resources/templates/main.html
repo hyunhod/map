@@ -65,7 +65,7 @@
             <ul class="list-group">
                 <!-- 추천 아파트 목록을 동적으로 표시 -->
                 <li th:each="apartment : ${recommendedApartments}" class="list-group-item">
-                    <span class="highlight" th:text="${apartment.aptNm}">아파트 이름</span> -
+                    <span class="highlight" th:text="${apartment.aptNm}">아파트 이름</span>
                     <span th:text="${apartment.dealAmount/10000}">실거래가</span>억 -
                     <span th:text="${apartment.excluUseAr}">실거래가</span>㎡ (
                     <span th:text="${#numbers.formatInteger((apartment.excluUseAr / 3.3), 0)}"></span>평)
