@@ -37,8 +37,10 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
             @Param("month") String month,
             Pageable pageable);
 
-    boolean existsBySggCdAndDealYearAndDealMonthAndAptNm(String sggCd, String dealYear, String dealMonth, String aptNm);
-
+    boolean existsBySggCdAndDealYearAndDealMonthAndDealDayAndAptNmAndDealAmountAndExcluUseArAndDealingGbnAndJibunAndFloorAndBuyerGbnAndSlerGbn(
+            String sggCd, String dealYear, String dealMonth, String dealDay, String aptNm,
+            Integer dealAmount, Double excluUseAr, String dealingGbn, String jibun, String floor,
+            String buyerGbn, String slerGbn);
 
 
 

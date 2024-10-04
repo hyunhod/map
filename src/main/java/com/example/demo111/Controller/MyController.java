@@ -33,10 +33,12 @@ public class MyController {
     @Autowired
     private RankingService rankingService;
 
+    //    "C:/Users/black/OneDrive/바탕 화면/수도권코드.txt"
     @GetMapping("/import")
     public String aa(){
-        apiService.fetchAndSaveApartmentData("C:/Users/black/OneDrive/바탕 화면/수도권코드.txt");
-        return "search2";
+        apiService.fetchAndSaveApartmentData("C:/Users/black/OneDrive/바탕 화면/aa.txt");
+        System.out.println("success");
+        return "main";
 
     }
 

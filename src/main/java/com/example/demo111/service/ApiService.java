@@ -263,7 +263,7 @@ public class ApiService {
             int currentYear = Year.now().getValue(); // 현재 연도를 가져옵니다.
             for (String lawdCode : lawdCodes) {
                 for (int year = 2024; year <= currentYear; year++) {
-                    for (int month = 1; month <= 12; month++) { // 1월부터 12월까지 반복
+                    for (int month = 5; month <= 6; month++) { // 1월부터 12월까지 반복
                         String dealYmd = String.format("%04d%02d", year, month); // 연도와 월을 사용
                         ResponseDto responseDto = fetchData(lawdCode, dealYmd, Integer.MAX_VALUE);
                         if (responseDto != null) {
@@ -282,8 +282,8 @@ public class ApiService {
 
         for (TransactionRanking ranking : rankings) {
             // 중복 체크
-            if (!rankingRepository.existsBySggCdAndDealYearAndDealMonthAndAptNm(
-                    ranking.getSggCd(), ranking.getDealYear(), ranking.getDealMonth(), ranking.getAptNm())) {
+            if (!rankingRepository.existsBySggCdAndDealYearAndDealMonthAndDealDayAndAptNmAndDealAmountAndExcluUseArAndDealingGbnAndJibunAndFloorAndBuyerGbnAndSlerGbn(
+                    ranking.getSggCd(), ranking.getDealYear(), ranking.getDealMonth(),ranking.getDealDay(), ranking.getAptNm(),ranking.getDealAmount(),ranking.getExcluUseAr(),ranking.getDealingGbn(),ranking.getJibun(),ranking.getFloor(),ranking.getBuyerGbn(),ranking.getSlerGbn())) {
                 uniqueRankings.add(ranking);  // 중복이 아닌 경우 Set에 추가
             }
         }
