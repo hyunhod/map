@@ -82,8 +82,15 @@ public class LocationService {
     // 수정된 메서드
     public List<Location> findLocationByCityOrDistrict(String cityOrDistrict) {
         return locationRepository.findByCityDistrict(cityOrDistrict);
-
     }
+
+    // 기본 상위 아파트 위치를 반환하는 메서드
+    public List<Location> findDefaultTopLocations() {
+        PageRequest pageRequest = PageRequest.of(0, 20); // 상위 20개만 가져옴
+        return locationRepository.findAll(pageRequest).getContent(); // 페이징된 결과의 내용을 반환
+    }
+
+
 
     // 시/군/구로 검색하여 해당 지역의 페이징된 거래 정보를 반환
     public Page<Location> getPagedLocationsByRegionCode(String regionCode, int page, int size) {

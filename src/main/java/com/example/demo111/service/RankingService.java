@@ -219,11 +219,17 @@ public class RankingService {
 
 
 
-    // 거래량이 가장 많은 아파트 반환 메서드
+    // 거래량이 가장 많은 아파트 반환 메서드(지역)
     public List<Object[]> getTopAptsByTransactionCount(String regionCode) {
         return rankingRepository.findTopAptsByTransactionCount(regionCode);
     }
 
+
+
+    // 거래량이 가장 많은 아파트 반환 메서드 (전체)
+    public List<Object[]> getTopAptsByTransactionCount() {
+        return rankingRepository.findAllTopAptsByTransactionCount();
+    }
 
 
 

@@ -39,46 +39,98 @@ public class SearchController {
         Map<String, Set<String>> locationsMap = locationService.getAllLocations();
         model.addAttribute("locations", locationsMap);
 
-        List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
-        List<String> finalTopApartments = new ArrayList<>();
-        List<Long> transactionCounts = new ArrayList<>(); // 거래 건수를 저장할 리스트
+        List<Location> locations;
+        if (locationName == null || locationName.isEmpty()) {
+            // 기본 상위 아파트 데이터를 조회
+            locations = locationService.findDefaultTopLocations(); // 기본 데이터 조회하는 메서드 추가
 
-        for (Location location : locations) {
-            String regionCode = location.getRegionCode(); // 지역 코드 얻기
+            List<String> finalTopApartments = new ArrayList<>();
+            List<Long> transactionCounts = new ArrayList<>(); // 거래 건수를 저장할 리스트
 
-            // 상위 아파트 이름과 거래 수량 가져오기
-            List<Object[]> topApartmentsWithCount = rankingService.getTopAptsByTransactionCount(regionCode);
+            for (Location location : locations) {
+                String regionCode = location.getRegionCode(); // 지역 코드 얻기
 
-            for (Object[] result : topApartmentsWithCount) {
-                String apartmentName = (String) result[0];
-                Long transactionCount = (Long) result[1];
+                // 상위 아파트 이름과 거래 수량 가져오기
+                List<Object[]> topApartmentsWithCount = rankingService.getTopAptsByTransactionCount();
 
-                // 거래 수량을 포함한 아파트 이름 추가
-                finalTopApartments.add(apartmentName);
-                transactionCounts.add(transactionCount);
+                for (Object[] result : topApartmentsWithCount) {
+                    String apartmentName = (String) result[0];
+                    Long transactionCount = (Long) result[1];
+
+
+                    if (transactionCount > 0) { // 거래 건수가 0 이상인 아파트만 추가
+                        finalTopApartments.add(apartmentName);
+                        transactionCounts.add(transactionCount);
+                    }
+                }
             }
+
+            // 중복 제거를 위해 Set 사용
+            Set<String> uniqueTopApartmentsSet = new HashSet<>(finalTopApartments);
+            finalTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
+
+            // 필요한 경우 상위 20개 아파트만 선택
+            finalTopApartments = finalTopApartments.stream()
+                    .limit(20)
+                    .collect(Collectors.toList());
+
+            // 거래 건수의 최대값 계산( 막대도표 상대비교하기위해)
+            Long maxTransactionCount = transactionCounts.stream()
+                    .max(Long::compareTo) // Long 타입의 최대값 찾기
+                    .orElse(1L); // 기본값 1L로 설정
+
+            // 모델에 상위 아파트 목록과 거래 수 추가
+            model.addAttribute("topApartments", finalTopApartments);
+            model.addAttribute("transactionCounts", transactionCounts);
+            model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
+
+            return "aptRankingResults"; // search.html로 이동
+        } else {
+            locations = locationService.findLocationByCityOrDistrict(locationName);
+
+
+            List<String> finalTopApartments = new ArrayList<>();
+            List<Long> transactionCounts = new ArrayList<>(); // 거래 건수를 저장할 리스트
+
+            for (Location location : locations) {
+                String regionCode = location.getRegionCode(); // 지역 코드 얻기
+
+                // 상위 아파트 이름과 거래 수량 가져오기
+                List<Object[]> topApartmentsWithCount = rankingService.getTopAptsByTransactionCount(regionCode);
+
+                for (Object[] result : topApartmentsWithCount) {
+                    String apartmentName = (String) result[0];
+                    Long transactionCount = (Long) result[1];
+
+
+                    if (transactionCount > 0) { // 거래 건수가 0 이상인 아파트만 추가
+                        finalTopApartments.add(apartmentName);
+                        transactionCounts.add(transactionCount);
+                    }
+                }
+            }
+
+            // 중복 제거를 위해 Set 사용
+            Set<String> uniqueTopApartmentsSet = new HashSet<>(finalTopApartments);
+            finalTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
+
+            // 필요한 경우 상위 20개 아파트만 선택
+            finalTopApartments = finalTopApartments.stream()
+                    .limit(20)
+                    .collect(Collectors.toList());
+
+            // 거래 건수의 최대값 계산( 막대도표 상대비교하기위해)
+            Long maxTransactionCount = transactionCounts.stream()
+                    .max(Long::compareTo) // Long 타입의 최대값 찾기
+                    .orElse(1L); // 기본값 1L로 설정
+
+            // 모델에 상위 아파트 목록과 거래 수 추가
+            model.addAttribute("topApartments", finalTopApartments);
+            model.addAttribute("transactionCounts", transactionCounts);
+            model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
+
+            return "aptRankingResults"; // search.html로 이동
         }
-
-        // 중복 제거를 위해 Set 사용
-        Set<String> uniqueTopApartmentsSet = new HashSet<>(finalTopApartments);
-        finalTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
-
-        // 필요한 경우 상위 20개 아파트만 선택
-        finalTopApartments = finalTopApartments.stream()
-                .limit(20)
-                .collect(Collectors.toList());
-
-        // 거래 건수의 최대값 계산( 막대도표 상대비교하기위해)
-        Long maxTransactionCount = transactionCounts.stream()
-                .max(Long::compareTo) // Long 타입의 최대값 찾기
-                .orElse(1L); // 기본값 1L로 설정
-
-        // 모델에 상위 아파트 목록과 거래 수 추가
-        model.addAttribute("topApartments", finalTopApartments);
-        model.addAttribute("transactionCounts", transactionCounts);
-        model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
-
-        return "aptRankingResults"; // search.html로 이동
     }
 
 
