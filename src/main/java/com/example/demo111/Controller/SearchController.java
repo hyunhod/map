@@ -166,7 +166,7 @@ public class SearchController {
         // 지역명으로 지역 정보를 조회
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
 
-
+        Set<String> apartmentNames = new HashSet<>(); // 중복 제거된 아파트 이름 저장
 
         List<TransactionRanking> paginatedTransactions = new ArrayList<>();
         int totalTransactions = 0;
@@ -179,7 +179,8 @@ public class SearchController {
             // 각 지역에 대해 페이지별로 거래 정보를 가져옴
             Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
 
-
+            // 중복 없는 아파트 이름 수집
+            transactionRankings.forEach(tr -> apartmentNames.add(tr.getAptNm()));
 
             // 현재 페이지에 해당하는 데이터만 추가
             paginatedTransactions.addAll(transactionRankings.getContent());
@@ -188,8 +189,10 @@ public class SearchController {
 
         // 전체 페이지 수 계산
         int totalPages = (int) Math.ceil((double) totalTransactions / size);
+        System.out.println("name :" +apartmentNames);
 
         // 모델에 결과와 페이징 정보를 추가
+        model.addAttribute("apartmentNames",apartmentNames);
         model.addAttribute("transactions", paginatedTransactions); // 거래 리스트
         model.addAttribute("totalPages", totalPages); // 전체 페이지 수
         model.addAttribute("currentPage", page); // 현재 페이지
@@ -222,20 +225,28 @@ public class SearchController {
     }
 
 
-    @GetMapping("/apartment/{aptNm}")
-    public String getApartmentDetails(@PathVariable String aptNm, Model model) {
-        List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(aptNm);
 
-        // 거래 날짜 기준으로 정렬
-        transactions.sort(Comparator.comparing(TransactionRanking::getDealYear)
-                .thenComparing(TransactionRanking::getDealMonth)
-                .thenComparing(TransactionRanking::getDealDay));
 
-        model.addAttribute("aptNm", aptNm);
-        model.addAttribute("transactions", transactions);
+    @GetMapping("/getApartmentDetails")
+    @ResponseBody
+    public Map<String, Object> getApartmentDetails(@RequestParam String name) {
+        // 해당 아파트 이름에 따른 거래 정보를 조회
+        List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(name);
 
-        return "apartmentDetails"; // 아파트 거래 내역을 표시할 HTML 페이지로 이동
+        // 아파트 정보 반환
+        Map<String, Object> response = new HashMap<>();
+        if (!transactions.isEmpty()) {
+            // 첫 번째 거래 정보를 기준으로 법정동, 지번 등 기본 정보 제공
+            TransactionRanking firstTransaction = transactions.get(0);
+            response.put("umdNm", firstTransaction.getUmdNm());
+            response.put("jibun", firstTransaction.getJibun());
+        }
+
+        // 거래 정보 리스트 추가
+        response.put("transactions", transactions);
+        return response;
     }
+
 
 
 

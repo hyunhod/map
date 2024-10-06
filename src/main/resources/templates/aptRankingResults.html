@@ -114,7 +114,8 @@
         <div class="bar"
              th:style="'width: ' + (${transactionCounts[iterStat.index]} / ${maxTransactionCount} * 100) + '%'">
             <!-- 상대 길이 설정 -->
-            <span class="bar-text" th:text="  ${apartment} + ' (' + ${transactionCounts[iterStat.index]} + '건)'"></span>
+            <a th:href="'/aptSearch?locationName=' + ${apartment}"
+               th:text="${apartment} + ' (' + ${transactionCounts[iterStat.index]} + '건)'"></a>
         </div>
     </th:block>
 </div>

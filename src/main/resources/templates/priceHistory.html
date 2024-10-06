@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검색 결과</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+
+    <style>
+        .search-form {
+        display: flex; /* Flexbox를 사용하여 수평 정렬 */
+        justify-content: flex-start; /* 왼쪽 정렬 */
+        align-items: center; /* 세로 중앙 정렬 */
+        gap: 10px; /* 각 요소 사이에 간격 추가 */
+        margin-bottom: 20px; /* 폼 아래 여백 추가 */
+    }
+
+    .search-form input,
+    .search-form select,
+    .search-form button {
+        padding: 10px; /* 패딩 추가하여 요소 크기 조절 */
+        border: 1px solid #ccc; /* 테두리 스타일 */
+        border-radius: 4px; /* 둥근 모서리 */
+        font-size: 14px; /* 폰트 크기 조정 */
+    }
+
+    .search-form button {
+        background-color: #007bff; /* 버튼 배경 색 */
+        color: white; /* 버튼 글자 색 */
+        border: none; /* 버튼 테두리 없애기 */
+        cursor: pointer; /* 커서 모양 변경 */
+    }
+
+    .search-form button:hover {
+        background-color: #0056b3; /* 호버 시 버튼 색상 변경 */
+    }
+        #map {
+            width: 100%;
+            height: 400px; /* Adjust as needed */
+            margin-top: 20px; /* Space between table and map */
+        }
+        #info {
+            width: 200px;
+            height: 400px;
+            float: left;
+            padding: 10px;
+            border-left: 1px solid #ccc;
+        }
+        #address-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        .address-item {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .address-item:hover {
+            background-color: #f0f0f0;
+        }
+        .apt-name {
+            cursor: pointer; /* Pointer 커서 추가 */
+            color: blue; /* 링크처럼 보이도록 색상 변경 */
+            text-decoration: underline; /* 밑줄 추가 */
+        }
+        .chart-container {
+            height: 400px; /* 그래프 높이 설정 */
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>거래 검색</h2>
+    <form action="/aptSearch" method="GET">
+        <div class="form-row">
+            <div class="form-group col-md-1">
+                <label for="region">지역</label>
+                <select id="region" name="region" class="form-control" required>
+                    <option value="">선택하세요</option>
+                    <th:block th:each="entry : ${locations}">
+                        <option th:value="${entry.value}" th:text="${entry.key}"></option>
+                    </th:block>
+                </select>
+            </div>
+            <div class="form-group col-md-1">
+                <label for="locationName">세부 지역</label>
+                <select id="locationName" name="locationName" class="form-control" required>
+                    <option value="">선택하세요</option>
+                    <!-- 세부 지역은 JavaScript를 통해 동적으로 추가됩니다 -->
+                </select>
+            </div>
+            <div class="form-group col-md-1 align-self-end">
+                <button type="submit" class="btn btn-primary btn-block">검색</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div class="container mt-5">
+
+    <!-- Kakao Map -->
+    <div id="map"></div>
+
+    <input type="text" id="address" placeholder="번지-지번 검색" style="width:400px;"/>
+    <button onclick="searchAddress()" class="btn btn-secondary">주소 검색</button>
+
+    <div id="address-list"></div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <!-- 아파트 이름 목록을 먼저 보여줌 -->
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>아파트 이름</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="aptNm : ${apartmentNames}">
+                    <td>
+                        <a href="#"
+                           th:text="${aptNm}"
+                           th:data-apt-nm="${aptNm}"
+                            th:onclick="'loadApartmentDetails(\'' + ${aptNm} + '\')'">
+
+                            <!-- 링크 텍스트 또는 내용 -->
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+    <!-- 홈 버튼 -->
+    <a href="/" class="btn btn-primary mb-3">홈</a>
+
+
+
+        <div id="apartment-details"></div> <!-- 아파트 상세 정보를 표시할 div 추가 -->
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+        const links = document.querySelectorAll('a[data-apt-nm]');
+        links.forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault(); // 기본 링크 동작 방지
+                  console.log('링크가 클릭됨'); // 링크 클릭 확인
+                const apartmentName = this.dataset.aptNm;
+                loadApartmentDetails(apartmentName);
+            });
+        });
+    });
+        function loadApartmentDetails(apartmentName) {
+        console.log('선택된 아파트:' ,apartmentName)
+            // 아파트 상세 정보를 요청하는 AJAX 호출
+            fetch('/getApartmentDetails?name=' + encodeURIComponent(apartmentName))
+                .then(response => response.json())
+                .then(data => {
+                    // 지도에 아파트 위치 표시
+                    showOnMap(data.umdNm, data.jibun, apartmentName);
+
+                    // 아파트의 거래 정보 및 상세 정보 표시
+                    const detailsDiv = document.getElementById('apartment-details');
+                    detailsDiv.innerHTML = `
+                        <h3>${apartmentName} 거래 정보</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>건축년도</th>
+                                    <th>가격</th>
+                                    <th>전용면적</th>
+                                    <th>거래일자</th>
+                                    <th>층</th>
+                                    <th>법정동</th>
+                                    <th>지번</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.transactions.map(transaction => `
+                                    <tr>
+                                        <td>${transaction.buildYear}</td>
+                                        <td>${transaction.dealAmount / 10000}억</td>
+                                        <td>${transaction.excluUseAr}</td>
+                                        <td>${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}</td>
+                                        <td>${transaction.floor}</td>
+                                        <td>${transaction.umdNm}</td>
+                                        <td>${transaction.jibun}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Error fetching apartment details:', error);
+                });
+
+    <!-- 페이징 링크 -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage - 1}, size=${size})}">이전</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
+                th:classappend="${i == currentPage} ? 'active'">
+                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${i}, size=${size})}" th:text="${i + 1}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage + 1}, size=${size})}">다음</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+
+    var mapContainer = document.getElementById('map'),
+        mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 시청 좌표
+            level: 3
+        };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var geocoder = new kakao.maps.services.Geocoder();
+    var marker = new kakao.maps.Marker();
+
+    // 주소로 좌표를 검색하는 함수
+    function searchAddress() {
+        var address = document.getElementById('address').value;
+
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                marker.setPosition(coords);
+                marker.setMap(map);
+                map.setCenter(coords);
+                console.log("위도:", result[0].y, "경도:", result[0].x);
+            } else {
+                alert('주소를 찾을 수 없습니다.');
+            }
+        });
+    }
+
+
+
+     $(document).ready(function() {
+       $('#region').change(function() {
+           var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
+
+           $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
+
+           if (regionCode) {
+               // AJAX 요청을 통해 세부 지역 가져오기
+               $.get('/sub-locations', { regionCode: regionCode }, function(data) {
+                   data.forEach(function(loc) {
+                       $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
+                   });
+               });
+           }
+       });
+
+       // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
+       $('#locationName').on('change', function() {
+           var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
+           console.log('선택된 세부 지역 코드:', selectedLocationCode); // 콘솔에 로그 찍기
+       });
+   });
+
+
+
+
+
+
+
+
+    // 선택한 아파트를 지도에 표시하는 함수
+    function showOnMap(umdNm, jibun, aptNm) {
+        var address = umdNm + " " + jibun; // 법정동 + 지번
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                marker.setPosition(coords);
+                marker.setMap(map);
+                map.setCenter(coords);
+                console.log("위도:", result[0].y, "경도:", result[0].x);
+                fetchPriceHistory(aptNm);
+            } else {
+                alert('주소를 찾을 수 없습니다.');
+            }
+        });
+    }
+
+   let priceChart; // 차트 전역 변수
+
+ function fetchPriceHistory(aptNm) {
+    fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
+        .then(response => response.json())
+        .then(data => {
+            // 거래 데이터를 월별로 집계
+            const monthlyData = {};
+            data.forEach(transaction => {
+                const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { total: 0, count: 0 };
+                }
+                monthlyData[monthKey].total += transaction.dealAmount;
+                monthlyData[monthKey].count++;
+            });
+
+            // 월별 평균 가격 계산
+            const labels = [];
+            const prices = [];
+            for (const month in monthlyData) {
+                labels.push(month);
+                prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
+            }
+
+            // 이전 차트가 존재하면 파괴
+            if (priceChart) {
+                priceChart.destroy();
+            }
+
+            // Chart.js를 이용해 그래프 그리기
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '평균 매매가(억 원)',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '거래 월'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '가격(억 원)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+ }
+
+
+
+</script>
+</body>
+</html>
