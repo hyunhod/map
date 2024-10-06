@@ -62,16 +62,28 @@
         <div class="col-md-12">
             <h3>2024 서울 실거래가 Top 10</h3>
             <p>최근 한달 거래된 상위 10개의 아파트 정보를 확인해보세요.</p>
-            <ul class="list-group">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                <tr>
+                    <th>소재지</th>
+                    <th>아파트 이름</th>
+                    <th>실거래가 (억)</th>
+                    <th>면적 (㎡ / 평)</th>
+                </tr>
+                </thead>
+                <tbody>
                 <!-- 추천 아파트 목록을 동적으로 표시 -->
-                <li th:each="apartment : ${recommendedApartments}" class="list-group-item">
-                    <span class="highlight" th:text="${apartment.aptNm}">아파트 이름</span>
-                    <span th:text="${apartment.dealAmount/10000}">실거래가</span>억 -
-                    <span th:text="${apartment.excluUseAr}">실거래가</span>㎡ (
-                    <span th:text="${#numbers.formatInteger((apartment.excluUseAr / 3.3), 0)}"></span>평)
-
-                </li>
-            </ul>
+                <tr th:each="apartment : ${recommendedApartments}">
+                    <td th:text="${apartment.estateAgentSggNm}"></td>
+                    <td th:text="${apartment.aptNm}"></td>
+                    <td th:text="${apartment.dealAmount / 10000}"></td>
+                    <td>
+                        <span th:text="${apartment.excluUseAr}"></span>㎡ (
+                        <span th:text="${#numbers.formatInteger((apartment.excluUseAr / 3.3), 0)}"></span>)
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 

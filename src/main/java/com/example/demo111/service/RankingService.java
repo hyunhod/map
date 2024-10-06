@@ -69,7 +69,6 @@ public class RankingService {
             }
             //리스트에 추가
             rankings.add(ranking);
-            System.out.println("rankings :: " + rankings);
 
         }
 

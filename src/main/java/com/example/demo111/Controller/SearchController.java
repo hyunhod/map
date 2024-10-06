@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import java.lang.Integer;
@@ -165,14 +166,20 @@ public class SearchController {
         // 지역명으로 지역 정보를 조회
         List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
 
+
+
         List<TransactionRanking> paginatedTransactions = new ArrayList<>();
         int totalTransactions = 0;
+
+
 
         for (Location location : locations) {
             String regionCode = location.getRegionCode(); // 지역 코드 얻기
 
             // 각 지역에 대해 페이지별로 거래 정보를 가져옴
             Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
+
+
 
             // 현재 페이지에 해당하는 데이터만 추가
             paginatedTransactions.addAll(transactionRankings.getContent());
@@ -213,6 +220,23 @@ public class SearchController {
         // 정렬된 거래 기록 반환
         return transactions;
     }
+
+
+    @GetMapping("/apartment/{aptNm}")
+    public String getApartmentDetails(@PathVariable String aptNm, Model model) {
+        List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(aptNm);
+
+        // 거래 날짜 기준으로 정렬
+        transactions.sort(Comparator.comparing(TransactionRanking::getDealYear)
+                .thenComparing(TransactionRanking::getDealMonth)
+                .thenComparing(TransactionRanking::getDealDay));
+
+        model.addAttribute("aptNm", aptNm);
+        model.addAttribute("transactions", transactions);
+
+        return "apartmentDetails"; // 아파트 거래 내역을 표시할 HTML 페이지로 이동
+    }
+
 
 
 }

@@ -61,7 +61,6 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
     List<Object[]> findTopAptsByTransactionCount(@Param("regionCode") String regionCode); // 메서드 이름 수정
 
 
-    // 전체 거래량이 가장 많은 아파트
     @Query("SELECT tr.aptNm, COUNT(tr) AS transactionCount " +
             "FROM TransactionRanking tr " +
             "GROUP BY tr.aptNm " +
