@@ -205,7 +205,7 @@ public class SearchController {
         model.addAttribute("sortBy", sortBy);
 
 
-        return "aptSearchResults"; // 결과를 표시할 HTML 페이지로 이동
+        return "priceHistory"; // 결과를 표시할 HTML 페이지로 이동
     }
 
 
@@ -219,6 +219,9 @@ public class SearchController {
         transactions.sort(Comparator.comparing(TransactionRanking::getDealYear)
                 .thenComparing(TransactionRanking::getDealMonth)
                 .thenComparing(TransactionRanking::getDealDay));
+
+        System.out.println(transactions);
+
 
         // 정렬된 거래 기록 반환
         return transactions;
