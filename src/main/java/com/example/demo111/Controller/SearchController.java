@@ -176,11 +176,15 @@ public class SearchController {
         for (Location location : locations) {
             String regionCode = location.getRegionCode(); // 지역 코드 얻기
 
+
+            // 아파트 이름은 모든 거래를 대상으로 수집 (페이지네이션 X)
+            List<TransactionRanking> allTransactions = rankingService.getAllTransactionsByRegion(regionCode);
+            allTransactions.forEach(tr -> apartmentNames.add(tr.getAptNm()));
+            System.out.println("new:"+allTransactions);
+
             // 각 지역에 대해 페이지별로 거래 정보를 가져옴
             Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
 
-            // 중복 없는 아파트 이름 수집
-            transactionRankings.forEach(tr -> apartmentNames.add(tr.getAptNm()));
 
             // 현재 페이지에 해당하는 데이터만 추가
             paginatedTransactions.addAll(transactionRankings.getContent());

@@ -230,7 +230,11 @@ public class RankingService {
         return rankingRepository.findAllTopAptsByTransactionCount();
     }
 
-
+    // 지역 코드에 따른 모든 거래 정보 가져오기 (페이징 없음)
+    public List<TransactionRanking> getAllTransactionsByRegion(String regionCode) {
+        // 지역 코드에 맞는 모든 거래 데이터를 조회
+        return rankingRepository.findBysggCd(regionCode);
+    }
 
 
 }
