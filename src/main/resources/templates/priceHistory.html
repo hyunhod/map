@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         .search-form {
             display: flex;
@@ -35,11 +37,13 @@
         .search-form button:hover {
             background-color: #0056b3;
         }
+
         #map {
             width: 100%;
             height: 400px;
             margin-top: 20px;
         }
+
         #info {
             width: 200px;
             height: 400px;
@@ -47,24 +51,29 @@
             padding: 10px;
             border-left: 1px solid #ccc;
         }
+
         #address-list {
             max-height: 200px;
             overflow-y: auto;
             border: 1px solid #ccc;
             margin-top: 10px;
         }
+
         .address-item {
             padding: 5px;
             cursor: pointer;
         }
+
         .address-item:hover {
             background-color: #f0f0f0;
         }
+
         .apt-name {
             cursor: pointer;
             color: blue;
             text-decoration: underline;
         }
+
         .chart-container {
             height: 400px;
         }
@@ -125,6 +134,10 @@
             </table>
         </div>
         <div id="apartment-details"></div>
+    </div>
+
+    <div class="chart-container">
+        <canvas id="priceChart"></canvas>
     </div>
 
     <a href="/" class="btn btn-primary mb-3">홈</a>
@@ -206,50 +219,148 @@
         });
     }
 
-    function fetchPriceHistory(aptNm) {
-        fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
-            .then(response => response.json())
-            .then(data => {
-                const detailsDiv = document.getElementById('apartment-details');
 
+    // Chart.js를 이용해 그래프 그리기
+let priceChart; // 차트 전역 변수
 
-                detailsDiv.innerHTML = `
-                    <h3>${aptNm} 거래 정보</h3>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>건축년도</th>
-                                <th>가격</th>
-                                <th>전용면적</th>
-                                <th>거래일자</th>
-                                <th>층</th>
-                                <th>법정동</th>
-                                <th>지번</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${data.map(transaction => `
-                                <tr>
-                                    <td>${transaction.buildYear}</td>
-                                    <td>${transaction.dealAmount / 10000}억</td>
-                                    <td>${transaction.excluUseAr}</td>
-                                    <td>${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}</td>
-                                    <td>${transaction.floor}</td>
-                                    <td>${transaction.umdNm}</td>
-                                    <td>${transaction.jibun}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                `;
-            })
-            .catch(error => {
-                console.error('Error fetching apartment price history:', error);
+// 가격 이력을 가져오는 함수
+function fetchPriceHistory(aptNm) {
+    fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
+        .then(response => response.json())
+        .then(data => {
+            const detailsDiv = document.getElementById('apartment-details');
+
+            // 거래 데이터를 월별로 집계
+            const monthlyData = {};
+            data.forEach(transaction => {
+                const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { total: 0, count: 0 };
+                }
+                monthlyData[monthKey].total += transaction.dealAmount;
+                monthlyData[monthKey].count++;
             });
-    }
 
-    // 페이징 링크를 추가하는 부분
+            // 월별 평균 가격 계산
+            const labels = [];
+            const prices = [];
+            for (const month in monthlyData) {
+                labels.push(month);
+                prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
+            }
+
+            // 이전 차트가 존재하면 파괴
+            if (priceChart) {
+                priceChart.destroy();
+            }
+
+            // Chart.js를 이용해 그래프 그리기
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '아파트 가격 (억원)',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '가격 (억원)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '날짜'
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching price history:', error);
+        });
+}
+//이름 불러오기
+function loadApartmentDetails(apartmentName) {
+    const detailsDiv = document.getElementById('apartment-details');
+    detailsDiv.innerHTML = `<h2>${apartmentName}</h2>`;
+
+    // 아파트 상세 정보 가져오기
+    fetch('/getApartmentDetails?name=' + encodeURIComponent(apartmentName))
+        .then(response => response.json())
+        .then(data => {
+        console.log(data.transactions);
+
+         // detailsDiv 초기화
+        detailsDiv.innerHTML = ''; // 내용을 비워서 이전 데이터를 제거
+
+            if (!data || !data.transactions || data.transactions.length === 0) {
+                detailsDiv.innerHTML += `<p>거래 정보가 없습니다.</p>`;
+                return;
+            }
+
+            // 추가적인 아파트 상세 정보 표시
+            detailsDiv.innerHTML += `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>건축년도</th>
+                            <th>가격</th>
+                            <th>전용면적</th>
+                            <th>거래일자</th>
+                            <th>층</th>
+                            <th>법정동</th>
+                            <th>지번</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.transactions.map(transaction => `
+                            <tr>
+                                <td>${transaction.buildYear}</td>
+                                <td>${transaction.dealAmount / 10000}억</td>
+                                <td>${transaction.excluUseAr}</td>
+                                <td>${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}</td>
+                                <td>${transaction.floor}</td>
+                                <td>${transaction.umdNm}</td>
+                                <td>${transaction.jibun}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        })
+        .catch(error => {
+            console.error('Error fetching apartment details:', error);
+            detailsDiv.innerHTML += `<p>상세 정보를 불러오는 데 오류가 발생했습니다.</p>`;
+        });
+    // 가격 이력 불러오기
+    fetchPriceHistory(apartmentName);
+}
+
+// DOMContentLoaded 이벤트가 발생했을 때의 코드
+document.addEventListener('DOMContentLoaded', function() {
+    const links = document.querySelectorAll('a[data-apt-nm]');
+    links.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const apartmentName = this.dataset.aptNm;
+            loadApartmentDetails(apartmentName);
+        });
+    });
+});
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
