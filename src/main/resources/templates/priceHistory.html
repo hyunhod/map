@@ -99,6 +99,34 @@
                     <option value="">선택하세요</option>
                 </select>
             </div>
+            <div class="form-group col-md-1">
+                <label for="minPrice">최소 가격</label>
+                <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="최소 가격">
+            </div>
+            <div class="form-group col-md-1">
+                <label for="maxPrice">최대 가격</label>
+                <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="최대 가격">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="minArea" class="text-nowrap">최소 면적 (㎡)</label>
+                <input type="number" class="form-control" id="minArea" name="minArea" placeholder="최소 면적">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="maxArea" class="text-nowrap">최대 면적 (㎡)</label>
+                <input type="number" class="form-control" id="maxArea" name="maxArea" placeholder="최대 면적">
+            </div>
+            <div class="form-group col-md-2">
+                <label for="dealDate">거래 날짜</label>
+                <input type="date" class="form-control" id="dealDate" name="dealDate">
+            </div>
+            <div class="form-group col-md-1">
+                <label for="sortBy">정렬 기준</label>
+                <select id="sortBy" name="sortBy" class="form-control">
+                    <option value="">선택하세요</option>
+                    <option value="dealAmount">거래 금액순</option>
+                    <option value="buildYear">건축년도순</option>
+                </select>
+            </div>
             <div class="form-group col-md-1 align-self-end">
                 <button type="submit" class="btn btn-primary btn-block">검색</button>
             </div>
@@ -118,16 +146,30 @@
                 <thead>
                 <tr>
                     <th>아파트 이름</th>
+                    <th>건축년도</th>
+                    <th>법정동</th>
+                    <th>지번</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="aptNm : ${apartmentNames}">
+                <tr th:each="apt : ${apartmentNames}">
                     <td>
                         <a href="#"
-                           th:text="${aptNm}"
-                           th:data-apt-nm="${aptNm}"
+                           th:text="${apt}"
+                           th:data-apt-nm="${apt}"
                            th:onclick="'loadApartmentDetails(this.dataset.aptNm)'">
                         </a>
+                    </td>
+                    <td colspan="3">
+                        <table>
+                            <tbody>
+                            <tr th:if="${apartmentDetails[apt.toString()] != null}">
+                                <td th:text="${apartmentDetails[apt.toString()][0].buildYear}"></td>
+                                <td th:text="${apartmentDetails[apt.toString()][0].umdNm}"></td>
+                                <td th:text="${apartmentDetails[apt.toString()][0].jibun}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </td>
                 </tr>
                 </tbody>

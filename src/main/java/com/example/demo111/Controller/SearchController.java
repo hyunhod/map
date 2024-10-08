@@ -160,6 +160,8 @@ public class SearchController {
 
         Map<String, Set<String>> mapLocation = locationService.getAllLocations();
         model.addAttribute("locations", mapLocation);
+        Map<String, List<TransactionRanking>> apartmentDetails = new HashMap<>();
+
 
 
 
@@ -185,7 +187,11 @@ public class SearchController {
             // 각 지역에 대해 페이지별로 거래 정보를 가져옴
             Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
 
+            for (String aptNm:apartmentNames){
+                List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(aptNm);
+                apartmentDetails.put(aptNm, transactions);
 
+            }
             // 현재 페이지에 해당하는 데이터만 추가
             paginatedTransactions.addAll(transactionRankings.getContent());
             totalTransactions += transactionRankings.getTotalElements(); // 전체 거래 수 업데이트
@@ -193,8 +199,9 @@ public class SearchController {
 
         // 전체 페이지 수 계산
         int totalPages = (int) Math.ceil((double) totalTransactions / size);
-        System.out.println("name :" +apartmentNames);
 
+
+        model.addAttribute("apartmentDetails",apartmentDetails);
         // 모델에 결과와 페이징 정보를 추가
         model.addAttribute("apartmentNames",apartmentNames);
         model.addAttribute("transactions", paginatedTransactions); // 거래 리스트
@@ -247,7 +254,11 @@ public class SearchController {
             TransactionRanking firstTransaction = transactions.get(0);
             response.put("umdNm", firstTransaction.getUmdNm());
             response.put("jibun", firstTransaction.getJibun());
+            response.put("buildYear", firstTransaction.getBuildYear()); // 건축년도
+
         }
+
+
 
         // 거래 정보 리스트 추가
         response.put("transactions", transactions);

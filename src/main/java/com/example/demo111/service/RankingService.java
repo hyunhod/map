@@ -213,7 +213,8 @@ public class RankingService {
 
     public List<TransactionRanking> getTransactionsByAptNm(String aptNm) {
         // 아파트 이름을 기준으로 거래 내역을 조회
-        return rankingRepository.findByAptNm(aptNm);
+       return rankingRepository.findByAptNm(aptNm);
+
     }
 
 
