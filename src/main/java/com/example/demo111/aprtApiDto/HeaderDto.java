@@ -1,4 +1,4 @@
-package com.example.demo111.aprtDto;
+package com.example.demo111.aprtApiDto;
 
 import lombok.Data;
 

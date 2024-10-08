@@ -1,4 +1,4 @@
-package com.example.demo111.lawdCodDto;
+package com.example.demo111.lawdCodApiDto;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.AllArgsConstructor;

@@ -2,18 +2,16 @@ package com.example.demo111.service;
 
 
 import com.example.demo111.Repository.RankingRepository;
-import com.example.demo111.aprtDto.BodyDto;
-import com.example.demo111.aprtDto.ItemsDto;
-import com.example.demo111.aprtDto.ResponseDto;
+import com.example.demo111.aprtApiDto.BodyDto;
+import com.example.demo111.aprtApiDto.ItemsDto;
+import com.example.demo111.aprtApiDto.ResponseDto;
 import com.example.demo111.domain.TransactionRanking;
-import com.example.demo111.lawdCodDto.LawdCodeDto;
-import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
+import com.example.demo111.lawdCodApiDto.LawdCodeDto;
+import com.example.demo111.lawdCodApiDto.LawdCodeResponseDto;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 

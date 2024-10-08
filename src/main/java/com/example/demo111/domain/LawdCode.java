@@ -1,6 +1,6 @@
 package com.example.demo111.domain;
 
-import com.example.demo111.lawdCodDto.LawdCodeResponseDto;
+import com.example.demo111.lawdCodApiDto.LawdCodeResponseDto;
 import lombok.Data;
 
 import java.util.List;

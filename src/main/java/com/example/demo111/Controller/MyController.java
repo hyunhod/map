@@ -3,17 +3,15 @@ package com.example.demo111.Controller;
 
 import com.example.demo111.Repository.RankingRepository;
 
-import com.example.demo111.aprtDto.ResponseDto;
+import com.example.demo111.aprtApiDto.ResponseDto;
 import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.service.ApiService;
 import com.example.demo111.service.RankingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

@@ -1,5 +1,6 @@
 package com.example.demo111.controller;
 
+import com.example.demo111.Dto.ApartmentTransactionDto;
 import com.example.demo111.domain.Location;
 import com.example.demo111.domain.TransactionRanking;
 import com.example.demo111.service.ApiService;
@@ -155,14 +156,12 @@ public class SearchController {
                                      @RequestParam(required = false) String dealDate,
                                      @RequestParam(required = false, defaultValue = "dealAmount") String sortBy,
                                      @RequestParam(defaultValue = "0") int page,
-                                     @RequestParam(defaultValue = "10") int size,
+                                     @RequestParam(defaultValue = "2") int size,
                                      Model model) {
 
         Map<String, Set<String>> mapLocation = locationService.getAllLocations();
         model.addAttribute("locations", mapLocation);
         Map<String, List<TransactionRanking>> apartmentDetails = new HashMap<>();
-
-
 
 
         // 지역명으로 지역 정보를 조회
@@ -182,7 +181,6 @@ public class SearchController {
             // 아파트 이름은 모든 거래를 대상으로 수집 (페이지네이션 X)
             List<TransactionRanking> allTransactions = rankingService.getAllTransactionsByRegion(regionCode);
             allTransactions.forEach(tr -> apartmentNames.add(tr.getAptNm()));
-            System.out.println("new:"+allTransactions);
 
             // 각 지역에 대해 페이지별로 거래 정보를 가져옴
             Page<TransactionRanking> transactionRankings = rankingService.getTransactionRankingsByRegion(regionCode, page, size, minPrice, maxPrice, minArea, maxArea, dealDate, sortBy);
