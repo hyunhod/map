@@ -10,6 +10,29 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+
+        table {
+              width: 100%;
+              border-collapse: collapse;
+          }
+
+          td {
+              padding: 10px;
+              text-align: left;
+          }
+
+          a {
+              display: block;
+          }
+
+          tbody tr {
+              border-bottom: 1px solid #ddd;
+          }
+
+          td[colspan="3"] {
+              padding-top: 20px;
+          }
+
         .search-form {
             display: flex;
             justify-content: flex-start;
@@ -77,6 +100,11 @@
         .chart-container {
             height: 400px;
         }
+        #apartment-details {
+    border-left: 1px solid #dee2e6; /* 왼쪽 테두리 추가 */
+    padding-left: 20px; /* 왼쪽 여백 추가 */
+}
+
     </style>
 </head>
 <body>
@@ -99,34 +127,6 @@
                     <option value="">선택하세요</option>
                 </select>
             </div>
-            <div class="form-group col-md-1">
-                <label for="minPrice">최소 가격</label>
-                <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="최소 가격">
-            </div>
-            <div class="form-group col-md-1">
-                <label for="maxPrice">최대 가격</label>
-                <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="최대 가격">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="minArea" class="text-nowrap">최소 면적 (㎡)</label>
-                <input type="number" class="form-control" id="minArea" name="minArea" placeholder="최소 면적">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="maxArea" class="text-nowrap">최대 면적 (㎡)</label>
-                <input type="number" class="form-control" id="maxArea" name="maxArea" placeholder="최대 면적">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="dealDate">거래 날짜</label>
-                <input type="date" class="form-control" id="dealDate" name="dealDate">
-            </div>
-            <div class="form-group col-md-1">
-                <label for="sortBy">정렬 기준</label>
-                <select id="sortBy" name="sortBy" class="form-control">
-                    <option value="">선택하세요</option>
-                    <option value="dealAmount">거래 금액순</option>
-                    <option value="buildYear">건축년도순</option>
-                </select>
-            </div>
             <div class="form-group col-md-1 align-self-end">
                 <button type="submit" class="btn btn-primary btn-block">검색</button>
             </div>
@@ -134,11 +134,13 @@
     </form>
 </div>
 
+
 <div class="container mt-5">
     <div id="map"></div>
     <input type="text" id="address" placeholder="번지-지번 검색" style="width:400px;"/>
     <button onclick="searchAddress()" class="btn btn-secondary">주소 검색</button>
     <div id="address-list"></div>
+
 
     <div class="row mt-4">
         <div class="col-md-8">
@@ -175,12 +177,17 @@
                 </tbody>
             </table>
         </div>
-        <div id="apartment-details"></div>
-    </div>
 
-    <div class="chart-container">
-        <canvas id="priceChart"></canvas>
+
+        <div class="col-md-4" id="apartment-details">
+            <!-- 거래 내역이 여기에 표시됨 -->
+
     </div>
+        <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+        </div>
+
+
 
     <a href="/" class="btn btn-primary mb-3">홈</a>
 </div>
@@ -197,16 +204,7 @@
         });
     });
 
-    function loadApartmentDetails(apartmentName) {
-        fetch('/getApartmentDetails?name=' + encodeURIComponent(apartmentName))
-        .then(response => response.json())
-        .then(data => {
-            showOnMap(data.umdNm, data.jibun, apartmentName);
-        })
-        .catch(error => {
-            console.error('Error fetching apartment details:', error);
-        });
-    }
+  
 
     var mapContainer = document.getElementById('map'),
         mapOption = {
@@ -249,6 +247,7 @@
     function showOnMap(umdNm, jibun, aptNm) {
         var address = umdNm + " " + jibun;
         geocoder.addressSearch(address, function(result, status) {
+         console.log(result, status); // 결과 및 상태 확인
             if (status === kakao.maps.services.Status.OK) {
                 var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                 marker.setPosition(coords);
@@ -344,7 +343,7 @@ function loadApartmentDetails(apartmentName) {
     fetch('/getApartmentDetails?name=' + encodeURIComponent(apartmentName))
         .then(response => response.json())
         .then(data => {
-        console.log(data.transactions);
+         showOnMap(data.umdNm, data.jibun,data.aptNm);
 
          // detailsDiv 초기화
         detailsDiv.innerHTML = ''; // 내용을 비워서 이전 데이터를 제거
