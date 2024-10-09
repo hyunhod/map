@@ -7,91 +7,128 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0"></script>
+
 
     <style>
-
         body {
-             background-color: #f8f9fa; /* 배경 색상 */
-         }
+     background-color: #f0f4f8; /* 부드러운 배경 색상 */
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 폰트 스타일 */
+ }
 
-         .container {
-             margin-top: 50px; /* 상단 여백 */
-             background-color: #ffffff; /* 컨테이너 배경 색상 */
-             padding: 20px;
-             border-radius: 8px; /* 모서리 둥글게 */
-             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-         }
+ .container {
+     margin-top: 30px; /* 상단 여백 */
+     background-color: #ffffff; /* 컨테이너 배경 색상 */
+     border-radius: 16px; /* 모서리 둥글게 */
+     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* 더 부드러운 그림자 효과 */
+     padding: 20px; /* 컨텐츠 여백 추가 */
+ }
 
-         h2 {
-             margin-bottom: 20px;
-             color: #343a40; /* 텍스트 색상 */
-         }
+ h2 {
+     margin-bottom: 20px;
+     color: #343a40; /* 텍스트 색상 */
+     font-weight: 600; /* Bold 스타일을 약간 줄임 */
+     font-size: 2em; /* 크기 증가 */
+     text-align: center; /* 중앙 정렬 */
+ }
 
-         .search-form {
-             margin-bottom: 20px;
-         }
+ .search-form {
+     margin-bottom: 20px; /* 여백 증가 */
 
-         .search-form input,
-         .search-form select,
-         .search-form button {
-             padding: 10px;
-             border: 1px solid #ced4da;
-             border-radius: 4px;
-             font-size: 14px;
-         }
+ }
 
-         .search-form button {
-             background-color: #007bff;
-             color: white;
-             border: none;
-         }
+ .search-form input,
+ .search-form select,
+ .search-form button {
+     padding: 12px 15px; /* 패딩 조정 */
+     border: 1px solid #ced4da;
+     border-radius: 8px; /* 모서리 둥글게 */
+     font-size: 16px;
+     transition: border-color 0.3s; /* 부드러운 전환 효과 */
+ }
 
-         .search-form button:hover {
-             background-color: #0056b3;
-         }
+ .search-form input:focus,
+ .search-form select:focus {
+     border-color: #007bff; /* 포커스 시 테두리 색상 */
+     outline: none; /* 포커스 시 아웃라인 제거 */
+ }
 
-         #map {
-             width: 100%;
-             height: 400px;
-             margin-top: 20px;
-             border-radius: 8px; /* 모서리 둥글게 */
-         }
+ .search-form button {
+     background-color: #007bff;
+     color: white;
+     border: none;
+     cursor: pointer; /* 포인터 변경 */
+     transition: background-color 0.3s, transform 0.3s; /* 전환 효과 추가 */
+ }
 
-         #address-list {
-             max-height: 200px;
-             overflow-y: auto;
-             border: 1px solid #ced4da;
-             margin-top: 10px;
-             background-color: #ffffff;
-         }
+ .search-form button:hover {
+     background-color: #0056b3; /* hover 색상 */
+     transform: translateY(-2px); /* 버튼이 위로 올라가는 효과 */
+ }
 
-         .address-item {
-             padding: 10px;
-             cursor: pointer;
-         }
+ #map {
+     width: 100%;
+     height: 300px;
+     margin-top: 20px;
+     border-radius: 16px; /* 모서리 둥글게 */
+     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+ }
 
-         .address-item:hover {
-             background-color: #e9ecef; /* hover 효과 */
-         }
+ #address-list {
+     max-height: 200px;
+     overflow-y: auto;
+     border: 1px solid #ced4da;
+     margin-top: 10px;
+     background-color: #ffffff;
+     border-radius: 8px;
+ }
 
-         .apt-name {
-             cursor: pointer;
-             color: #007bff;
-             text-decoration: underline;
-         }
+ .address-item {
+     padding: 12px 15px; /* 여백 증가 */
+     cursor: pointer;
+     transition: background-color 0.3s, transform 0.3s; /* 전환 효과 추가 */
+ }
 
-         .apt-name:hover {
-             text-decoration: none; /* hover시 밑줄 제거 */
-         }
+ .address-item:hover {
+     background-color: #e9ecef; /* hover 효과 */
+     transform: translateY(-1px); /* 위로 올라가는 효과 */
+ }
 
-         .chart-container {
-             margin-top: 30px;
-             border-radius: 8px; /* 모서리 둥글게 */
-             background-color: #ffffff; /* 차트 배경 색상 */
-             padding: 20px;
-             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-         }
+ .apt-name {
+     cursor: pointer;
+     color: #007bff;
+     text-decoration: underline;
+ }
+
+ .apt-name:hover {
+     text-decoration: none; /* hover시 밑줄 제거 */
+     color: #0056b3; /* hover 색상 변경 */
+ }
+
+ .chart-container {
+     margin: 10px 0;  /* 원하는 크기로 조정 */
+     border-radius: 16px; /* 모서리 둥글게 */
+     background-color: #ffffff; /* 차트 배경 색상 */
+     padding: 20px;
+     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+ }
+
+ .pagination {
+     justify-content: center;
+     margin-top: 20px; /* 위쪽 여백 추가 */
+ }
+
+ .pagination .page-item .page-link {
+     border-radius: 50%;
+     margin: 0 5px;
+     padding: 10px 15px; /* 클릭 영역 확대 */
+     transition: background-color 0.3s, color 0.3s; /* 전환 효과 추가 */
+ }
+
+ .pagination .page-item .page-link:hover {
+     background-color: #007bff; /* hover 색상 */
+     color: white; /* 텍스트 색상 */
+ }
 
     </style>
 </head>
@@ -132,7 +169,7 @@
 
 
     <div class="row mt-4">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <table class="table">
                 <thead>
                 <tr>
@@ -157,52 +194,42 @@
                 </tr>
                 </tbody>
             </table>
+            <!-- 페이지 네비게이션 -->
+            <div>
+                <!-- 이전 페이지 버튼 -->
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/aptSearch( locationName=${locationName}, page=${currentPage - 1})}">이전</a>
+
+                <!-- 현재 페이지 표시 -->
+                <span th:text="${currentPage + 1}">1</span>
+
+                <!-- 총 페이지 수 출력 -->
+                <span> / <span th:text="${totalPages}">0</span></span>
+
+                <!-- 다음 페이지 버튼 -->
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/aptSearch(locationName=${locationName}, page=${currentPage + 1})}">다음</a>
+            </div>
         </div>
 
-        <div class="col-md-6" id="apartment-details">
+        <div class="col-md-7" id="apartment-details">
             <!-- 거래 내역이 여기에 표시됨 -->
-
         </div>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+
+
     </div>
 </div>
-        <div class="chart-container">
-            <canvas id="priceChart"></canvas>
-        </div>
+
+
         <a href="/" class="btn btn-primary mb-3">홈</a>
 
-<!-- 페이지 네비게이션 -->
-<div>
-    <span>페이지: </span>
 
-    <!-- 이전 페이지 버튼 -->
-    <a th:if="${currentPage > 0}"
-       th:href="@{/aptSearch( locationName=${locationName}, page=${currentPage - 1})}">이전</a>
-
-    <!-- 현재 페이지 표시 -->
-    <span th:text="${currentPage + 1}">1</span>
-
-    <!-- 총 페이지 수 출력 -->
-    <span> / <span th:text="${totalPages}">0</span></span>
-
-    <!-- 다음 페이지 버튼 -->
-    <a th:if="${currentPage < totalPages - 1}"
-       th:href="@{/aptSearch(locationName=${locationName}, page=${currentPage + 1})}">다음</a>
-</div>
 
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const links = document.querySelectorAll('a[data-apt-nm]');
-        links.forEach(link => {
-            link.addEventListener('click', function(event) {
-                event.preventDefault();
-                const apartmentName = this.dataset.aptNm;
-                loadApartmentDetails(apartmentName);
-            });
-        });
-    });
-
-
     var mapContainer = document.getElementById('map'),
         mapOption = {
             center: new kakao.maps.LatLng(37.5665, 126.9780),
@@ -241,6 +268,8 @@
         });
     });
 
+
+
     function showOnMap(umdNm, jibun, aptNm) {
         var address = umdNm + " " + jibun;
         geocoder.addressSearch(address, function(result, status) {
@@ -258,7 +287,6 @@
     }
 
 
-    // Chart.js를 이용해 그래프 그리기
 let priceChart; // 차트 전역 변수
 
 // 가격 이력을 가져오는 함수
@@ -286,14 +314,15 @@ function fetchPriceHistory(aptNm) {
                 labels.push(month);
                 prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
             }
-
-            // 이전 차트가 존재하면 파괴
+   // 이전 차트가 존재하면 파괴
             if (priceChart) {
                 priceChart.destroy();
             }
-
             // Chart.js를 이용해 그래프 그리기
             const ctx = document.getElementById('priceChart').getContext('2d');
+
+
+
             priceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -328,9 +357,11 @@ function fetchPriceHistory(aptNm) {
             });
         })
         .catch(error => {
-            console.error('Error fetching price history:', error);
+            console.error(error);
         });
 }
+
+
 //이름 불러오기
 function loadApartmentDetails(apartmentName,page=0,size=5) {
 
