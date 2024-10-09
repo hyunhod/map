@@ -105,7 +105,8 @@
                 <select id="region" name="region" class="form-control" required>
                     <option value="">선택하세요</option>
                     <th:block th:each="entry : ${locations}">
-                        <option th:value="${entry.value}" th:text="${entry.key}"></option>
+                        <option th:value="${entry.value}" th:text="${entry.key}">
+                           </option>
                     </th:block>
                 </select>
             </div>
@@ -150,9 +151,9 @@
                            th:onclick="'loadApartmentDetails(this.dataset.aptNm)'">
                         </a>
                     </td>
-                    <td th:text="${entry.value[0].buildYear}"></td>
-                    <td th:text="${entry.value[0].umdNm}"></td>
-                    <td th:text="${entry.value[0].jibun}"></td>
+                    <td th:text="${entry.value.isEmpty() ? 'N/A' : entry.value[0].buildYear}"></td>
+                    <td th:text="${entry.value.isEmpty() ? 'N/A' : entry.value[0].umdNm}"></td>
+                    <td th:text="${entry.value.isEmpty() ? 'N/A' : entry.value[0].jibun}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -160,6 +161,7 @@
 
         <div class="col-md-6" id="apartment-details">
             <!-- 거래 내역이 여기에 표시됨 -->
+
         </div>
     </div>
 </div>
@@ -167,26 +169,26 @@
             <canvas id="priceChart"></canvas>
         </div>
         <a href="/" class="btn btn-primary mb-3">홈</a>
-        </div>
 
-    <nav aria-label="Page navigation" class="mt-4">
-        <ul class="pagination">
-            <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/aptSearch(page=${currentPage - 1})}">이전</a>
-            </li>
-            <th:block th:each="pageNum : ${pageNumbers}">
-                <li class="page-item" th:class="${pageNum == currentPage} ? 'active'">
-                    <a class="page-link" th:href="@{/aptSearch(page=${pageNum})}" th:text="${pageNum}"></a>
-                </li>
-            </th:block>
-            <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/aptSearch(page=${currentPage + 1})}">다음</a>
-            </li>
-        </ul>
-    </nav>
+<!-- 페이지 네비게이션 -->
+<div>
+    <span>페이지: </span>
 
+    <!-- 이전 페이지 버튼 -->
+    <a th:if="${currentPage > 0}"
+       th:href="@{/aptSearch( locationName=${locationName}, page=${currentPage - 1})}">이전</a>
 
+    <!-- 현재 페이지 표시 -->
+    <span th:text="${currentPage + 1}">1</span>
+
+    <!-- 총 페이지 수 출력 -->
+    <span> / <span th:text="${totalPages}">0</span></span>
+
+    <!-- 다음 페이지 버튼 -->
+    <a th:if="${currentPage < totalPages - 1}"
+       th:href="@{/aptSearch(locationName=${locationName}, page=${currentPage + 1})}">다음</a>
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -330,12 +332,13 @@ function fetchPriceHistory(aptNm) {
         });
 }
 //이름 불러오기
-function loadApartmentDetails(apartmentName) {
+function loadApartmentDetails(apartmentName,page=0,size=5) {
+
     const detailsDiv = document.getElementById('apartment-details');
     detailsDiv.innerHTML = `<h2>${apartmentName}</h2>`;
 
     // 아파트 상세 정보 가져오기
-    fetch('/getApartmentDetails?name=' + encodeURIComponent(apartmentName))
+    fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)
         .then(response => response.json())
         .then(data => {
         showOnMap(data.umdNm, data.jibun,data.aptNm);
@@ -377,14 +380,37 @@ function loadApartmentDetails(apartmentName) {
                     </tbody>
                 </table>
             `;
+
+             // 페이지 네이션 추가
+            addPaginationControls(apartmentName, data.currentPage, data.totalPages);
         })
         .catch(error => {
             console.error('Error fetching apartment details:', error);
             detailsDiv.innerHTML += `<p>상세 정보를 불러오는 데 오류가 발생했습니다.</p>`;
         });
+
     // 가격 이력 불러오기
     fetchPriceHistory(apartmentName);
 }
+
+
+// 페이지 네이션 컨트롤 추가
+function addPaginationControls(apartmentName, currentPage, totalPages) {
+    const detailsDiv = document.getElementById('apartment-details');
+
+    let paginationHtml = '<div class="pagination">';
+    if (currentPage > 0) {
+        paginationHtml += `<button onclick="loadApartmentDetails('${apartmentName}', ${currentPage - 1})">Previous</button>`;
+    }
+    if (currentPage < totalPages - 1) {
+        paginationHtml += `<button onclick="loadApartmentDetails('${apartmentName}', ${currentPage + 1})">Next</button>`;
+    }
+    paginationHtml += '</div>';
+
+
+    detailsDiv.innerHTML += paginationHtml;
+}
+
 
 // DOMContentLoaded 이벤트가 발생했을 때의 코드
 document.addEventListener('DOMContentLoaded', function() {

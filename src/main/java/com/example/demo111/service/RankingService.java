@@ -209,12 +209,17 @@ public class RankingService {
         return result; // 검색 결과 반환
     }
 
-    public List<TransactionRanking> getTransactionsByAptNm(String aptNm) {
+    public Page<TransactionRanking> getTransactionsByAptNm(String aptNm,Pageable pageable) {
         // 아파트 이름을 기준으로 거래 내역을 조회
-       return rankingRepository.findByAptNm(aptNm);
+       return rankingRepository.findByAptNm(aptNm,pageable);
 
     }
 
+    public List<TransactionRanking> getTransactionsByAptNm(String aptNm) {
+        // 아파트 이름을 기준으로 거래 내역을 조회
+        return rankingRepository.findByAptNm(aptNm);
+
+    }
 
 
     // 거래량이 가장 많은 아파트 반환 메서드(지역)
