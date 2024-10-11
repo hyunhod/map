@@ -279,7 +279,7 @@
                 marker.setPosition(coords);
                 marker.setMap(map);
                 map.setCenter(coords);
-                fetchPriceHistory(aptNm);
+
             } else {
                 alert('주소를 찾을 수 없습니다.');
             }
@@ -291,6 +291,7 @@ let priceChart; // 차트 전역 변수
 
 // 가격 이력을 가져오는 함수
 function fetchPriceHistory(aptNm) {
+console.log('fetch : ',aptNm);
     fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
         .then(response => response.json())
         .then(data => {
@@ -320,7 +321,6 @@ function fetchPriceHistory(aptNm) {
             }
             // Chart.js를 이용해 그래프 그리기
             const ctx = document.getElementById('priceChart').getContext('2d');
-
 
 
             priceChart = new Chart(ctx, {
@@ -366,7 +366,6 @@ function fetchPriceHistory(aptNm) {
 function loadApartmentDetails(apartmentName,page=0,size=5) {
 
     const detailsDiv = document.getElementById('apartment-details');
-    detailsDiv.innerHTML = `<h2>${apartmentName}</h2>`;
 
     // 아파트 상세 정보 가져오기
     fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)
@@ -422,6 +421,7 @@ function loadApartmentDetails(apartmentName,page=0,size=5) {
 
     // 가격 이력 불러오기
     fetchPriceHistory(apartmentName);
+
 }
 
 
