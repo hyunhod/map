@@ -162,9 +162,12 @@
 
 
 <div class="container mt-5">
-    <div id="map"></div>
     <input type="text" id="address" placeholder="번지-지번 검색" style="width:400px;"/>
     <button onclick="searchAddress()" class="btn btn-secondary">주소 검색</button>
+    <div id="map"></div>
+    <div class="chart-container" id="chart-Container" style="display: none;">
+        <canvas id="priceChart"></canvas>
+    </div>
     <div id="address-list"></div>
 
 
@@ -215,19 +218,10 @@
         <div class="col-md-7" id="apartment-details">
             <!-- 거래 내역이 여기에 표시됨 -->
         </div>
-            <div class="chart-container">
-                <canvas id="priceChart"></canvas>
-            </div>
-
 
     </div>
 </div>
-
-
         <a href="/" class="btn btn-primary mb-3">홈</a>
-
-
-
 
 <script>
     var mapContainer = document.getElementById('map'),
@@ -338,6 +332,7 @@ console.log('fetch : ',aptNm);
                 },
                 options: {
                     responsive: true,
+                     maintainAspectRatio: false, // 종횡비를 유지하지 않으려면 false로 설정
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -364,8 +359,11 @@ console.log('fetch : ',aptNm);
 
 //이름 불러오기
 function loadApartmentDetails(apartmentName,page=0,size=5) {
-
+ const chartContainer = document.getElementById('chart-Container'); // chart-Container DOM 요소 참조 추가
     const detailsDiv = document.getElementById('apartment-details');
+     // 차트 컨테이너 보이도록 설정
+            chartContainer.style.display = 'block';
+
 
     // 아파트 상세 정보 가져오기
     fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)
@@ -413,6 +411,8 @@ function loadApartmentDetails(apartmentName,page=0,size=5) {
 
              // 페이지 네이션 추가
             addPaginationControls(apartmentName, data.currentPage, data.totalPages);
+
+
         })
         .catch(error => {
             console.error('Error fetching apartment details:', error);
