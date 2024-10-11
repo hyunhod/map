@@ -431,10 +431,12 @@ function addPaginationControls(apartmentName, currentPage, totalPages) {
 
     let paginationHtml = '<div class="pagination">';
     if (currentPage > 0) {
-        paginationHtml += `<button onclick="loadApartmentDetails('${apartmentName}', ${currentPage - 1})">Previous</button>`;
+        paginationHtml += `<button onclick="loadApartmentDetails('${apartmentName}', ${currentPage - 1})">이전</button>`;
     }
+    // 현재 페이지와 총 페이지 수 표시
+    paginationHtml += `<span>${currentPage + 1} / ${totalPages}</span> `;
     if (currentPage < totalPages - 1) {
-        paginationHtml += `<button onclick="loadApartmentDetails('${apartmentName}', ${currentPage + 1})">Next</button>`;
+        paginationHtml += `<button onclick="loadApartmentDetails('${apartmentName}', ${currentPage + 1})">다음</button>`;
     }
     paginationHtml += '</div>';
 
