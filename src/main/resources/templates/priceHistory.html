@@ -162,8 +162,10 @@
 
 
 <div class="container mt-5">
-    <input type="text" id="address" placeholder="번지-지번 검색" style="width:400px;"/>
+    <input type="text" id="address" placeholder="번지-지번 검색" style="width:250px;"/>
     <button onclick="searchAddress()" class="btn btn-secondary">주소 검색</button>
+    <input type="text" id="searchApt" placeholder="아파트 검색" style="width:250px;"/>
+    <button onclick="searchApt()" class="btn btn-secondary">아파트 검색</button>
     <div id="map"></div>
     <div class="chart-container" id="chart-Container" style="display: none;">
         <canvas id="priceChart"></canvas>
@@ -182,6 +184,7 @@
                     <th>지번</th>
                 </tr>
                 </thead>
+
                 <tbody>
                 <tr th:each="entry : ${apartmentDetails}">
                     <td>
@@ -196,6 +199,7 @@
                     <td th:text="${entry.value.isEmpty() ? 'N/A' : entry.value[0].jibun}"></td>
                 </tr>
                 </tbody>
+
             </table>
             <!-- 페이지 네비게이션 -->
             <div>
@@ -261,6 +265,19 @@
             }
         });
     });
+
+
+function searchApt() {
+    const searchQuery = document.getElementById('searchApt').value.trim();
+console.log(searchQuery);
+
+    fetch(`/aptSearch?apartmentName=${encodeURIComponent(searchQuery)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+        })
+}
 
 
 

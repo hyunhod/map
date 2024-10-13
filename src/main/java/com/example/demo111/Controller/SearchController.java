@@ -151,51 +151,67 @@ public class SearchController {
     // 아파트 거래 정보를 조회하는 메서드
     @GetMapping("/aptSearch")
     public String searchTransactions(@RequestParam(required = false) String locationName,
+                                     @RequestParam(required = false) String apartmentName,
                                      @PageableDefault(page = 0, size = 5) Pageable pageable,
                                      Model model) {
-
         Map<String, Set<String>> mapLocation = locationService.getAllLocations();
         model.addAttribute("locations", mapLocation);
         Map<String, List<TransactionRanking>> apartmentDetails = new HashMap<>();
 
-        // 지역명으로 지역 정보를 조회
-        List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
-        Set<String> apartmentNames = new HashSet<>();
+        if (apartmentName != null && !apartmentName.isEmpty()) {
+            List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(apartmentName);
+            apartmentDetails.put(apartmentName, transactions);
+        } else if (locationName != null && !locationName.isEmpty()) {
+            // 지역명으로 지역 정보를 조회
+            List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
+            Set<String> apartmentNames = new HashSet<>();
 
-        // 모든 거래를 대상으로 아파트 이름 수집
-        for (Location location : locations) {
-            String regionCode = location.getRegionCode(); // 지역 코드 얻기
-            List<TransactionRanking> allTransactions = rankingService.getAllTransactionsByRegion(regionCode);
-            allTransactions.forEach(tr -> apartmentNames.add(tr.getAptNm()));
+            // 모든 거래를 대상으로 아파트 이름 수집
+            for (Location location : locations) {
+                String regionCode = location.getRegionCode(); // 지역 코드 얻기
+                List<TransactionRanking> allTransactions = rankingService.getAllTransactionsByRegion(regionCode);
+                allTransactions.forEach(tr -> apartmentNames.add(tr.getAptNm()));
+            }
+
+            List<String> apartmentNamesList = new ArrayList<>(apartmentNames);
+            int totalApartments = apartmentNamesList.size();
+
+            // 페이지네이션된 아파트 이름 리스트
+            List<String> pagedApartmentNames = apartmentNamesList.stream()
+                    .skip(pageable.getPageNumber() * pageable.getPageSize())
+                    .limit(pageable.getPageSize())
+                    .collect(Collectors.toList());
+
+            // 아파트 이름에 대한 거래 내역을 가져옴
+            for (String aptNm : pagedApartmentNames) {
+                List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(aptNm);
+                apartmentDetails.put(aptNm, transactions);
+            }
+
+            // 전체 페이지 수와 현재 페이지 설정
+            int totalPages = (int) Math.ceil((double) totalApartments / pageable.getPageSize());
+            model.addAttribute("totalPages", totalPages);
+            model.addAttribute("currentPage", pageable.getPageNumber());
+            model.addAttribute("apartmentNames", pagedApartmentNames);
+            model.addAttribute("locationName", locationName);
         }
 
-        List<String> apartmentNamesList = new ArrayList<>(apartmentNames);
-        int totalApartments = apartmentNamesList.size();
-
-        // 페이지네이션된 아파트 이름 리스트
-        List<String> pagedApartmentNames = apartmentNamesList.stream()
-                .skip(pageable.getPageNumber() * pageable.getPageSize())
-                .limit(pageable.getPageSize())
-                .collect(Collectors.toList());
-
-        // 아파트 이름에 대한 거래 내역을 가져옴
-        for (String aptNm : pagedApartmentNames) {
-            List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(aptNm);
-            apartmentDetails.put(aptNm, transactions);
-
-        }
-
-        // 전체 페이지 수와 현재 페이지 설정
-        int totalPages = (int) Math.ceil((double) totalApartments / pageable.getPageSize());
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("currentPage", pageable.getPageNumber());
         model.addAttribute("apartmentDetails", apartmentDetails);
-        model.addAttribute("apartmentNames", pagedApartmentNames);
-        model.addAttribute("locationName", locationName);
 
+        // 추가: null 체크 후 기본값 설정
+        if (model.getAttribute("totalPages") == null) {
+            model.addAttribute("totalPages", 0); // 기본값 설정
+        }
+        if (model.getAttribute("currentPage") == null) {
+            model.addAttribute("currentPage", 0); // 기본값 설정
+        }
+        if (model.getAttribute("apartmentNames") == null) {
+            model.addAttribute("apartmentNames", Collections.emptyList()); // 기본값 설정
+        }
+
+        System.out.println(apartmentDetails);
         return "priceHistory"; // 결과를 표시할 HTML 페이지로 이동
     }
-
 
     @GetMapping("/price-history")
     @ResponseBody
@@ -207,8 +223,6 @@ public class SearchController {
         transactions.sort(Comparator.comparing(TransactionRanking::getDealYear)
                 .thenComparing(TransactionRanking::getDealMonth)
                 .thenComparing(TransactionRanking::getDealDay));
-
-        System.out.println(transactions);
 
 
         // 정렬된 거래 기록 반환
@@ -222,8 +236,7 @@ public class SearchController {
             , @PageableDefault(page = 0, size = 5) Pageable pageable) {
         // 해당 아파트 이름에 따른 거래 정보를 조회
         Page<TransactionRanking> transactionsPage = rankingService.getTransactionsByAptNm(name,pageable);
-        // 로그 추가
-        System.out.println("Fetching transactions for apartment: " + name + ", Page: " + pageable.getPageNumber());
+
 
         // 아파트 정보 반환
         Map<String, Object> response = new HashMap<>();
@@ -243,5 +256,7 @@ public class SearchController {
         response.put("totalPages", transactionsPage.getTotalPages());
         return response;
     }
+
+
 
 }
