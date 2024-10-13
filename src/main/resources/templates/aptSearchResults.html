@@ -7,126 +7,211 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0"></script>
 
 
     <style>
-        .search-form {
-        display: flex; /* Flexbox를 사용하여 수평 정렬 */
-        justify-content: flex-start; /* 왼쪽 정렬 */
-        align-items: center; /* 세로 중앙 정렬 */
-        gap: 10px; /* 각 요소 사이에 간격 추가 */
-        margin-bottom: 20px; /* 폼 아래 여백 추가 */
-    }
+        body {
+     background-color: #f0f4f8; /* 부드러운 배경 색상 */
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 폰트 스타일 */
+ }
 
-    .search-form input,
-    .search-form select,
-    .search-form button {
-        padding: 10px; /* 패딩 추가하여 요소 크기 조절 */
-        border: 1px solid #ccc; /* 테두리 스타일 */
-        border-radius: 4px; /* 둥근 모서리 */
-        font-size: 14px; /* 폰트 크기 조정 */
-    }
 
-    .search-form button {
-        background-color: #007bff; /* 버튼 배경 색 */
-        color: white; /* 버튼 글자 색 */
-        border: none; /* 버튼 테두리 없애기 */
-        cursor: pointer; /* 커서 모양 변경 */
-    }
+ .container {
+     margin-top: 30px; /* 상단 여백 */
+     background-color: #ffffff; /* 컨테이너 배경 색상 */
+     border-radius: 16px; /* 모서리 둥글게 */
+     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* 더 부드러운 그림자 효과 */
+     padding: 20px; /* 컨텐츠 여백 추가 */
+ }
 
-    .search-form button:hover {
-        background-color: #0056b3; /* 호버 시 버튼 색상 변경 */
-    }
-        #map {
-            width: 100%;
-            height: 400px; /* Adjust as needed */
-            margin-top: 20px; /* Space between table and map */
-        }
-        #info {
-            width: 200px;
-            height: 400px;
-            float: left;
-            padding: 10px;
-            border-left: 1px solid #ccc;
-        }
-        #address-list {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-        }
-        .address-item {
-            padding: 5px;
-            cursor: pointer;
-        }
-        .address-item:hover {
-            background-color: #f0f0f0;
-        }
-        .apt-name {
-            cursor: pointer; /* Pointer 커서 추가 */
-            color: blue; /* 링크처럼 보이도록 색상 변경 */
-            text-decoration: underline; /* 밑줄 추가 */
-        }
-        .chart-container {
-            height: 400px; /* 그래프 높이 설정 */
-        }
+ h2 {
+     margin-bottom: 20px;
+     color: #343a40; /* 텍스트 색상 */
+     font-weight: 600; /* Bold 스타일을 약간 줄임 */
+     font-size: 2em; /* 크기 증가 */
+     text-align: center; /* 중앙 정렬 */
+ }
 
+ .search-form {
+     margin-bottom: 20px; /* 여백 증가 */
+
+ }
+
+ .search-form input,
+ .search-form select,
+ .search-form button {
+     padding: 12px 15px; /* 패딩 조정 */
+     border: 1px solid #ced4da;
+     border-radius: 8px; /* 모서리 둥글게 */
+     font-size: 16px;
+     transition: border-color 0.3s; /* 부드러운 전환 효과 */
+ }
+
+ .search-form input:focus,
+ .search-form select:focus {
+     border-color: #007bff; /* 포커스 시 테두리 색상 */
+     outline: none; /* 포커스 시 아웃라인 제거 */
+ }
+
+ .search-form button {
+     background-color: #007bff;
+     color: white;
+     border: none;
+     cursor: pointer; /* 포인터 변경 */
+     transition: background-color 0.3s, transform 0.3s; /* 전환 효과 추가 */
+ }
+
+ .search-form button:hover {
+     background-color: #0056b3; /* hover 색상 */
+     transform: translateY(-2px); /* 버튼이 위로 올라가는 효과 */
+ }
+
+ #map {
+     width: 100%;
+     height: 300px;
+     margin-top: 20px;
+     border-radius: 16px; /* 모서리 둥글게 */
+     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); /* 그림자 효과 */
+ }
+
+ #address-list {
+     max-height: 200px;
+     overflow-y: auto;
+     border: 1px solid #ced4da;
+     margin-top: 10px;
+     background-color: #ffffff;
+     border-radius: 8px;
+ }
+
+ .address-item {
+     padding: 12px 15px; /* 여백 증가 */
+     cursor: pointer;
+     transition: background-color 0.3s, transform 0.3s; /* 전환 효과 추가 */
+ }
+
+ .address-item:hover {
+     background-color: #e9ecef; /* hover 효과 */
+     transform: translateY(-1px); /* 위로 올라가는 효과 */
+ }
+
+ .apt-name {
+     cursor: pointer;
+     color: #007bff;
+     text-decoration: underline;
+ }
+
+ .apt-name:hover {
+     text-decoration: none; /* hover시 밑줄 제거 */
+     color: #0056b3; /* hover 색상 변경 */
+ }
+
+ .chart-container {
+     margin: 10px 0;  /* 원하는 크기로 조정 */
+     border-radius: 16px; /* 모서리 둥글게 */
+     background-color: #ffffff; /* 차트 배경 색상 */
+     padding: 20px;
+     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+ }
+
+ .pagination {
+     justify-content: center;
+     margin-top: 20px; /* 위쪽 여백 추가 */
+ }
+
+ .pagination .page-item .page-link {
+     border-radius: 50%;
+     margin: 0 5px;
+     padding: 10px 15px; /* 클릭 영역 확대 */
+     transition: background-color 0.3s, color 0.3s; /* 전환 효과 추가 */
+ }
+
+ .pagination .page-item .page-link:hover {
+     background-color: #007bff; /* hover 색상 */
+     color: white; /* 텍스트 색상 */
+ }
+ .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.pagination-button {
+    background-color: #007bff; /* 버튼 배경색 */
+    color: white; /* 버튼 글자색 */
+    border: none; /* 테두리 없애기 */
+    padding: 10px 20px; /* 여백 */
+    margin: 0 5px; /* 버튼 간격 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 16px; /* 글자 크기 */
+    transition: background-color 0.3s; /* 배경색 변경 시 애니메이션 */
+}
+
+.pagination-button:hover {
+    background-color: #0056b3; /* 호버 시 배경색 */
+}
+
+.pagination-button:disabled {
+    background-color: #cccccc; /* 비활성화된 버튼 색상 */
+    cursor: not-allowed; /* 비활성화된 버튼 커서 */
+}
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.pagination-button {
+    background-color: #007bff; /* 버튼 배경색 */
+    color: white; /* 버튼 글자색 */
+    border: none; /* 테두리 없애기 */
+    padding: 10px 20px; /* 여백 */
+    margin: 0 5px; /* 버튼 간격 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    cursor: pointer; /* 마우스 커서 변경 */
+    font-size: 16px; /* 글자 크기 */
+    transition: background-color 0.3s; /* 배경색 변경 시 애니메이션 */
+    text-decoration: none; /* 링크 기본 스타일 제거 */
+    display: inline-block; /* 버튼처럼 보이게 하기 */
+}
+
+.pagination-button:hover {
+    background-color: #0056b3; /* 호버 시 배경색 */
+}
+
+.pagination-button:disabled {
+    background-color: #cccccc; /* 비활성화된 버튼 색상 */
+    cursor: not-allowed; /* 비활성화된 버튼 커서 */
+}
 
 
     </style>
 </head>
 <body>
-
-<div class="container mt-5">
+<div class="container">
     <h2>거래 검색</h2>
-    <form action="/aptSearch" method="GET">
+    <form action="/aptSearch" method="GET" class="search-form">
         <div class="form-row">
-            <div class="form-group col-md-1">
+            <div class="form-group col-md-4">
                 <label for="region">지역</label>
                 <select id="region" name="region" class="form-control" required>
                     <option value="">선택하세요</option>
                     <th:block th:each="entry : ${locations}">
-                        <option th:value="${entry.value}" th:text="${entry.key}"></option>
+                        <option th:value="${entry.value}" th:text="${entry.key}">
+                           </option>
                     </th:block>
                 </select>
             </div>
-            <div class="form-group col-md-1">
+            <div class="form-group col-md-4">
                 <label for="locationName">세부 지역</label>
                 <select id="locationName" name="locationName" class="form-control" required>
                     <option value="">선택하세요</option>
-                    <!-- 세부 지역은 JavaScript를 통해 동적으로 추가됩니다 -->
                 </select>
             </div>
-            <div class="form-group col-md-1">
-                <label for="minPrice">최소 가격</label>
-                <input type="number" class="form-control" id="minPrice" name="minPrice" placeholder="최소 가격">
-            </div>
-            <div class="form-group col-md-1">
-                <label for="maxPrice">최대 가격</label>
-                <input type="number" class="form-control" id="maxPrice" name="maxPrice" placeholder="최대 가격">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="minArea" class="text-nowrap">최소 면적 (㎡)</label>
-                <input type="number" class="form-control" id="minArea" name="minArea" placeholder="최소 면적">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="maxArea" class="text-nowrap">최대 면적 (㎡)</label>
-                <input type="number" class="form-control" id="maxArea" name="maxArea" placeholder="최대 면적">
-            </div>
-            <div class="form-group col-md-2">
-                <label for="dealDate">거래 날짜</label>
-                <input type="date" class="form-control" id="dealDate" name="dealDate">
-            </div>
-            <div class="form-group col-md-1">
-                <label for="sortBy">정렬 기준</label>
-                <select id="sortBy" name="sortBy" class="form-control">
-                    <option value="">선택하세요</option>
-                    <option value="dealAmount">거래 금액순</option>
-                    <option value="buildYear">건축년도순</option>
-                </select>
-            </div>
-            <div class="form-group col-md-1 align-self-end">
+            <div class="form-group col-md-4 align-self-end">
                 <button type="submit" class="btn btn-primary btn-block">검색</button>
             </div>
         </div>
@@ -135,219 +220,316 @@
 
 
 <div class="container mt-5">
-
-    <!-- Kakao Map -->
-    <div id="map"></div>
-
-    <input type="text" id="address" placeholder="번지-지번 검색" style="width:400px;"/>
+    <input type="text" id="address" placeholder="번지-지번 검색" style="width:250px;"/>
     <button onclick="searchAddress()" class="btn btn-secondary">주소 검색</button>
+    <input type="text" id="searchApt" placeholder="아파트 검색" style="width:250px;"/>
+    <button onclick="searchApt()" class="btn btn-secondary">아파트 검색</button>
+    <div id="searchResult" style="font-weight: bold; margin-bottom: 10px;"></div> <!-- 검색 결과 표시할 div -->
 
+    <div id="map"></div>
+    <div class="chart-container" id="chart-Container" style="display: none;">
+        <canvas id="priceChart"></canvas>
+    </div>
     <div id="address-list"></div>
 
+
     <div class="row mt-4">
-        <div class="col-md-8">
+        <div class="col-md-5">
             <table class="table">
                 <thead>
                 <tr>
-                    <th>이름</th>
+                    <th>아파트 이름</th>
                     <th>건축년도</th>
-                    <th>가격</th>
-                    <th>전용면적</th>
-                    <th>거래일자</th>
-                    <th>층</th>
                     <th>법정동</th>
                     <th>지번</th>
                 </tr>
                 </thead>
+
                 <tbody>
-                <tr th:each="ranking : ${transactions}">
+                <tr th:each="entry : ${apartmentDetails}">
                     <td>
-                        <span class="apt-name"
-                              th:text="${ranking.aptNm}"
-                              th:attr="onclick='showOnMap(\'' + ${ranking.umdNm} + '\', \'' + ${ranking.jibun} + '\', \'' + ${ranking.aptNm} + '\')'"></span>
+                        <a href="#"
+                           th:text="${entry.key}"
+                           th:data-apt-nm="${entry.key}"
+                           th:onclick="'loadApartmentDetails(this.dataset.aptNm)'">
+                        </a>
                     </td>
-                    <td th:text="${ranking.buildYear}"></td>
-                    <td th:text="${ranking.dealAmount/10000 +'억'}"></td>
-                    <td th:text="${ranking.excluUseAr}"></td>
-                    <td th:text="${ranking.dealYear} + '-' + ${ranking.dealMonth} + '-' + ${ranking.dealDay}"></td>
-                    <td th:text="${ranking.floor}"></td>
-                    <td th:text="${ranking.umdNm}"></td>
-                    <td th:text="${ranking.jibun}"></td>
+                    <td th:text="${entry.value.isEmpty() ? 'N/A' : entry.value[0].buildYear}"></td>
+                    <td th:text="${entry.value.isEmpty() ? 'N/A' : entry.value[0].umdNm}"></td>
+                    <td th:text="${entry.value.isEmpty() ? 'N/A' : entry.value[0].jibun}"></td>
                 </tr>
                 </tbody>
+
             </table>
-        </div>
-        <div class="col-md-4">
-            <!-- 그래프를 표시할 캔버스 -->
-            <div class="chart-container">
-                <canvas id="priceChart"></canvas>
+            <!-- 페이지 네비게이션 -->
+            <div>
+                <!-- 이전 페이지 버튼 -->
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/aptSearch( locationName=${locationName}, page=${currentPage - 1})}">이전</a>
+
+                <!-- 현재 페이지 표시 -->
+                <span th:text="${currentPage + 1}">1</span>
+
+                <!-- 총 페이지 수 출력 -->
+                <span> / <span th:text="${totalPages}">0</span></span>
+
+                <!-- 다음 페이지 버튼 -->
+                <a th:if="${currentPage < totalPages - 1}"
+                   th:href="@{/aptSearch(locationName=${locationName}, page=${currentPage + 1})}">다음</a>
             </div>
         </div>
+
+        <div class="col-md-7" id="apartment-details">
+            <!-- 거래 내역이 여기에 표시됨 -->
+        </div>
+
     </div>
-    <!-- 홈 버튼 -->
-    <a href="/" class="btn btn-primary mb-3">홈</a>
-
-
-    <!-- 페이징 링크 -->
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
-                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage - 1}, size=${size})}">이전</a>
-            </li>
-            <li class="page-item" th:each="i : ${#numbers.sequence(T(java.lang.Math).max(0, currentPage - 2), T(java.lang.Math).min(totalPages - 1, currentPage + 2))}"
-                th:classappend="${i == currentPage} ? 'active'">
-                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${i}, size=${size})}" th:text="${i + 1}">1</a>
-            </li>
-            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
-                <a class="page-link" th:href="@{/aptSearch(locationName=${locationName},minPrice=${minPrice}, maxPrice=${maxPrice}, minArea=${minArea},maxArea=${maxArea},dealDate=${dealDate},sortBy=${sortBy},page=${currentPage + 1}, size=${size})}">다음</a>
-            </li>
-        </ul>
-    </nav>
 </div>
+        <a href="/" class="btn btn-primary mb-3">홈</a>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    var mapContainer = document.getElementById('map'),
+        mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 3
+        };
 
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var geocoder = new kakao.maps.services.Geocoder();
+    var marker = new kakao.maps.Marker();
 
-   var mapContainer = document.getElementById('map'),
-       mapOption = {
-           center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 시청 좌표
-           level: 3
-       };
-
-   var map = new kakao.maps.Map(mapContainer, mapOption);
-   var geocoder = new kakao.maps.services.Geocoder();
-   var marker = new kakao.maps.Marker();
-
-   // 주소로 좌표를 검색하는 함수
-   function searchAddress() {
-       var address = document.getElementById('address').value;
-
-       geocoder.addressSearch(address, function(result, status) {
-           if (status === kakao.maps.services.Status.OK) {
-               var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-               marker.setPosition(coords);
-               marker.setMap(map);
-               map.setCenter(coords);
-               console.log("위도:", result[0].y, "경도:", result[0].x);
-           } else {
-               alert('주소를 찾을 수 없습니다.');
-           }
-       });
-   }
-
-
+    function searchAddress() {
+        var address = document.getElementById('address').value;
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                marker.setPosition(coords);
+                marker.setMap(map);
+                map.setCenter(coords);
+            } else {
+                alert('주소를 찾을 수 없습니다.');
+            }
+        });
+    }
 
     $(document).ready(function() {
-      $('#region').change(function() {
-          var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
-
-          $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
-
-          if (regionCode) {
-              // AJAX 요청을 통해 세부 지역 가져오기
-              $.get('/sub-locations', { regionCode: regionCode }, function(data) {
-                  data.forEach(function(loc) {
-                      $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
-                  });
-              });
-          }
-      });
-
-      // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
-      $('#locationName').on('change', function() {
-          var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
-          console.log('선택된 세부 지역 코드:', selectedLocationCode); // 콘솔에 로그 찍기
-      });
-  });
+        $('#region').change(function() {
+            var regionCode = $(this).val();
+            $('#locationName').empty().append('<option value="">선택하세요</option>');
+            if (regionCode) {
+                $.get('/sub-locations', { regionCode: regionCode }, function(data) {
+                    data.forEach(function(loc) {
+                        $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
+                    });
+                });
+            }
+        });
+    });
 
 
+function searchApt() {
+
+ const searchQuery = document.getElementById('searchApt').value.trim();
+
+ // 검색 쿼리를 상단에 표시
+            const searchResultContainer = document.getElementById('searchResult');
+            searchResultContainer.innerHTML = `검색한 아파트: ${searchQuery}`; // 검색한 아파트 표시
+
+ loadApartmentDetails(searchQuery); // 클릭 시 함수 호출
+    }
 
 
+    function showOnMap(umdNm, jibun, aptNm) {
+        var address = umdNm + " " + jibun;
+        geocoder.addressSearch(address, function(result, status) {
+         console.log(result, status); // 결과 및 상태 확인
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                marker.setPosition(coords);
+                marker.setMap(map);
+                map.setCenter(coords);
 
-   // 선택한 아파트를 지도에 표시하는 함수
-   function showOnMap(umdNm, jibun, aptNm) {
-       var address = umdNm + " " + jibun; // 법정동 + 지번
-       geocoder.addressSearch(address, function(result, status) {
-           if (status === kakao.maps.services.Status.OK) {
-               var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-               marker.setPosition(coords);
-               marker.setMap(map);
-               map.setCenter(coords);
-               console.log("위도:", result[0].y, "경도:", result[0].x);
-               fetchPriceHistory(aptNm);
-           } else {
-               alert('주소를 찾을 수 없습니다.');
-           }
-       });
-   }
+            } else {
+                alert('주소를 찾을 수 없습니다.');
+            }
+        });
+    }
 
-  let priceChart; // 차트 전역 변수
 
+let priceChart; // 차트 전역 변수
+
+// 가격 이력을 가져오는 함수
 function fetchPriceHistory(aptNm) {
-   fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
-       .then(response => response.json())
-       .then(data => {
-           // 거래 데이터를 월별로 집계
-           const monthlyData = {};
-           data.forEach(transaction => {
-               const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
-               if (!monthlyData[monthKey]) {
-                   monthlyData[monthKey] = { total: 0, count: 0 };
-               }
-               monthlyData[monthKey].total += transaction.dealAmount;
-               monthlyData[monthKey].count++;
-           });
+    fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
+        .then(response => response.json())
+        .then(data => {
+            const detailsDiv = document.getElementById('apartment-details');
 
-           // 월별 평균 가격 계산
-           const labels = [];
-           const prices = [];
-           for (const month in monthlyData) {
-               labels.push(month);
-               prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
-           }
+            // 거래 데이터를 월별로 집계
+            const monthlyData = {};
+            data.forEach(transaction => {
+                const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { total: 0, count: 0 };
+                }
+                monthlyData[monthKey].total += transaction.dealAmount;
+                monthlyData[monthKey].count++;
+            });
 
-           // 이전 차트가 존재하면 파괴
-           if (priceChart) {
-               priceChart.destroy();
-           }
+            // 월별 평균 가격 계산
+            const labels = [];
+            const prices = [];
+            for (const month in monthlyData) {
+                labels.push(month);
+                prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
+            }
+   // 이전 차트가 존재하면 파괴
+            if (priceChart) {
+                priceChart.destroy();
+            }
+            // Chart.js를 이용해 그래프 그리기
+            const ctx = document.getElementById('priceChart').getContext('2d');
 
-           // Chart.js를 이용해 그래프 그리기
-           const ctx = document.getElementById('priceChart').getContext('2d');
-           priceChart = new Chart(ctx, {
-               type: 'line',
-               data: {
-                   labels: labels,
-                   datasets: [{
-                       label: '평균 매매가(억 원)',
-                       data: prices,
-                       borderColor: 'rgba(75, 192, 192, 1)',
-                       fill: false,
-                       tension: 0.1
-                   }]
-               },
-               options: {
-                   scales: {
-                       x: {
-                           title: {
-                               display: true,
-                               text: '거래 월'
-                           }
-                       },
-                       y: {
-                           title: {
-                               display: true,
-                               text: '가격(억 원)'
-                           }
-                       }
-                   }
-               }
-           });
-       });
+
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '아파트 가격 (억원)',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                     maintainAspectRatio: false, // 종횡비를 유지하지 않으려면 false로 설정
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '가격 (억원)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '날짜'
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+//이름 불러오기
+function loadApartmentDetails(apartmentName,page=0,size=5) {
+ const chartContainer = document.getElementById('chart-Container'); // chart-Container DOM 요소 참조 추가
+    const detailsDiv = document.getElementById('apartment-details');
+     // 차트 컨테이너 보이도록 설정
+            chartContainer.style.display = 'block';
+
+
+    // 아파트 상세 정보 가져오기
+    fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)
+        .then(response => response.json())
+        .then(data => {
+        showOnMap(data.umdNm, data.jibun,data.aptNm);
+
+         // detailsDiv 초기화
+        detailsDiv.innerHTML = ''; // 내용을 비워서 이전 데이터를 제거
+
+            if (!data || !data.transactions || data.transactions.length === 0) {
+                detailsDiv.innerHTML += `<p>거래 정보가 없습니다.</p>`;
+                return;
+            }
+
+            // 추가적인 아파트 상세 정보 표시
+            detailsDiv.innerHTML += `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>건축년도</th>
+                            <th>가격</th>
+                            <th>전용면적</th>
+                            <th>거래일자</th>
+                            <th>층</th>
+                            <th>법정동</th>
+                            <th>지번</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.transactions.map(transaction => `
+                            <tr>
+                                <td>${transaction.buildYear}</td>
+                                <td>${transaction.dealAmount / 10000}억</td>
+                                <td>${transaction.excluUseAr}</td>
+                                <td>${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}</td>
+                                <td>${transaction.floor}</td>
+                                <td>${transaction.umdNm}</td>
+                                <td>${transaction.jibun}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+             // 페이지 네이션 추가
+            addPaginationControls(apartmentName, data.currentPage, data.totalPages);
+
+
+        })
+        .catch(error => {
+            console.error('Error fetching apartment details:', error);
+            detailsDiv.innerHTML += `<p>상세 정보를 불러오는 데 오류가 발생했습니다.</p>`;
+        });
+
+    // 가격 이력 불러오기
+    fetchPriceHistory(apartmentName);
+
+}
+
+
+// 페이지 네이션 컨트롤 추가
+function addPaginationControls(apartmentName, currentPage, totalPages) {
+    const detailsDiv = document.getElementById('apartment-details');
+
+   let paginationHtml = '<div class="pagination">';
+if (currentPage > 0) {
+    paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage - 1})">이전</a>`;
+}
+// 현재 페이지와 총 페이지 수 표시
+paginationHtml += `<span>${currentPage + 1} / ${totalPages}</span> `;
+if (currentPage < totalPages - 1) {
+    paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage + 1})">다음</a>`;
+}
+paginationHtml += '</div>';
+
+    detailsDiv.innerHTML += paginationHtml;
 }
 
 
 
+// DOMContentLoaded 이벤트가 발생했을 때의 코드
+document.addEventListener('DOMContentLoaded', function() {
+    const links = document.querySelectorAll('a[data-apt-nm]');
+    links.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const apartmentName = this.dataset.aptNm;
+            loadApartmentDetails(apartmentName);
+        });
+    });
+});
 </script>
 </body>
 </html>

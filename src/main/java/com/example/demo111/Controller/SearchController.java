@@ -151,17 +151,12 @@ public class SearchController {
     // 아파트 거래 정보를 조회하는 메서드
     @GetMapping("/aptSearch")
     public String searchTransactions(@RequestParam(required = false) String locationName,
-                                     @RequestParam(required = false) String apartmentName,
                                      @PageableDefault(page = 0, size = 5) Pageable pageable,
                                      Model model) {
         Map<String, Set<String>> mapLocation = locationService.getAllLocations();
         model.addAttribute("locations", mapLocation);
         Map<String, List<TransactionRanking>> apartmentDetails = new HashMap<>();
         String searchedApartmentName = null;
-        if (apartmentName != null && !apartmentName.isEmpty()) {
-            searchedApartmentName = apartmentName; // 검색된 아파트 이름 저장
-
-        }
             // 지역명으로 지역 정보를 조회
             List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
             Set<String> apartmentNames = new HashSet<>();
@@ -195,10 +190,8 @@ public class SearchController {
             model.addAttribute("apartmentNames", pagedApartmentNames);
             model.addAttribute("locationName", locationName);
 
-        model.addAttribute("searchedApartmentName", searchedApartmentName); // 아파트 이름 모델에 추가
         model.addAttribute("apartmentDetails", apartmentDetails);
-        System.out.println(searchedApartmentName);
-        return "priceHistory"; // 결과를 표시할 HTML 페이지로 이동
+        return "aptSearchResults"; // 결과를 표시할 HTML 페이지로 이동
     }
 
     @GetMapping("/price-history")

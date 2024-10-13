@@ -6,7 +6,12 @@
     <title>거래 검색</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
     <style>
+        #map {
+        width: 100%;
+        height: 400px; /* 원하는 크기로 설정하세요 */
+    }
         .bar {
             height: 30px; /* 막대 높이 */
             background: linear-gradient(135deg, #36a2eb, #4bc0c0); /* 그라데이션 색상 */
@@ -81,9 +86,40 @@
             <button type="submit" class="btn btn-primary mb-2">검색</button>
         </form>
     </div>
+
 </div>
 
+
+<div id="map"></div>
+
 <script>
+
+    var mapContainer = document.getElementById('map'),
+        mapOption = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 3
+        };
+
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+    var geocoder = new kakao.maps.services.Geocoder();
+    var marker = new kakao.maps.Marker();
+
+    function searchAddress() {
+        var address = document.getElementById('address').value;
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                marker.setPosition(coords);
+                marker.setMap(map);
+                map.setCenter(coords);
+            } else {
+                alert('주소를 찾을 수 없습니다.');
+            }
+        });
+    }
+
+
+
     $(document).ready(function() {
         $('#region').change(function() {
             var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
@@ -103,9 +139,101 @@
         // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
         $('#locationName').on('change', function() {
             var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
-            console.log('선택된 세부 지역 코드:', selectedLocationCode); // 콘솔에 로그 찍기
         });
     });
+
+
+    function showOnMap(umdNm, jibun, aptNm) {
+        var address = umdNm + " " + jibun;
+        geocoder.addressSearch(address, function(result, status) {
+         console.log(result, status); // 결과 및 상태 확인
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                marker.setPosition(coords);
+                marker.setMap(map);
+                map.setCenter(coords);
+
+            } else {
+                alert('주소를 찾을 수 없습니다.');
+            }
+        });
+    }
+
+//이름 불러오기
+function loadApartmentDetails(apartmentName) {
+console.log(apartmentName)
+    const detailsDiv = document.getElementById('apartment-details');
+
+    // 아파트 상세 정보 가져오기
+    fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)
+        .then(response => response.json())
+        .then(data => {
+        showOnMap(data.umdNm, data.jibun,data.aptNm);
+
+         // detailsDiv 초기화
+        detailsDiv.innerHTML = ''; // 내용을 비워서 이전 데이터를 제거
+
+            if (!data || !data.transactions || data.transactions.length === 0) {
+                detailsDiv.innerHTML += `<p>거래 정보가 없습니다.</p>`;
+                return;
+            }
+
+            // 추가적인 아파트 상세 정보 표시
+            detailsDiv.innerHTML += `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>건축년도</th>
+                            <th>가격</th>
+                            <th>전용면적</th>
+                            <th>거래일자</th>
+                            <th>층</th>
+                            <th>법정동</th>
+                            <th>지번</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${data.transactions.map(transaction => `
+                            <tr>
+                                <td>${transaction.buildYear}</td>
+                                <td>${transaction.dealAmount / 10000}억</td>
+                                <td>${transaction.excluUseAr}</td>
+                                <td>${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}</td>
+                                <td>${transaction.floor}</td>
+                                <td>${transaction.umdNm}</td>
+                                <td>${transaction.jibun}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+             // 페이지 네이션 추가
+            addPaginationControls(apartmentName, data.currentPage, data.totalPages);
+
+
+        })
+        .catch(error => {
+            console.error('Error fetching apartment details:', error);
+            detailsDiv.innerHTML += `<p>상세 정보를 불러오는 데 오류가 발생했습니다.</p>`;
+        });
+
+    // 가격 이력 불러오기
+    fetchPriceHistory(apartmentName);
+
+}
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.apartment-link').forEach(link => {
+        link.addEventListener('click', function (event) {
+            event.preventDefault(); // 기본 링크 동작 방지
+            const apartmentName = this.getAttribute('data-apartment');
+            loadApartmentDetails(apartmentName); // 아파트 이름을 가져와서 함수 호출
+        });
+    });
+});
+
 </script>
 
 <!-- 막대그래프 표시 -->
@@ -114,11 +242,14 @@
         <div class="bar"
              th:style="'width: ' + (${transactionCounts[iterStat.index]} / ${maxTransactionCount} * 100) + '%'">
             <!-- 상대 길이 설정 -->
-            <a th:href="'/aptSearch?locationName=' + ${apartment}"
+            <a href="#" class="apartment-link"
+               th:data-apartment="${apartment}"
                th:text="${apartment} + ' (' + ${transactionCounts[iterStat.index]} + '건)'"></a>
         </div>
     </th:block>
 </div>
+
+<div class="col-md-7" id="apartment-details">
 
 <!-- 홈 버튼 -->
 <a href="/" class="btn btn-primary mb-3">홈</a>
