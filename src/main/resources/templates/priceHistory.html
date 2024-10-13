@@ -166,6 +166,8 @@
     <button onclick="searchAddress()" class="btn btn-secondary">주소 검색</button>
     <input type="text" id="searchApt" placeholder="아파트 검색" style="width:250px;"/>
     <button onclick="searchApt()" class="btn btn-secondary">아파트 검색</button>
+    <div id="searchResult" style="font-weight: bold; margin-bottom: 10px;"></div> <!-- 검색 결과 표시할 div -->
+
     <div id="map"></div>
     <div class="chart-container" id="chart-Container" style="display: none;">
         <canvas id="priceChart"></canvas>
@@ -268,7 +270,13 @@
 
 
 function searchApt() {
+
  const searchQuery = document.getElementById('searchApt').value.trim();
+
+ // 검색 쿼리를 상단에 표시
+            const searchResultContainer = document.getElementById('searchResult');
+            searchResultContainer.innerHTML = `검색한 아파트: ${searchQuery}`; // 검색한 아파트 표시
+
  loadApartmentDetails(searchQuery); // 클릭 시 함수 호출
     }
 
@@ -294,7 +302,6 @@ let priceChart; // 차트 전역 변수
 
 // 가격 이력을 가져오는 함수
 function fetchPriceHistory(aptNm) {
-console.log('fetch : ',aptNm);
     fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
         .then(response => response.json())
         .then(data => {
