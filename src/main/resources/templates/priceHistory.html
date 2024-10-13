@@ -268,17 +268,9 @@
 
 
 function searchApt() {
-    const searchQuery = document.getElementById('searchApt').value.trim();
-console.log(searchQuery);
-
-    fetch(`/aptSearch?apartmentName=${encodeURIComponent(searchQuery)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        })
-}
-
+ const searchQuery = document.getElementById('searchApt').value.trim();
+ loadApartmentDetails(searchQuery); // 클릭 시 함수 호출
+    }
 
 
     function showOnMap(umdNm, jibun, aptNm) {

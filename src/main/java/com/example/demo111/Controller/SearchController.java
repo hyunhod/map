@@ -157,11 +157,11 @@ public class SearchController {
         Map<String, Set<String>> mapLocation = locationService.getAllLocations();
         model.addAttribute("locations", mapLocation);
         Map<String, List<TransactionRanking>> apartmentDetails = new HashMap<>();
-
+        String searchedApartmentName = null;
         if (apartmentName != null && !apartmentName.isEmpty()) {
-            List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(apartmentName);
-            apartmentDetails.put(apartmentName, transactions);
-        } else if (locationName != null && !locationName.isEmpty()) {
+            searchedApartmentName = apartmentName; // 검색된 아파트 이름 저장
+
+        }
             // 지역명으로 지역 정보를 조회
             List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
             Set<String> apartmentNames = new HashSet<>();
@@ -194,22 +194,10 @@ public class SearchController {
             model.addAttribute("currentPage", pageable.getPageNumber());
             model.addAttribute("apartmentNames", pagedApartmentNames);
             model.addAttribute("locationName", locationName);
-        }
 
+        model.addAttribute("searchedApartmentName", searchedApartmentName); // 아파트 이름 모델에 추가
         model.addAttribute("apartmentDetails", apartmentDetails);
-
-        // 추가: null 체크 후 기본값 설정
-        if (model.getAttribute("totalPages") == null) {
-            model.addAttribute("totalPages", 0); // 기본값 설정
-        }
-        if (model.getAttribute("currentPage") == null) {
-            model.addAttribute("currentPage", 0); // 기본값 설정
-        }
-        if (model.getAttribute("apartmentNames") == null) {
-            model.addAttribute("apartmentNames", Collections.emptyList()); // 기본값 설정
-        }
-
-        System.out.println(apartmentDetails);
+        System.out.println(searchedApartmentName);
         return "priceHistory"; // 결과를 표시할 HTML 페이지로 이동
     }
 
