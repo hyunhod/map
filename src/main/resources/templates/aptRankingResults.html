@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0"></script>
+
     <style>
         #map {
         width: 100%;
@@ -91,6 +93,9 @@
 
 
 <div id="map"></div>
+<div class="chart-container" id="chart-Container" style="display: none;">
+    <canvas id="priceChart"></canvas>
+</div>
 
 <script>
 
@@ -159,10 +164,92 @@
         });
     }
 
+
+
+let priceChart; // 차트 전역 변수
+
+// 가격 이력을 가져오는 함수
+function fetchPriceHistory(aptNm) {
+console.log(aptNm);
+    fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
+        .then(response => response.json())
+        .then(data => {
+            const detailsDiv = document.getElementById('apartment-details');
+
+            // 거래 데이터를 월별로 집계
+            const monthlyData = {};
+            data.forEach(transaction => {
+                const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
+                if (!monthlyData[monthKey]) {
+                    monthlyData[monthKey] = { total: 0, count: 0 };
+                }
+                monthlyData[monthKey].total += transaction.dealAmount;
+                monthlyData[monthKey].count++;
+            });
+
+            // 월별 평균 가격 계산
+            const labels = [];
+            const prices = [];
+            for (const month in monthlyData) {
+                labels.push(month);
+                prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
+            }
+   // 이전 차트가 존재하면 파괴
+            if (priceChart) {
+                priceChart.destroy();
+            }
+            // Chart.js를 이용해 그래프 그리기
+            const ctx = document.getElementById('priceChart').getContext('2d');
+
+
+            priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '아파트 가격 (억원)',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 1,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                     maintainAspectRatio: false, // 종횡비를 유지하지 않으려면 false로 설정
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '가격 (억원)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: '날짜'
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error(error);
+        });
+}
+
+
+
+
+
 //이름 불러오기
-function loadApartmentDetails(apartmentName) {
-console.log(apartmentName)
+function loadApartmentDetails(apartmentName,page=0,size=5) {
+ const chartContainer = document.getElementById('chart-Container'); // chart-Container DOM 요소 참조 추가
     const detailsDiv = document.getElementById('apartment-details');
+     chartContainer.style.display = 'block';
 
     // 아파트 상세 정보 가져오기
     fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)

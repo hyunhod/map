@@ -61,17 +61,15 @@ public class SearchController {
                     String apartmentName = (String) result[0];
                     Long transactionCount = (Long) result[1];
 
-
                     if (transactionCount > 0) { // 거래 건수가 0 이상인 아파트만 추가
                         finalTopApartments.add(apartmentName);
                         transactionCounts.add(transactionCount);
                     }
                 }
+
             }
 
-            // 중복 제거를 위해 Set 사용
-            Set<String> uniqueTopApartmentsSet = new HashSet<>(finalTopApartments);
-            finalTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
+            System.out.println(finalTopApartments);
 
             // 필요한 경우 상위 20개 아파트만 선택
             finalTopApartments = finalTopApartments.stream()
@@ -87,6 +85,7 @@ public class SearchController {
             model.addAttribute("topApartments", finalTopApartments);
             model.addAttribute("transactionCounts", transactionCounts);
             model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
+
 
             return "aptRankingResults"; // search.html로 이동
         } else {
