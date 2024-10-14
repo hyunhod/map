@@ -14,6 +14,15 @@
         width: 100%;
         height: 400px; /* 원하는 크기로 설정하세요 */
     }
+    .container {
+  display: flex;
+}
+.bar-container,
+#apartment-details {
+    padding: 0; /* 패딩 제거 */
+    margin: 0; /* 마진 제거 */
+}
+
         .bar {
             height: 30px; /* 막대 높이 */
             background: linear-gradient(135deg, #36a2eb, #4bc0c0); /* 그라데이션 색상 */
@@ -65,9 +74,11 @@
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <div class="header-container">
-        <h1>인기 아파트 Top 20</h1>
+<div class="container-fluid mt-5 px-0"> <!-- container-fluid로 전체 너비 사용 -->
+    <div class="header-container d-flex justify-content-between align-items-center">
+        <div class="flex-grow-1 text-center">
+            <h1 class="m-0">인기 아파트 Top 20</h1> <!-- m-0 클래스를 사용하여 여백 제거 -->
+        </div>
         <form action="/aptRanking" method="GET" class="form-inline">
             <div class="form-group mb-2">
                 <label for="region" class="mr-2">지역</label>
@@ -88,14 +99,12 @@
             <button type="submit" class="btn btn-primary mb-2">검색</button>
         </form>
     </div>
-
 </div>
-
-
 <div id="map"></div>
 <div class="chart-container" id="chart-Container" style="display: none;">
     <canvas id="priceChart"></canvas>
 </div>
+
 
 <script>
 
@@ -246,7 +255,7 @@ console.log(aptNm);
 
 
 //이름 불러오기
-function loadApartmentDetails(apartmentName,page=0,size=5) {
+function loadApartmentDetails(apartmentName,page=0,size=10) {
  const chartContainer = document.getElementById('chart-Container'); // chart-Container DOM 요소 참조 추가
     const detailsDiv = document.getElementById('apartment-details');
      chartContainer.style.display = 'block';
@@ -321,10 +330,34 @@ function loadApartmentDetails(apartmentName,page=0,size=5) {
     });
 });
 
+
+
+
+
+    // 페이지 네이션 컨트롤 추가
+function addPaginationControls(apartmentName, currentPage, totalPages) {
+    const detailsDiv = document.getElementById('apartment-details');
+
+   let paginationHtml = '<div class="pagination">';
+if (currentPage > 0) {
+    paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage - 1})">이전</a>`;
+}
+// 현재 페이지와 총 페이지 수 표시
+paginationHtml += `<span>${currentPage + 1} / ${totalPages}</span> `;
+if (currentPage < totalPages - 1) {
+    paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage + 1})">다음</a>`;
+}
+paginationHtml += '</div>';
+
+    detailsDiv.innerHTML += paginationHtml;
+}
+
+
 </script>
 
 <!-- 막대그래프 표시 -->
-<div class="bar-container">
+<div class="container-fluid d-flex">
+<div class="bar-container col-md-7">
     <th:block th:each="apartment, iterStat : ${topApartments}">
         <div class="bar"
              th:style="'width: ' + (${transactionCounts[iterStat.index]} / ${maxTransactionCount} * 100) + '%'">
@@ -336,10 +369,11 @@ function loadApartmentDetails(apartmentName,page=0,size=5) {
     </th:block>
 </div>
 
-<div class="col-md-7" id="apartment-details">
+<div class="col-md-5" id="apartment-details">
+</div>
+</div>
 
 <!-- 홈 버튼 -->
 <a href="/" class="btn btn-primary mb-3">홈</a>
-
 </body>
 </html>

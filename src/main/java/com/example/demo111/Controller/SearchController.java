@@ -69,8 +69,6 @@ public class SearchController {
 
             }
 
-            System.out.println(finalTopApartments);
-
             // 필요한 경우 상위 20개 아파트만 선택
             finalTopApartments = finalTopApartments.stream()
                     .limit(20)
