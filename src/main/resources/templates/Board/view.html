@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 상세 보기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .post-container {
+            max-width: 800px; /* 너비 제한 */
+            margin: 0 auto; /* 중앙 정렬 */
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .comment-section {
+            margin-top: 40px;
+        }
+        .comment-item {
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <!-- 게시글 상세 내용 -->
+    <div class="post-container">
+        <h1 class="text-center" th:text="${post.title}">게시글 제목</h1>
+        <p class="text-muted text-center">작성자: <span th:text="${post.author}">작성자</span></p>
+        <hr>
+        <div th:text="${post.content}">
+            게시글 내용
+        </div>
+        <p class="text-muted text-end mt-4">작성일: <span th:text="${#temporals.format(post.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></span></p>
+    </div>
+
+    <!-- 댓글 섹션 -->
+    <div class="comment-section">
+        <h4>댓글</h4>
+        <div th:if="${#lists.isEmpty(comments)}">
+            <p class="text-muted">댓글이 없습니다.</p>
+        </div>
+        <div th:each="comment : ${comments}" class="comment-item">
+            <p th:text="${comment.content}">댓글 내용</p>
+            <p class="text-muted text-end">
+                작성자: <span th:text="${comment.author}">작성자</span> |
+                작성일: <span th:text="${#temporals.format(comment.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></span>
+            </p>
+        </div>
+    </div>
+
+    <!-- 댓글 작성 폼 (필요한 경우) -->
+    <form th:action="@{/comments/add}" method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="content" class="form-label">댓글 작성</label>
+            <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">댓글 작성</button>
+        <input type="hidden" name="postId" th:value="${post.id}">
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

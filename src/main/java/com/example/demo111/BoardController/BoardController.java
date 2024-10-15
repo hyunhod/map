@@ -45,7 +45,7 @@ public class BoardController {
         model.addAttribute("post", post);
         List<NComment> comments = post.getComments(); // 해당 게시글의 댓글 목록 가져오기
         model.addAttribute("comments", comments);
-        return "Board/communication"; // 게시글 상세 보기 페이지
+        return "Board/view"; // 게시글 상세 보기 페이지
     }
 
 
