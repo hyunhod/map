@@ -1,4 +1,4 @@
-package com.example.demo111.domain;
+package com.example.demo111.ApartDomain;
 
 import com.example.demo111.lawdCodApiDto.LawdCodeResponseDto;
 import lombok.Data;

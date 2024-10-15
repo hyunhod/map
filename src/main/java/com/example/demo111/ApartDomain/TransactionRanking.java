@@ -1,9 +1,7 @@
-package com.example.demo111.domain;
+package com.example.demo111.ApartDomain;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
-import java.time.LocalDate;
 
 @Entity
 @Data

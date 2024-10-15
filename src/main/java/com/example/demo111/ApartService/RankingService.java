@@ -1,9 +1,9 @@
-package com.example.demo111.service;
+package com.example.demo111.ApartService;
 
 import com.example.demo111.aprtApiDto.ItemsDto;
 import com.example.demo111.aprtApiDto.ResponseDto;
-import com.example.demo111.Repository.RankingRepository;
-import com.example.demo111.domain.TransactionRanking;
+import com.example.demo111.ApartRepository.RankingRepository;
+import com.example.demo111.ApartDomain.TransactionRanking;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

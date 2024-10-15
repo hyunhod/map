@@ -1,11 +1,11 @@
-package com.example.demo111.service;
+package com.example.demo111.ApartService;
 
 
-import com.example.demo111.Repository.RankingRepository;
+import com.example.demo111.ApartRepository.RankingRepository;
 import com.example.demo111.aprtApiDto.BodyDto;
 import com.example.demo111.aprtApiDto.ItemsDto;
 import com.example.demo111.aprtApiDto.ResponseDto;
-import com.example.demo111.domain.TransactionRanking;
+import com.example.demo111.ApartDomain.TransactionRanking;
 import com.example.demo111.lawdCodApiDto.LawdCodeDto;
 import com.example.demo111.lawdCodApiDto.LawdCodeResponseDto;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;

@@ -1,12 +1,12 @@
-package com.example.demo111.Controller;
+package com.example.demo111.ApartController;
 
 
-import com.example.demo111.Repository.RankingRepository;
+import com.example.demo111.ApartRepository.RankingRepository;
 
 import com.example.demo111.aprtApiDto.ResponseDto;
-import com.example.demo111.domain.TransactionRanking;
-import com.example.demo111.service.ApiService;
-import com.example.demo111.service.RankingService;
+import com.example.demo111.ApartDomain.TransactionRanking;
+import com.example.demo111.ApartService.ApiService;
+import com.example.demo111.ApartService.RankingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -1,7 +1,7 @@
-package com.example.demo111.service;
+package com.example.demo111.ApartService;
 
-import com.example.demo111.Repository.LocationRepository;
-import com.example.demo111.domain.Location;
+import com.example.demo111.ApartRepository.LocationRepository;
+import com.example.demo111.ApartDomain.Location;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

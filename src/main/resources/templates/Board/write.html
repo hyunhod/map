@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 글 작성</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- Header Section -->
+<header class="bg-dark text-white text-center py-4">
+    <h1>게시글 작성</h1>
+</header>
+
+<!-- 게시글 작성 Form Section -->
+<main class="container mt-4">
+    <form action="/board/save" method="POST">
+        <div class="mb-3">
+            <label for="title" class="form-label">제목</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="mb-3">
+            <label for="content" class="form-label">내용</label>
+            <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="author" class="form-label">작성자</label>
+            <input type="text" class="form-control" id="author" name="author" required>
+        </div>
+        <button type="submit" class="btn btn-primary">작성하기</button>
+    </form>
+</main>
+
+<!-- Footer Section -->
+<footer class="bg-dark text-white text-center py-3 mt-4">
+    <p>&copy; 2024 부동산 커뮤니티</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,23 +1,19 @@
 package com.example.demo111.controller;
 
-import com.example.demo111.domain.Location;
-import com.example.demo111.domain.TransactionRanking;
-import com.example.demo111.service.ApiService;
-import com.example.demo111.service.LocationService;
-import com.example.demo111.service.RankingService;
+import com.example.demo111.ApartDomain.Location;
+import com.example.demo111.ApartDomain.TransactionRanking;
+import com.example.demo111.ApartService.ApiService;
+import com.example.demo111.ApartService.LocationService;
+import com.example.demo111.ApartService.RankingService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.lang.Integer;
 
 import java.util.*;
 import java.util.stream.Collectors;
