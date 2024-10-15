@@ -81,7 +81,7 @@ public class SearchController {
             model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
 
 
-            return "aptRankingResults"; // search.html로 이동
+            return "/Apt/aptRankingResults"; // search.html로 이동
         } else {
             locations = locationService.findLocationByCityOrDistrict(locationName);
 
@@ -126,7 +126,7 @@ public class SearchController {
             model.addAttribute("transactionCounts", transactionCounts);
             model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
 
-            return "aptRankingResults"; // search.html로 이동
+            return "/Apt/aptRankingResults"; // search.html로 이동
         }
     }
 
@@ -184,7 +184,7 @@ public class SearchController {
             model.addAttribute("locationName", locationName);
 
         model.addAttribute("apartmentDetails", apartmentDetails);
-        return "aptSearchResults"; // 결과를 표시할 HTML 페이지로 이동
+        return "/Apt/aptSearchResults"; // 결과를 표시할 HTML 페이지로 이동
     }
 
     @GetMapping("/price-history")
