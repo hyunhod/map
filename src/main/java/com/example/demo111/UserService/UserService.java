@@ -13,6 +13,16 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // 회원 저장
+    public void saveUser(NUser user) {
+        userRepository.save(user);
+    }
+
+    // 아이디 중복 체크
+    public boolean existsByUsername(String username) {
+        return userRepository.findByUsername(username) != null;
+    }
+
     // 로그인 검증 로직
     public NUser authenticate(String username, String password) {
         // 데이터베이스에서 사용자 정보 확인
