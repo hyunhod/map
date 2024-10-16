@@ -59,7 +59,11 @@
     </div>
 
     <!-- 댓글 작성 폼 (필요한 경우) -->
-    <form th:action="@{/comments/add}" method="post" class="mt-4">
+    <form th:action="@{/comments}" method="post" class="mt-4">
+        <div class="mb-3">
+            <label for="author" class="form-label">작성자</label>
+            <input type="text" class="form-control" id="author" name="author" required>
+        </div>
         <div class="mb-3">
             <label for="content" class="form-label">댓글 작성</label>
             <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
