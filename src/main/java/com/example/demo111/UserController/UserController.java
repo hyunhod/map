@@ -16,7 +16,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("first")
+    @GetMapping("/login")
     public String login(){
         return "/Login/login";
     }
@@ -44,13 +44,12 @@ public class UserController {
         newUser.setEmail(email);
 
         userService.saveUser(newUser); // 회원 정보 저장
-        return "redirect:/first"; // 회원가입 후 로그인 페이지로 리다이렉트
+        return "redirect:/login"; // 회원가입 후 로그인 페이지로 리다이렉트
     }
 
 
     @PostMapping("/login")
     public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
-        System.out.println("gugigigi");
         // 로그인 검증 로직
         NUser NUser = userService.authenticate(username, password);
         if (NUser != null) {
@@ -60,5 +59,12 @@ public class UserController {
         } else {
             return "redirect:/Login/login?error";
         }
+
     }
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate(); // 세션 무효화 (사용자 정보 삭제)
+        return "redirect:/login"; // 로그아웃 후 로그인 페이지로 이동
+    }
+
 }

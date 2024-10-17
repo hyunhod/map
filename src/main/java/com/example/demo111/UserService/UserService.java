@@ -4,6 +4,7 @@ import com.example.demo111.UserDomain.NUser;
 import com.example.demo111.UserRepository.UserRepository;
 import org.springframework.stereotype.Service;
 
+
 @Service
 public class UserService {
 
@@ -23,7 +24,7 @@ public class UserService {
         return userRepository.findByUsername(username) != null;
     }
 
-    // 로그인 검증 로직
+    // 로그인 검증
     public NUser authenticate(String username, String password) {
         // 데이터베이스에서 사용자 정보 확인
         NUser NUser = userRepository.findByUsername(username);
@@ -32,4 +33,6 @@ public class UserService {
         }
         return null; // 인증 실패
     }
+
+
 }
