@@ -43,7 +43,13 @@ public class PostController {
     }
     // 게시글 상세 보기
     @GetMapping("/{id}")
-    public String viewPost(@PathVariable Long id, Model model) {
+    public String viewPost(@PathVariable Long id, Model model,HttpSession session) {
+
+        String username = (String) session.getAttribute("username");
+        if (username == null) {
+            // 로그인된 사용자가 없을 경우, 로그인 페이지로 리다이렉트
+            return "redirect:/login";
+        }
         Post post = postService.findById(id);
         model.addAttribute("post", post);
         List<NComment> comments = post.getComments(); // 해당 게시글의 댓글 목록 가져오기
