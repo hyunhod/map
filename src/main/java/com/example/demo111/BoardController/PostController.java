@@ -3,6 +3,7 @@ package com.example.demo111.BoardController;
 import com.example.demo111.BoardDomain.NComment;
 import com.example.demo111.BoardDomain.Post;
 import com.example.demo111.BoardService.PostService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,9 @@ public class PostController {
 
     // 게시글 작성 후 저장
     @PostMapping("/save")
-    public String createPost(@ModelAttribute Post post) {
+    public String createPost(@ModelAttribute Post post, HttpSession session) {
+        String username = (String)session.getAttribute("username");
+        post.setAuthor(username);
         postService.save(post); // 게시글 저장
         return "redirect:/board"; // 게시글 목록으로 리다이렉트
     }
