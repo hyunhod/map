@@ -67,4 +67,24 @@ public class UserController {
         return "redirect:/login"; // 로그아웃 후 로그인 페이지로 이동
     }
 
+    @GetMapping("/findUsername")
+    public String showFindUsernamePage() {
+        return "findUsername";
+    }
+
+    @PostMapping("/findUsername")
+    public String findUsername(@RequestParam("email") String email, Model model) {
+        String username = userService.findUsernameByEmail(email);
+
+        if (username != null) {
+            model.addAttribute("username", username);
+            return "foundUsername"; // 아이디가 발견되면 결과 페이지로 이동
+        } else {
+            model.addAttribute("error", "이메일로 등록된 아이디를 찾을 수 없습니다.");
+            return "findUsername";
+        }
+    }
+
+
+
 }

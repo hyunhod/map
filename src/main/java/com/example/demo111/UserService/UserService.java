@@ -4,6 +4,8 @@ import com.example.demo111.UserDomain.NUser;
 import com.example.demo111.UserRepository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class UserService {
@@ -34,5 +36,10 @@ public class UserService {
         return null; // 인증 실패
     }
 
+
+    public String findUsernameByEmail(String email) {
+        Optional<NUser> user = userRepository.findByEmail(email);
+        return user.map(NUser::getUsername).orElse(null);
+    }
 
 }

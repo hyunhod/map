@@ -14,4 +14,12 @@ public class NCommentService {
     public void save(NComment comment){
         commentRepository.save(comment);
     }
+
+    public NComment findById(Long id) {
+        return commentRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+    }
+
+    public void deleteById(Long id) {
+        commentRepository.deleteById(id);
+    }
 }
