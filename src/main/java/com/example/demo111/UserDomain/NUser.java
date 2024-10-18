@@ -18,4 +18,5 @@ public class NUser {
     private String password;
     private String email;
 
+
 }

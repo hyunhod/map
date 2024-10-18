@@ -42,4 +42,17 @@ public class UserService {
         return user.map(NUser::getUsername).orElse(null);
     }
 
+    // 사용자 검증 (아이디와 이름이 일치하는지 확인)
+    public boolean validateUser(String username, String email) {
+        Optional<NUser> user = userRepository.findByUsernameAndEmail(username, email);
+        return user.isPresent();
+    }
+
+    // 비밀번호 업데이트
+    public void updatePassword(String username, String newPassword) {
+        NUser user = userRepository.findByUsername(username);
+        user.setPassword(newPassword); // 비밀번호는 실제로 암호화하는 게 좋습니다 (예: BCrypt)
+        userRepository.save(user);
+    }
+
 }

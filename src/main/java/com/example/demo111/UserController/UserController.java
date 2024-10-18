@@ -69,7 +69,7 @@ public class UserController {
 
     @GetMapping("/findUsername")
     public String showFindUsernamePage() {
-        return "findUsername";
+        return "/Login/findUsername";
     }
 
     @PostMapping("/findUsername")
@@ -78,12 +78,34 @@ public class UserController {
 
         if (username != null) {
             model.addAttribute("username", username);
-            return "foundUsername"; // 아이디가 발견되면 결과 페이지로 이동
+            return "/Login/foundUsername"; // 아이디가 발견되면 결과 페이지로 이동
         } else {
             model.addAttribute("error", "이메일로 등록된 아이디를 찾을 수 없습니다.");
-            return "findUsername";
+            return "/Login/findUsername";
         }
     }
+
+    @GetMapping("/findPassword")
+    public String showFindPasswordPage() {
+        return "/Login/findPassword";
+    }
+
+    @PostMapping("/findPassword")
+    public String findPassword(@RequestParam("username") String username,
+                               @RequestParam("email") String email,
+                               @RequestParam("newPassword") String newPassword) {
+        // 서비스에서 사용자 확인
+        boolean isUserValid = userService.validateUser(username, email);
+        if (isUserValid) {
+            // 유저가 맞으면 비밀번호 업데이트
+            userService.updatePassword(username, newPassword);
+            return "redirect:/login?passwordResetSuccess"; // 성공 시 로그인 페이지로 이동
+        } else {
+            // 실패 시 다시 찾기 페이지로 리다이렉트
+            return "redirect:/findPassword?error";
+        }
+    }
+
 
 
 
