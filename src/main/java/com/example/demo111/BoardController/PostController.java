@@ -57,5 +57,25 @@ public class PostController {
         return "Board/view"; // 게시글 상세 보기 페이지
     }
 
+    @PostMapping("/delete/{id}")
+    public String deletePost(@PathVariable Long id, HttpSession session) {
+        Post post = postService.findById(id);
+
+        // 세션에서 로그인한 사용자 정보 가져오기
+        String loggedInUsername = (String) session.getAttribute("username");
+
+        System.out.println("1111: "+post.getAuthor());
+        System.out.println("22222 "+loggedInUsername);
+        // 게시글 작성자와 로그인한 사용자가 동일한지 확인
+        if (!post.getAuthor().equals(loggedInUsername)) {
+            // 삭제 권한이 없을 경우 에러 페이지로 리다이렉트
+            return "redirect:/error?unauthorized";
+        }
+
+        postService.deleteById(id); // 게시글 삭제
+        return "redirect:/board";
+    }
+
+
 
 }
