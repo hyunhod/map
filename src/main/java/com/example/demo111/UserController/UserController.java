@@ -34,7 +34,13 @@ public class UserController {
         // 아이디 중복 체크
         if (userService.existsByUsername(username)) {
             model.addAttribute("errorMessage", "사용 중인 아이디입니다. 다른 아이디를 선택하세요.");
-            return "register"; // 에러 메시지와 함께 회원가입 페이지로 리턴
+            return "/Login/register"; // 에러 메시지와 함께 회원가입 페이지로 리턴
+        }
+
+        // 비밀번호 유효성 체크
+        if (!validatePassword(password)) {
+            model.addAttribute("errorMessage", "비밀번호는 최소 8자리이며, 숫자, 대문자, 소문자, 특수 문자를 포함해야 합니다.");
+            return "/Login/register"; // 에러 메시지와 함께 회원가입 페이지로 리턴
         }
 
 
@@ -45,6 +51,13 @@ public class UserController {
 
         userService.saveUser(newUser); // 회원 정보 저장
         return "redirect:/login"; // 회원가입 후 로그인 페이지로 리다이렉트
+    }
+
+    // 비밀번호 유효성 검사 메서드
+    private boolean validatePassword(String password) {
+        // 최소 8자, 숫자, 대문자, 소문자, 특수문자 포함하는 정규식
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#\\$%\\^&\\*])(?=\\S+$).{8,}$";
+        return password.matches(passwordPattern);
     }
 
 
