@@ -107,10 +107,6 @@ public class SearchController {
                 }
             }
 
-            // 중복 제거를 위해 Set 사용
-            Set<String> uniqueTopApartmentsSet = new HashSet<>(finalTopApartments);
-            finalTopApartments = new ArrayList<>(uniqueTopApartmentsSet);
-
             // 필요한 경우 상위 20개 아파트만 선택
             finalTopApartments = finalTopApartments.stream()
                     .limit(20)
