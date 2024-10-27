@@ -230,6 +230,31 @@
     <div class="chart-container" id="chart-Container" style="display: none;">
         <canvas id="priceChart"></canvas>
     </div>
+
+    <div class="container mt-5">
+        <div class="search-criteria row">
+            <div class="col-md-3 mb-3"> <!-- col-md-3는 화면 크기에 따라 비율 조정 -->
+                <label for="minPrice">최소 가격:</label>
+                <input type="number" id="minPrice" placeholder="최소 가격(단위:억)" class="form-control">
+            </div>
+
+            <div class="col-md-3 mb-3"> <!-- col-md-3는 화면 크기에 따라 비율 조정 -->
+                <label for="maxPrice">최대 가격:</label>
+                <input type="number" id="maxPrice" placeholder="최대 가격(단위:억)" class="form-control">
+            </div>
+
+            <div class="col-md-3 mb-3"> <!-- col-md-3는 화면 크기에 따라 비율 조정 -->
+                <label for="minArea">최소 면적:</label>
+                <input type="number" id="minArea" placeholder="최소 면적(제곱미터)" class="form-control">
+            </div>
+
+            <div class="col-md-3 mb-3"> <!-- col-md-3는 화면 크기에 따라 비율 조정 -->
+                <label for="maxArea">최대 면적:</label>
+                <input type="number" id="maxArea" placeholder="최대 면적(제곱미터)" class="form-control">
+            </div>
+        </div>
+    </div>
+
     <div id="address-list"></div>
 
 
@@ -245,19 +270,6 @@
                 </tr>
                 </thead>
 
-                <div class="search-criteria">
-                    <label for="minPrice">최소 가격:</label>
-                    <input type="number" id="minPrice" placeholder="최소 가격">
-
-                    <label for="maxPrice">최대 가격:</label>
-                    <input type="number" id="maxPrice" placeholder="최대 가격">
-
-                    <label for="minArea">최소 면적:</label>
-                    <input type="number" id="minArea" placeholder="최소 면적">
-
-                    <label for="maxArea">최대 면적:</label>
-                    <input type="number" id="maxArea" placeholder="최대 면적">
-                </div>
 
 
 
@@ -453,8 +465,8 @@ function fetchPriceHistory(aptNm) {
 //이름 불러오기
 function loadApartmentDetails(apartmentName,page=0,size=5) {
 
-const minPrice = document.getElementById('minPrice').value || 0; // 값이 없을 경우 0으로 설정
-    const maxPrice = document.getElementById('maxPrice').value || 999999999;
+const minPrice = document.getElementById('minPrice').value *10000|| 0; // 값이 없을 경우 0으로 설정
+    const maxPrice = document.getElementById('maxPrice').value *10000 || 999999999;
     const minArea = document.getElementById('minArea').value || 0;
     const maxArea = document.getElementById('maxArea').value || 999999999;
 // 값 확인을 위한 로그
