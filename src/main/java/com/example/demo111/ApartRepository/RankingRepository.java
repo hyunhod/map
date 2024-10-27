@@ -71,4 +71,19 @@ public interface RankingRepository extends JpaRepository<TransactionRanking,Long
             "ORDER BY transactionCount DESC")
     List<Object[]> findAllTopAptsByTransactionCount();
 
+
+    @Query("SELECT t FROM TransactionRanking t WHERE t.aptNm = :aptNm " +
+            "AND (:minPrice IS NULL OR t.dealAmount >= :minPrice) " +
+            "AND (:maxPrice IS NULL OR t.dealAmount <= :maxPrice) " +
+            "AND (:minArea IS NULL OR t.excluUseAr >= :minArea) " +
+            "AND (:maxArea IS NULL OR t.excluUseAr <= :maxArea)")
+    Page<TransactionRanking> findTransactionsWithFilters(@Param("aptNm") String aptNm,
+                                                         @Param("minPrice") Integer minPrice,
+                                                         @Param("maxPrice") Integer maxPrice,
+                                                         @Param("minArea") Double minArea,
+                                                         @Param("maxArea") Double maxArea,
+                                                         Pageable pageable);
+
 }
+
+

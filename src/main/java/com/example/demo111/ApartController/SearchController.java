@@ -202,10 +202,15 @@ public class SearchController {
 
     @GetMapping("/getApartmentDetails")
     @ResponseBody
-    public Map<String, Object> getApartmentDetails(@RequestParam String name
-            , @PageableDefault(page = 0, size = 5) Pageable pageable) {
-        // 해당 아파트 이름에 따른 거래 정보를 조회
-        Page<TransactionRanking> transactionsPage = rankingService.getTransactionsByAptNm(name,pageable);
+    public Map<String, Object> getApartmentDetails(@RequestParam String name,
+                                                   @RequestParam(required = false) Integer minPrice, // 최소 가격 필터
+                                                   @RequestParam(required = false) Integer maxPrice, // 최대 가격 필터
+                                                   @RequestParam(required = false) Double minArea,   // 최소 면적 필터
+                                                   @RequestParam(required = false) Double maxArea,   // 최대 면적 필터
+             @PageableDefault(page = 0, size = 5) Pageable pageable) {
+        System.out.println("miPrice :"+minPrice);
+        // 해당 아파트 이름과 필터 조건에 따른 거래 정보를 조회
+        Page<TransactionRanking> transactionsPage = rankingService.getFilteredTransactions(name, minPrice, maxPrice, minArea, maxArea, pageable);
 
 
         // 아파트 정보 반환

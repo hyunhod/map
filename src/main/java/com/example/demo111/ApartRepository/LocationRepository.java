@@ -24,4 +24,8 @@ public interface LocationRepository extends JpaRepository<Location,Long> {
     // 지역 코드로 페이징된 거래 정보 가져오기
     Page<Location> findByRegionCode(String regionCode, Pageable pageable);
 
+
+
+
+
 }

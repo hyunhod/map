@@ -241,6 +241,12 @@ public class RankingService {
     }
 
 
+    public Page<TransactionRanking> getFilteredTransactions(String aptNm, Integer minPrice,Integer maxPrice ,Double minArea, Double maxArea, Pageable pageable) {
+        // 필터 조건을 기반으로 거래 내역을 조회
+        return rankingRepository.findTransactionsWithFilters(aptNm, minPrice, maxPrice, minArea, maxArea, pageable);
+    }
+
+
 }
 
 
