@@ -6,66 +6,79 @@
     <title>거래 검색</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=c74df985d80b0746ec2b535f9e18c2a1&libraries=services,drawing"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0"></script>
 
     <style>
-        /* 기본 레이아웃 */
-        .container {
-            max-width: 1200px;
-            margin: auto;
-            padding-top: 30px;
-        }
 
-        #map {
-            width: 100%;
-            height: 400px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
 
-        .bar {
-            height: 30px;
-            background: linear-gradient(135deg, #36a2eb, #4bc0c0);
-            position: relative;
-            margin: 5px 0;
-            transition: width 0.3s ease;
-            border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
+    /* 기본 레이아웃 */
+    .container {
+        max-width: 1200px;
+        margin: auto;
+        padding-top: 30px;
+    }
 
-        .bar-text {
-            position: absolute;
-            color: #fff;
-            font-weight: bold;
-            font-size: 0.7em;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-        }
+    #map {
+        width: 100%;
+        height: 400px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
 
-        .bar-container {
-            height: 70%;
-            margin: 20px 0;
-            padding-left: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
+    .bar {
+        height: 30px;
+        background:linear-gradient(to right, rgba(173, 216, 230, 0.7), rgba(0, 0, 255, 0.7));
+        position: relative;
+        margin: 5px 0;
+        transition: width 0.3s ease;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
 
-        /* 홈 버튼 */
-        .home-button {
-            margin: 20px auto;
-            width: 200px;
-        }
+    .bar-text {
+        position: absolute;
+        color: #fff;
+        font-weight: bold;
+        font-size: 0.7em;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
 
-        /* 헤더 레이아웃 */
-        .header-container {
-            margin-bottom: 20px;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
+    .bar-container {
+        height: 70%;
+        margin: 20px 0;
+        padding-left: 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+    }
 
-        .chart-container {
-            margin-top: 20px;
+    /* 홈 버튼 */
+    .home-button {
+        margin: 20px auto;
+        width: 200px;
+    }
+    .apartment-link {
+color: #ffffff; /* 텍스트 색을 흰색으로 설정 */
+padding-left: 12px; /* 텍스트 좌측 간격 */
+text-decoration: none; /* 텍스트 밑줄 제거 */
+position: absolute; /* 막대 중앙에 텍스트 위치 */
+top: 50%; /* 세로 가운데 정렬 */
+transform: translateY(-50%); /* 가운데 정렬 보정 */
+}
+
+
+
+    /* 헤더 레이아웃 */
+    .header-container {
+        margin-bottom: 20px;
+        padding: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-container {
+        margin-top: 20px;
     </style>
 </head>
 <body>
@@ -98,281 +111,279 @@
             </form>
         </div>
     </div>
-
-<div id="map"></div>
-<div class="chart-container" id="chart-Container" style="display: none;">
-    <canvas id="priceChart"></canvas>
-</div>
-
-
-<script>
-
-    var mapContainer = document.getElementById('map'),
-        mapOption = {
-            center: new kakao.maps.LatLng(37.5665, 126.9780),
-            level: 3
-        };
-
-    var map = new kakao.maps.Map(mapContainer, mapOption);
-    var geocoder = new kakao.maps.services.Geocoder();
-    var marker = new kakao.maps.Marker();
-
-    function searchAddress() {
-        var address = document.getElementById('address').value;
-        geocoder.addressSearch(address, function(result, status) {
-            if (status === kakao.maps.services.Status.OK) {
-                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                marker.setPosition(coords);
-                marker.setMap(map);
-                map.setCenter(coords);
-            } else {
-                alert('주소를 찾을 수 없습니다.');
-            }
-        });
-    }
+    <div id="map"></div>
+    <div class="chart-container" id="chart-Container" style="display: none;">
+        <canvas id="priceChart"></canvas>
+    </div>
 
 
+    <script>
 
-    $(document).ready(function() {
-        $('#region').change(function() {
-            var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
+        var mapContainer = document.getElementById('map'),
+            mapOption = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780),
+                level: 3
+            };
 
-            $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+        var geocoder = new kakao.maps.services.Geocoder();
+        var marker = new kakao.maps.Marker();
 
-            if (regionCode) {
-                // AJAX 요청을 통해 세부 지역 가져오기
-                $.get('/sub-locations', { regionCode: regionCode }, function(data) {
-                    data.forEach(function(loc) {
-                        $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
-                    });
-                });
-            }
-        });
-
-        // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
-        $('#locationName').on('change', function() {
-            var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
-        });
-    });
-
-
-    function showOnMap(umdNm, jibun, aptNm) {
-        var address = umdNm + " " + jibun;
-        geocoder.addressSearch(address, function(result, status) {
-         console.log(result, status); // 결과 및 상태 확인
-            if (status === kakao.maps.services.Status.OK) {
-                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                marker.setPosition(coords);
-                marker.setMap(map);
-                map.setCenter(coords);
-
-            } else {
-                alert('주소를 찾을 수 없습니다.');
-            }
-        });
-    }
-
-
-
-let priceChart; // 차트 전역 변수
-
-// 가격 이력을 가져오는 함수
-function fetchPriceHistory(aptNm) {
-console.log(aptNm);
-    fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
-        .then(response => response.json())
-        .then(data => {
-            const detailsDiv = document.getElementById('apartment-details');
-
-            // 거래 데이터를 월별로 집계
-            const monthlyData = {};
-            data.forEach(transaction => {
-                const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
-                if (!monthlyData[monthKey]) {
-                    monthlyData[monthKey] = { total: 0, count: 0 };
+        function searchAddress() {
+            var address = document.getElementById('address').value;
+            geocoder.addressSearch(address, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    marker.setPosition(coords);
+                    marker.setMap(map);
+                    map.setCenter(coords);
+                } else {
+                    alert('주소를 찾을 수 없습니다.');
                 }
-                monthlyData[monthKey].total += transaction.dealAmount;
-                monthlyData[monthKey].count++;
+            });
+        }
+
+
+
+        $(document).ready(function() {
+            $('#region').change(function() {
+                var regionCode = $(this).val(); // 선택된 지역 코드 가져오기
+
+                $('#locationName').empty().append('<option value="">선택하세요</option>'); // 세부 지역 드롭다운 초기화
+
+                if (regionCode) {
+                    // AJAX 요청을 통해 세부 지역 가져오기
+                    $.get('/sub-locations', { regionCode: regionCode }, function(data) {
+                        data.forEach(function(loc) {
+                            $('#locationName').append('<option value="' + loc + '">' + loc + '</option>');
+                        });
+                    });
+                }
             });
 
-            // 월별 평균 가격 계산
-            const labels = [];
-            const prices = [];
-            for (const month in monthlyData) {
-                labels.push(month);
-                prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
-            }
-   // 이전 차트가 존재하면 파괴
-            if (priceChart) {
-                priceChart.destroy();
-            }
-            // Chart.js를 이용해 그래프 그리기
-            const ctx = document.getElementById('priceChart').getContext('2d');
+            // 세부 지역 드롭다운이 업데이트 된 후에 이벤트 리스너 추가
+            $('#locationName').on('change', function() {
+                var selectedLocationCode = $(this).val(); // 선택된 세부 지역 코드 가져오기
+            });
+        });
 
 
-            priceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '아파트 가격 (억원)',
-                        data: prices,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderWidth: 1,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                     maintainAspectRatio: false, // 종횡비를 유지하지 않으려면 false로 설정
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '가격 (억원)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: '날짜'
+        function showOnMap(umdNm, jibun, aptNm) {
+            var address = umdNm + " " + jibun;
+            geocoder.addressSearch(address, function(result, status) {
+             console.log(result, status); // 결과 및 상태 확인
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    marker.setPosition(coords);
+                    marker.setMap(map);
+                    map.setCenter(coords);
+
+                } else {
+                    alert('주소를 찾을 수 없습니다.');
+                }
+            });
+        }
+
+
+
+    let priceChart; // 차트 전역 변수
+
+    // 가격 이력을 가져오는 함수
+    function fetchPriceHistory(aptNm) {
+        fetch(`/price-history?aptNm=${encodeURIComponent(aptNm)}`)
+            .then(response => response.json())
+            .then(data => {
+                const detailsDiv = document.getElementById('apartment-details');
+
+                // 거래 데이터를 월별로 집계
+                const monthlyData = {};
+                data.forEach(transaction => {
+                    const monthKey = `${transaction.dealYear}-${transaction.dealMonth}`;
+                    if (!monthlyData[monthKey]) {
+                        monthlyData[monthKey] = { total: 0, count: 0 };
+                    }
+                    monthlyData[monthKey].total += transaction.dealAmount;
+                    monthlyData[monthKey].count++;
+                });
+
+                // 월별 평균 가격 계산
+                const labels = [];
+                const prices = [];
+                for (const month in monthlyData) {
+                    labels.push(month);
+                    prices.push(monthlyData[month].total / monthlyData[month].count / 10000); // 억 단위로 변환
+                }
+       // 이전 차트가 존재하면 파괴
+                if (priceChart) {
+                    priceChart.destroy();
+                }
+                // Chart.js를 이용해 그래프 그리기
+                const ctx = document.getElementById('priceChart').getContext('2d');
+
+
+                priceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '아파트 가격 (억원)',
+                            data: prices,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 1,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                         maintainAspectRatio: false, // 종횡비를 유지하지 않으려면 false로 설정
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: '가격 (억원)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: '날짜'
+                                }
                             }
                         }
                     }
-                }
+                });
+            })
+            .catch(error => {
+                console.error(error);
             });
-        })
-        .catch(error => {
-            console.error(error);
-        });
-}
+    }
 
 
 
 
 
-//이름 불러오기
-function loadApartmentDetails(apartmentName,page=0,size=10) {
- const chartContainer = document.getElementById('chart-Container'); // chart-Container DOM 요소 참조 추가
-    const detailsDiv = document.getElementById('apartment-details');
-     chartContainer.style.display = 'block';
+    //이름 불러오기
+    function loadApartmentDetails(apartmentName,page=0,size=10) {
+     const chartContainer = document.getElementById('chart-Container'); // chart-Container DOM 요소 참조 추가
+        const detailsDiv = document.getElementById('apartment-details');
+         chartContainer.style.display = 'block';
 
-    // 아파트 상세 정보 가져오기
-    fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)
-        .then(response => response.json())
-        .then(data => {
-        showOnMap(data.umdNm, data.jibun,data.aptNm);
+        // 아파트 상세 정보 가져오기
+        fetch(`/getApartmentDetails?name=${encodeURIComponent(apartmentName)}&page=${page}&size=${size}`)
+            .then(response => response.json())
+            .then(data => {
+            showOnMap(data.umdNm, data.jibun,data.aptNm);
 
-         // detailsDiv 초기화
-        detailsDiv.innerHTML = ''; // 내용을 비워서 이전 데이터를 제거
+             // detailsDiv 초기화
+            detailsDiv.innerHTML = ''; // 내용을 비워서 이전 데이터를 제거
 
-            if (!data || !data.transactions || data.transactions.length === 0) {
-                detailsDiv.innerHTML += `<p>거래 정보가 없습니다.</p>`;
-                return;
-            }
+                if (!data || !data.transactions || data.transactions.length === 0) {
+                    detailsDiv.innerHTML += `<p>거래 정보가 없습니다.</p>`;
+                    return;
+                }
 
-            // 추가적인 아파트 상세 정보 표시
-            detailsDiv.innerHTML += `
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>건축년도</th>
-                            <th>가격</th>
-                            <th>전용면적</th>
-                            <th>거래일자</th>
-                            <th>층</th>
-                            <th>법정동</th>
-                            <th>지번</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${data.transactions.map(transaction => `
+                // 추가적인 아파트 상세 정보 표시
+                detailsDiv.innerHTML += `
+                    <table class="table">
+                        <thead>
                             <tr>
-                                <td>${transaction.buildYear}</td>
-                                <td>${transaction.dealAmount / 10000}억</td>
-                                <td>${transaction.excluUseAr}</td>
-                                <td>${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}</td>
-                                <td>${transaction.floor}</td>
-                                <td>${transaction.umdNm}</td>
-                                <td>${transaction.jibun}</td>
+                                <th>건축년도</th>
+                                <th>가격</th>
+                                <th>전용면적</th>
+                                <th>거래일자</th>
+                                <th>층</th>
+                                <th>법정동</th>
+                                <th>지번</th>
                             </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+                        </thead>
+                        <tbody>
+                            ${data.transactions.map(transaction => `
+                                <tr>
+                                    <td>${transaction.buildYear}</td>
+                                    <td>${transaction.dealAmount / 10000}억</td>
+                                    <td>${transaction.excluUseAr}</td>
+                                    <td>${transaction.dealYear}-${transaction.dealMonth}-${transaction.dealDay}</td>
+                                    <td>${transaction.floor}</td>
+                                    <td>${transaction.umdNm}</td>
+                                    <td>${transaction.jibun}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
 
-             // 페이지 네이션 추가
-            addPaginationControls(apartmentName, data.currentPage, data.totalPages);
+                 // 페이지 네이션 추가
+                addPaginationControls(apartmentName, data.currentPage, data.totalPages);
 
 
-        })
-        .catch(error => {
-            console.error('Error fetching apartment details:', error);
-            detailsDiv.innerHTML += `<p>상세 정보를 불러오는 데 오류가 발생했습니다.</p>`;
-        });
+            })
+            .catch(error => {
+                console.error('Error fetching apartment details:', error);
+                detailsDiv.innerHTML += `<p>상세 정보를 불러오는 데 오류가 발생했습니다.</p>`;
+            });
 
-    // 가격 이력 불러오기
-    fetchPriceHistory(apartmentName);
+        // 가격 이력 불러오기
+        fetchPriceHistory(apartmentName);
 
-}
+    }
 
 
-    document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.apartment-link').forEach(link => {
-        link.addEventListener('click', function (event) {
-            event.preventDefault(); // 기본 링크 동작 방지
-            const apartmentName = this.getAttribute('data-apartment');
-            loadApartmentDetails(apartmentName); // 아파트 이름을 가져와서 함수 호출
+        document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.apartment-link').forEach(link => {
+            link.addEventListener('click', function (event) {
+                event.preventDefault(); // 기본 링크 동작 방지
+                const apartmentName = this.getAttribute('data-apartment');
+                loadApartmentDetails(apartmentName); // 아파트 이름을 가져와서 함수 호출
+            });
         });
     });
-});
 
 
 
 
 
-    // 페이지 네이션 컨트롤 추가
-function addPaginationControls(apartmentName, currentPage, totalPages) {
-    const detailsDiv = document.getElementById('apartment-details');
+        // 페이지 네이션 컨트롤 추가
+    function addPaginationControls(apartmentName, currentPage, totalPages) {
+        const detailsDiv = document.getElementById('apartment-details');
 
-   let paginationHtml = '<div class="pagination">';
-if (currentPage > 0) {
-    paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage - 1})">이전</a>`;
-}
-// 현재 페이지와 총 페이지 수 표시
-paginationHtml += `<span>${currentPage + 1} / ${totalPages}</span> `;
-if (currentPage < totalPages - 1) {
-    paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage + 1})">다음</a>`;
-}
-paginationHtml += '</div>';
+       let paginationHtml = '<div class="pagination">';
+    if (currentPage > 0) {
+        paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage - 1})">이전</a>`;
+    }
+    // 현재 페이지와 총 페이지 수 표시
+    paginationHtml += `<span>${currentPage + 1} / ${totalPages}</span> `;
+    if (currentPage < totalPages - 1) {
+        paginationHtml += `<a href="javascript:void(0)" class="pagination-link" onclick="loadApartmentDetails('${apartmentName}', ${currentPage + 1})">다음</a>`;
+    }
+    paginationHtml += '</div>';
 
-    detailsDiv.innerHTML += paginationHtml;
-}
+        detailsDiv.innerHTML += paginationHtml;
+    }
 
 
-</script>
+    </script>
 
-<!-- 막대그래프 표시 -->
-<div class="container-fluid d-flex">
-<div class="bar-container col-md-7">
-    <th:block th:each="apartment, iterStat : ${topApartments}">
-        <div class="bar"
-             th:style="'width: ' + (${transactionCounts[iterStat.index]} / ${maxTransactionCount} * 100) + '%'">
-            <!-- 상대 길이 설정 -->
-            <a href="#" class="apartment-link"
-               th:data-apartment="${apartment}"
-               th:text="${apartment} + ' (' + ${transactionCounts[iterStat.index]} + '건)'"></a>
+    <!-- 막대그래프 표시 -->
+    <div class="container-fluid d-flex">
+        <div class="bar-container col-md-7">
+            <th:block th:each="apartment, iterStat : ${topApartments}">
+                <div class="bar"
+                     th:style="'width: ' + (${transactionCounts[iterStat.index]} / ${maxTransactionCount} * 100) + '%'">
+                    <!-- 상대 길이 설정 -->
+                    <a href="#" class="apartment-link"
+                       th:data-apartment="${apartment}"
+                       th:text="${apartment} + ' (' + ${transactionCounts[iterStat.index]} + '건)'"></a>
+                </div>
+            </th:block>
         </div>
-    </th:block>
-</div>
 
-<div class="col-md-5" id="apartment-details">
-</div>
-</div>
+        <div class="col-md-5" id="apartment-details">
+        </div>
+    </div>
 
-<!-- 홈 버튼 -->
-<a href="/" class="btn btn-primary mb-3">홈</a>
+    <!-- 홈 버튼 -->
+    <a href="/" class="btn btn-primary mb-3">홈</a>
 </body>
 </html>
