@@ -10,96 +10,95 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0"></script>
 
     <style>
+        /* 기본 레이아웃 */
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding-top: 30px;
+        }
+
         #map {
-        width: 100%;
-        height: 400px; /* 원하는 크기로 설정하세요 */
-    }
-    .container {
-  display: flex;
-}
-.bar-container,
-#apartment-details {
-    padding: 0; /* 패딩 제거 */
-    margin: 0; /* 마진 제거 */
-}
+            width: 100%;
+            height: 400px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
 
         .bar {
-            height: 30px; /* 막대 높이 */
-            background: linear-gradient(135deg, #36a2eb, #4bc0c0); /* 그라데이션 색상 */
-            position: relative; /* 상대 위치 설정 */
-            margin: 5px 0; /* 상하 여백 */
-            transition: width 0.3s ease; /* 너비 변화 애니메이션 */
-            border-radius: 5px; /* 모서리 둥글게 */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+            height: 30px;
+            background: linear-gradient(135deg, #36a2eb, #4bc0c0);
+            position: relative;
+            margin: 5px 0;
+            transition: width 0.3s ease;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .bar-text {
             position: absolute;
             color: #fff;
             font-weight: bold;
-            margin-bottom: 5px; /* 텍스트와 막대 간 간격 설정 */
-            font-size: 0.7em; /* 폰트 크기 조정 */
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5); /* 텍스트 그림자 추가 */
+            font-size: 0.7em;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         .bar-container {
-
-            height: 70%; /* 그래프 높이를 전체의 80%로 설정 */
-            margin: 20px 0; /* 상하 여백 */
-            padding-left: 20px; /* 여백 설정 */
-            background-color: #fff; /* 배경 색상 */
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
-            border-radius: 8px; /* 모서리 둥글게 */
-            flex-grow: 1; /* 그래프가 가능한 공간을 채우도록 설정 */
-             width: 70%; /* 전체 너비를 70%로 설정 */
-
+            height: 70%;
+            margin: 20px 0;
+            padding-left: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
 
-        .bar:hover {
-            transform: translateY(-5px) scale(1.05); /* 호버 시 약간 위로 이동 및 확대 */
-        }
-
-        /* 홈 버튼을 페이지의 맨 아래에 고정 */
+        /* 홈 버튼 */
         .home-button {
-            margin: 20px auto; /* 상하 여백 및 중앙 정렬 */
-            width: 200px; /* 버튼 너비 설정 */
+            margin: 20px auto;
+            width: 200px;
         }
 
+        /* 헤더 레이아웃 */
         .header-container {
-            display: flex; /* Flexbox 사용 */
-            justify-content: space-between; /* 양쪽 끝으로 정렬 */
-            align-items: center; /* 세로 중앙 정렬 */
-            margin-bottom: 20px; /* 아래 여백 추가 */
+            margin-bottom: 20px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
+
+        .chart-container {
+            margin-top: 20px;
     </style>
 </head>
 <body>
-<div class="container-fluid mt-5 px-0"> <!-- container-fluid로 전체 너비 사용 -->
-    <div class="header-container d-flex justify-content-between align-items-center">
-        <div class="flex-grow-1 text-center">
-            <h1 class="m-0">인기 아파트 Top 20</h1> <!-- m-0 클래스를 사용하여 여백 제거 -->
-        </div>
-        <form action="/aptRanking" method="GET" class="form-inline">
-            <div class="form-group mb-2">
-                <label for="region" class="mr-2">지역</label>
-                <select id="region" name="region" class="form-control" required>
-                    <option value="">선택하세요</option>
-                    <th:block th:each="entry : ${locations}">
-                        <option th:value="${entry.value}" th:text="${entry.key}"></option>
-                    </th:block>
-                </select>
-            </div>
-            <div class="form-group mb-2 mx-2">
-                <label for="locationName" class="mr-2">세부 지역</label>
-                <select id="locationName" name="locationName" class="form-control" required>
-                    <option value="">선택하세요</option>
-                    <!-- 세부 지역은 JavaScript를 통해 동적으로 추가됩니다 -->
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary mb-2">검색</button>
-        </form>
+<div class="container">
+    <!-- Header -->
+    <div class="header-container text-center bg-light rounded p-3">
+        <h1>인기 아파트 Top 20</h1>
     </div>
-</div>
+
+    <!-- Search Form -->
+    <div class="card my-4">
+        <div class="card-body">
+            <form action="/aptRanking" method="GET" class="form-inline">
+                <div class="form-group mx-2">
+                    <label for="region" class="mr-2">지역</label>
+                    <select id="region" name="region" class="form-control" required>
+                        <option value="">선택하세요</option>
+                        <th:block th:each="entry : ${locations}">
+                            <option th:value="${entry.value}" th:text="${entry.key}"></option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="form-group mx-2">
+                    <label for="locationName" class="mr-2">세부 지역</label>
+                    <select id="locationName" name="locationName" class="form-control" required>
+                        <option value="">선택하세요</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">검색</button>
+            </form>
+        </div>
+    </div>
+
 <div id="map"></div>
 <div class="chart-container" id="chart-Container" style="display: none;">
     <canvas id="priceChart"></canvas>
