@@ -149,7 +149,6 @@ public class SearchController {
             // 지역명으로 지역 정보를 조회
             List<Location> locations = locationService.findLocationByCityOrDistrict(locationName);
             Set<String> apartmentNames = new HashSet<>();
-
             // 모든 거래를 대상으로 아파트 이름 수집
             for (Location location : locations) {
                 String regionCode = location.getRegionCode(); // 지역 코드 얻기
@@ -165,20 +164,17 @@ public class SearchController {
                     .skip(pageable.getPageNumber() * pageable.getPageSize())
                     .limit(pageable.getPageSize())
                     .collect(Collectors.toList());
-
             // 아파트 이름에 대한 거래 내역을 가져옴
             for (String aptNm : pagedApartmentNames) {
                 List<TransactionRanking> transactions = rankingService.getTransactionsByAptNm(aptNm);
                 apartmentDetails.put(aptNm, transactions);
             }
-
             // 전체 페이지 수와 현재 페이지 설정
             int totalPages = (int) Math.ceil((double) totalApartments / pageable.getPageSize());
             model.addAttribute("totalPages", totalPages);
             model.addAttribute("currentPage", pageable.getPageNumber());
             model.addAttribute("apartmentNames", pagedApartmentNames);
             model.addAttribute("locationName", locationName);
-
         model.addAttribute("apartmentDetails", apartmentDetails);
         return "/Apt/aptSearchResults"; // 결과를 표시할 HTML 페이지로 이동
     }

@@ -153,7 +153,7 @@ public class MyController {
         model.addAttribute("endPage", endPage);
         long endTime = System.currentTimeMillis(); // 종료 시간 기록
         long duration = endTime - startTime; // 응답 시간 계산
-        System.out.println("응답 시간: " + duration + "ms");
+
 
         return "result"; // 결과 페이지 이름
     }
