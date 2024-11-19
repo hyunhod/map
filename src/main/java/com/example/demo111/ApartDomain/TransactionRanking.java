@@ -11,7 +11,6 @@ public class TransactionRanking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(name="이름")
     private String aptNm;
     @Column(name="건축년도")

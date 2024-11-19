@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class UserController {
-
     @Autowired
     private UserService userService;
 
@@ -42,8 +41,6 @@ public class UserController {
             model.addAttribute("errorMessage", "비밀번호는 최소 8자리이며, 숫자, 대문자, 소문자, 특수 문자를 포함해야 합니다.");
             return "/Login/register"; // 에러 메시지와 함께 회원가입 페이지로 리턴
         }
-
-
         NUser newUser = new NUser();
         newUser.setUsername(username);
         newUser.setPassword(password); // 나중에 패스워드 암호화 처리 필요
@@ -72,7 +69,6 @@ public class UserController {
         } else {
             return "redirect:/Login/login?error";
         }
-
     }
     @GetMapping("/logout")
     public String logout(HttpSession session) {

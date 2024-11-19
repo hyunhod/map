@@ -76,7 +76,6 @@ public class ApiService {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return response;
     }
     // API 호출 (pageNo, numOfRows는 필수가 아니므로 기본값 설정 가능)
@@ -121,9 +120,6 @@ public class ApiService {
                 lawdCd,
                 dealYmd,
                 numOfRows);
-
-
-
         ResponseEntity<String> responseEntity = get(url);
         if (responseEntity == null || responseEntity.getBody() == null) {
             System.out.println("No response body received.");
@@ -234,7 +230,6 @@ public class ApiService {
                     isFirstLine = false; // 첫 줄은 건너뜁니다.
                     continue;
                 }
-
                 String[] parts = line.split("\t"); // 탭으로 분리
                 if (parts.length > 0) {
                     String lawdCode = parts[0].trim(); // 법정동코드
@@ -248,7 +243,6 @@ public class ApiService {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return new ArrayList<>(lawdCodesSet); // List로 변환하여 반환
     }
 
@@ -293,7 +287,6 @@ public class ApiService {
             List<TransactionRanking> batchList = uniqueList.subList(i, Math.min(i + batchSize, uniqueList.size()));
             rankingRepository.saveAll(batchList);  // 배치로 데이터 저장
         }
-
     }
 
 }

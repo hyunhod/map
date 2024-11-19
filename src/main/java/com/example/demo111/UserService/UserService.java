@@ -9,23 +9,18 @@ import java.util.Optional;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
-
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
-
     // 회원 저장
     public void saveUser(NUser user) {
         userRepository.save(user);
     }
-
     // 아이디 중복 체크
     public boolean existsByUsername(String username) {
         return userRepository.findByUsername(username) != null;
     }
-
     // 로그인 검증
     public NUser authenticate(String username, String password) {
         // 데이터베이스에서 사용자 정보 확인
@@ -35,8 +30,6 @@ public class UserService {
         }
         return null; // 인증 실패
     }
-
-
     public String findUsernameByEmail(String email) {
         Optional<NUser> user = userRepository.findByEmail(email);
         return user.map(NUser::getUsername).orElse(null);

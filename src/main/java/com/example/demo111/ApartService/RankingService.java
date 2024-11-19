@@ -52,7 +52,6 @@ public class RankingService {
             ranking.setSlerGbn(item.getSlerGbn());
             ranking.setDealingGbn(item.getDealingGbn());
 
-
             if (item.getDealAmount() != null && !item.getDealAmount().isEmpty()) {
                 try {
                     String sanitizedAmount = item.getDealAmount().replace(",", ""); // 쉼표 제거
@@ -69,7 +68,6 @@ public class RankingService {
             rankings.add(ranking);
 
         }
-
 
         return rankings;
     }
@@ -114,11 +112,9 @@ public class RankingService {
     public List<TransactionRanking> getTop10BySggCd(String sggCd) {
         // 현재 날짜 가져오기
         LocalDate currentDate = LocalDate.now();
-
         // 지난달의 연도와 월 계산
         int year = currentDate.getYear();
         int month = currentDate.getMonthValue();
-
         // 이전 달을 가져오기 위해 조정
         if (month == 1) { // 1월이면 작년 12월로 설정
             year = year - 1;
@@ -126,12 +122,10 @@ public class RankingService {
         } else { // 나머지 달은 월을 감소
             month = month - 1; // 이전 달로 설정
         }
-
         // Pageable 생성
         Pageable pageable = PageRequest.of(0, 10);
         // 리포지토리 메서드 호출
         List<Object[]> results = rankingRepository.findTop10BySggCdAndDealAmount(sggCd, String.valueOf(year), String.valueOf(month), pageable);
-
         // 결과를 TransactionRanking 객체로 변환
         List<TransactionRanking> rankings = results.stream()
                 .map(result -> {
@@ -140,11 +134,8 @@ public class RankingService {
                     ranking.setDealAmount((Integer) result[1]); // 최대 가격
                     ranking.setExcluUseAr((Double) result[2]); // 전용면적
                     ranking.setEstateAgentSggNm((String) result[3]);
-
                     return ranking;
-                })
-                .collect(Collectors.toList());
-
+                }).collect(Collectors.toList());
         return rankings;
     }
 

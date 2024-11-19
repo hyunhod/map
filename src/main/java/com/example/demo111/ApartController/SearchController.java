@@ -62,9 +62,7 @@ public class SearchController {
                         transactionCounts.add(transactionCount);
                     }
                 }
-
             }
-
             // 필요한 경우 상위 20개 아파트만 선택
             finalTopApartments = finalTopApartments.stream()
                     .limit(20)
@@ -79,16 +77,11 @@ public class SearchController {
             model.addAttribute("topApartments", finalTopApartments);
             model.addAttribute("transactionCounts", transactionCounts);
             model.addAttribute("maxTransactionCount", maxTransactionCount); // 최대값 모델에 추가
-
-
             return "/Apt/aptRankingResults"; // search.html로 이동
         } else {
             locations = locationService.findLocationByCityOrDistrict(locationName);
-
-
             List<String> finalTopApartments = new ArrayList<>();
             List<Long> transactionCounts = new ArrayList<>(); // 거래 건수를 저장할 리스트
-
             for (Location location : locations) {
                 String regionCode = location.getRegionCode(); // 지역 코드 얻기
 

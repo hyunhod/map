@@ -118,7 +118,6 @@ transform: translateY(-50%); /* 가운데 정렬 보정 */
 
 
     <script>
-
         var mapContainer = document.getElementById('map'),
             mapOption = {
                 center: new kakao.maps.LatLng(37.5665, 126.9780),
@@ -142,8 +141,6 @@ transform: translateY(-50%); /* 가운데 정렬 보정 */
                 }
             });
         }
-
-
 
         $(document).ready(function() {
             $('#region').change(function() {
@@ -283,7 +280,6 @@ transform: translateY(-50%); /* 가운데 정렬 보정 */
                     detailsDiv.innerHTML += `<p>거래 정보가 없습니다.</p>`;
                     return;
                 }
-
                 // 추가적인 아파트 상세 정보 표시
                 detailsDiv.innerHTML += `
                     <table class="table">
